@@ -79,11 +79,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'modua',
-        'USER': 'webbuild',
+        'USER': 'root_webbuild',
         # TODO: Remove above webbuild user and password once the django build is done.
         # 'USER': 'website',
         'PASSWORD': 'happytime3.14',
-        'HOST': '127.0.0.1',
+        'HOST': 'local.dev',
         'PORT': '',
     }
 }
