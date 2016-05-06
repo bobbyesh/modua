@@ -1,6 +1,6 @@
 from django.test import TestCase, Client, RequestFactory
 from django.db import models
-from modua_app.string_processor import QueryString
+from modua_app.nondelimited_text import NonDelimitedText
 
 class TestDictionary(models.Model):
     word = models.CharField(max_length=15)
@@ -19,11 +19,6 @@ class TestRequests(TestCase):
         response = self.client.get("/lookup/foo")
         self.assertEqual(response.status_code, 200, "/lookup/foo resturns status code 200)")
 
-    def test_string_processor(self):
-        request = self.get_basic_request()
-        query_from_request = QueryString.from_request(request)
-        query_from_manual = QueryString(self.test_string, self.test_locale)
-        self.assertEqual(query_from_request, query_from_manual)
     
     def get_basic_request(self):
         string_pair = "string=" + self.test_string
@@ -34,7 +29,7 @@ class TestRequests(TestCase):
 
 
     def test_query_string_iter(self):
-        query = QueryString(self.test_string, self.test_locale)
-        test_list = ["天下無雙","天下無","天下","天"]
-        self.assertEqual(list(query), test_list)
+        text = NonDelimitedText(self.test_string, self.test_locale)
+        test_list = ["天","天下","天下無","天下無雙"]
+        self.assertEqual(list(text.sub_units), test_list)
 
