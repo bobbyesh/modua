@@ -11,6 +11,10 @@ To use for testing:
 
 To use for testing with coverage.py:
     python3 -m coverage manage.py test --settings=modua.settings.test
+    
+    or
+
+    coverage run manage.py test --settings=modua.settings.test
 
 """
 
