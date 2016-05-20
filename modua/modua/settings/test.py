@@ -10,7 +10,7 @@ To use for testing:
     python3 manage.py test --settings=modua.settings.test
 
 To use for testing with coverage.py:
-    python3 -m coverage manage.py test --settings=modua.settings.test
+    python3 -m coverage run manage.py test --settings=modua.settings.test
     
     or
 
