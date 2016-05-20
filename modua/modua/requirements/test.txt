@@ -1,10 +1,10 @@
 # test.txt
-# Requirements for the test environment
-# 
-#   Usage:
-#       pip install -r requirements/test.txt
+# Requirements file for maintaining dependencies.
+# Usage:
+#     python -m pip install -r test.txt
 
--r base.txt   # includes the base.txt requirements file
+# Includes requirements from base.txt
+-r base.txt
 
+# Requirements specific to testing
 coverage==4.0.3
-Django==1.9.6
