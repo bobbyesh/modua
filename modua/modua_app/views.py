@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+
 # Create your views here.
-def lookup(request):
-    return HttpResponse("good")
+def search(request):
+    return HttpResponse("good", status=200)
 
