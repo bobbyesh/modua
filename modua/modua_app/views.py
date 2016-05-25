@@ -1,8 +1,8 @@
-from django.shortcuts import render
 from django.http import HttpResponse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
-
-# Create your views here.
+@api_view(['GET'])
 def search(request):
-    return HttpResponse("good", status=200)
+    return Response(data=request.data)
 
