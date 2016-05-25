@@ -18,5 +18,5 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('modua_app.urls')),
+    url(r'^api/0.1/', include('modua_app.urls')),
 ]
