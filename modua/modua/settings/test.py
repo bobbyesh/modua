@@ -7,10 +7,10 @@ setup a way to maintain dependencies for using MySql locally as well as
 in production.
 
 To use for testing:
-    python3 manage.py test --settings=modua.settings.test
+    python manage.py test --settings=modua.settings.test
 
 To use for testing with coverage.py:
-    python3 -m coverage run manage.py test --settings=modua.settings.test
+    python -m coverage run manage.py test --settings=modua.settings.test
     
     or
 
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'modua',
+    'modua_app',
 ]
 
 MIDDLEWARE_CLASSES = [
