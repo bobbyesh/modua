@@ -8,8 +8,8 @@ from extras import CharNullField
 
 class Languages(models.Model):
     pk_languages_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    fk_user_added_lang_id = models.ForeignKey(User, related_name='fk_user_added_lang_id', null=True)
+    fk_user_updated_lang_id = models.ForeignKey(User, related_name='fk_user_updated_lang_id', null=True)
     #TODO: Create fulltext index in DB
     language = models.CharField(null=True, max_length=150)
     alphabet = models.CharField(null=True, max_length=300)
@@ -27,8 +27,8 @@ class Languages(models.Model):
 
 class Dictionary_Apis(models.Model):
     pk_dictionary_apis_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    fk_user_added_dic_id = models.ForeignKey(User, related_name='fk_user_added_dic_id', null=True)
+    fk_user_updated_dic_id = models.ForeignKey(User, related_name='fk_user_updated_dic_id', null=True)
     # TODO: Create fulltext index in DB
     api_name = models.CharField(null=True, max_length=150)
     # This should be Usage, notes, and known issues
@@ -57,8 +57,8 @@ class Dictionary_Apis(models.Model):
 
 class Word_Types(models.Model):
     pk_word_types_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    fk_user_added_word_id = models.ForeignKey(User, related_name='fk_user_added_word_id', null=True)
+    fk_user_updated_word_id = models.ForeignKey(User, related_name='fk_user_updated_word_id', null=True)
     word_type = models.CharField(null=True, max_length=150)
     added = models.DateTimeField(null=True, editable=False)
     updated = models.DateTimeField(null=True, editable=False)
@@ -102,8 +102,8 @@ class Definitions(models.Model):
 
 class Country(models.Model):
     pk_country_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    fk_user_added_country_id = models.ForeignKey(User, related_name='fk_user_added_country_id', null=True)
+    fk_user_updated_country_id = models.ForeignKey(User, related_name='fk_user_updated_country_id', null=True)
     country_name = models.CharField(null=True, max_length=250)
     added = models.DateTimeField(null=True, editable=False)
     updated = models.DateTimeField(null=True, editable=False)
@@ -120,9 +120,9 @@ class Country(models.Model):
 
 class Region(models.Model):
     pk_region_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_country_id = models.ForeignKey(Country, related_name='fk_country_id', null=True)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    fk_country_region_id = models.ForeignKey(Country, related_name='fk_country_region_id', null=True)
+    fk_user_added_region_id = models.ForeignKey(User, related_name='fk_user_added_region_id', null=True)
+    fk_user_updated_region_id = models.ForeignKey(User, related_name='fk_user_updated_region_id', null=True)
     region = models.CharField(null=True, max_length=300)
     added = models.DateTimeField(null=True, editable=False)
     updated = models.DateTimeField(null=True, editable=False)
@@ -139,10 +139,10 @@ class Region(models.Model):
 
 class City(models.Model):
     pk_city_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_country_id = models.ForeignKey(Country, related_name='fk_country_id', null=True)
-    fk_region_id = models.ForeignKey(Region, related_name='fk_region_id', null=True)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    fk_country_city_id = models.ForeignKey(Country, related_name='fk_country_city_id', null=True)
+    fk_region_city_id = models.ForeignKey(Region, related_name='fk_region_city_id', null=True)
+    fk_user_added_city_id = models.ForeignKey(User, related_name='fk_user_added_city_id', null=True)
+    fk_user_updated_city_id = models.ForeignKey(User, related_name='fk_user_updated_city_id', null=True)
     city_name = models.CharField(null=True, max_length=150)
     added = models.DateTimeField(null=True, editable=False)
     updated = models.DateTimeField(null=True, editable=False)
