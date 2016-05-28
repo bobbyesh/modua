@@ -1,8 +1,8 @@
-from rest_framework import serializers
-from .models import Definition
+from modua.requirements. rest_framework import serializers
+from .models import Definitions
 
 
 class DefinitionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Definition
+        model = Definitions
         fields = ('text', 'definition', 'language')

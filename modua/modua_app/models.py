@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from modua.extras import CharNullField
+from extras import CharNullField
 
 '''These models are currently only for testing.'''
 
@@ -55,6 +55,24 @@ class Dictionary_Apis(models.Model):
         return self.api_name
 
 
+class Word_Types(models.Model):
+    pk_word_types_id = models.AutoField(null=False, primary_key=True, editable=False)
+    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
+    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
+    word_type = models.CharField(null=True, max_length=150)
+    added = models.DateTimeField(null=True, editable=False)
+    updated = models.DateTimeField(null=True, editable=False)
+
+    def save(self):
+        if not self.pk_word_types_id:
+            self.added = timezone.now()
+        self.updated = timezone.now()
+        super(Word_Types, self).save()
+
+    def __str__(self):
+        return self.word_type
+
+
 class Definitions(models.Model):
     pk_definition_id = models.AutoField(null=False, primary_key=True, editable=False)
     fk_sourcelang_id = models.ForeignKey(Languages, related_name='fk_sourcelang_id', null=True)
@@ -80,24 +98,6 @@ class Definitions(models.Model):
 
     def __str__(self):
         return self.definition
-
-
-class Word_Types(models.Model):
-    pk_word_types_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_user_added_id = models.ForeignKey(User, related_name='fk_user_added_id', null=True)
-    fk_user_updated_id = models.ForeignKey(User, related_name='fk_user_updated_id', null=True)
-    word_type = models.CharField(null=True, max_length=150)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-
-    def save(self):
-        if not self.pk_word_types_id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(Word_Types, self).save()
-
-    def __str__(self):
-        return self.word_type
 
 
 class Country(models.Model):
