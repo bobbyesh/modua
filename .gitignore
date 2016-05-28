@@ -6,5 +6,4 @@ modua/.coverage
 modua/htmlcov
 db.sqlite3
 modua/modua_app/migrations
-*migrations*
 .gitignore
