@@ -25,7 +25,8 @@ class Languages(models.Model):
     def __str__(self):
         return self.language
 
-class Dictionary_Apis(models.Model):
+
+class DictionaryApis(models.Model):
     pk_dictionary_apis_id = models.AutoField(null=False, primary_key=True, editable=False)
     fk_user_added_dic_id = models.ForeignKey(User, related_name='fk_user_added_dic_id', null=True)
     fk_user_updated_dic_id = models.ForeignKey(User, related_name='fk_user_updated_dic_id', null=True)
@@ -49,13 +50,13 @@ class Dictionary_Apis(models.Model):
         if not self.pk_dictionary_apis_id:
             self.added = timezone.now()
         self.updated = timezone.now()
-        super(Dictionary_Apis, self).save()
+        super(DictionaryApis, self).save()
 
     def __str__(self):
         return self.api_name
 
 
-class Word_Types(models.Model):
+class WordTypes(models.Model):
     pk_word_types_id = models.AutoField(null=False, primary_key=True, editable=False)
     fk_user_added_word_id = models.ForeignKey(User, related_name='fk_user_added_word_id', null=True)
     fk_user_updated_word_id = models.ForeignKey(User, related_name='fk_user_updated_word_id', null=True)
@@ -67,7 +68,7 @@ class Word_Types(models.Model):
         if not self.pk_word_types_id:
             self.added = timezone.now()
         self.updated = timezone.now()
-        super(Word_Types, self).save()
+        super(WordTypes, self).save()
 
     def __str__(self):
         return self.word_type
@@ -77,9 +78,9 @@ class Definitions(models.Model):
     pk_definition_id = models.AutoField(null=False, primary_key=True, editable=False)
     fk_sourcelang_id = models.ForeignKey(Languages, related_name='fk_sourcelang_id', null=True)
     fk_definitionlang_id = models.ForeignKey(Languages, related_name='fk_definitionlang_id', null=True)
-    fk_dictionary_apis_id = models.ForeignKey(Dictionary_Apis, related_name='fk_dictionary_apis_id', null=True)
+    fk_dictionary_apis_id = models.ForeignKey(DictionaryApis, related_name='fk_dictionary_apis_id', null=True)
     fk_user_contributor_id = models.ForeignKey(User, related_name='fk_user_contributor_id', null=True)
-    fk_word_type_id = models.ForeignKey(Word_Types, related_name='fk_word_type_id', null=True)
+    fk_word_type_id = models.ForeignKey(WordTypes, related_name='fk_word_type_id', null=True)
     # TODO: Create fulltext index in DB
     definition = models.CharField(null=True, max_length=8000)
     transliteration = CharNullField(null=True, max_length=8000, blank=True)
@@ -157,7 +158,7 @@ class City(models.Model):
         return self.city_name
 
 
-class User_Definitions(models.Model):
+class UserDefinitions(models.Model):
     pk_user_definitions_id = models.AutoField(null=False, primary_key=True, editable=False)
     fk_user_owner_id = models.ForeignKey(User, related_name='fk_user_owner_id', null=True)
     fk_definitions_id = models.ForeignKey(Definitions, related_name='fk_definitions_id', null=True)
@@ -168,4 +169,4 @@ class User_Definitions(models.Model):
         if not self.pk_user_definitions_id:
             self.added = timezone.now()
         self.updated = timezone.now()
-        super(User_Definitions, self).save()
+        super(UserDefinitions, self).save()
