@@ -1,3 +1,9 @@
 */modua/.idea
-*/modua/__pycache__
-
+*__pycache__*
+/test/
+.idea/
+modua/.coverage
+modua/htmlcov
+db.sqlite3
+modua/modua_app/migrations
+.gitignore

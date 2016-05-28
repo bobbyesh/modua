@@ -17,6 +17,9 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
+
+#    url(r'^$', include('main_site.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/0.1/', include('modua_app.urls')),
+
 ]
