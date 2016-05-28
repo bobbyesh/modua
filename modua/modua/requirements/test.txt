@@ -1,0 +1,13 @@
+# test.txt
+# Requirements file for maintaining dependencies.
+# Usage:
+#     python -m pip install -r test.txt
+
+# Includes requirements from base.txt
+-r base.txt
+
+# Requirements specific to testing
+coverage==4.0.3
+mock==2.0.0
+pbr==1.9.1
+six==1.10.0
