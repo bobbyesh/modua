@@ -2,6 +2,7 @@
 *__pycache__*
 /test/
 .idea/
+modua/.idea/
 modua/.coverage
 modua/htmlcov
 db.sqlite3
