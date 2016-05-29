@@ -2,7 +2,9 @@ from django.views.generic import ListView, DetailView, TemplateView, FormView
 
 
 class HomeView(TemplateView):
-    pass
+    template_name = "main_site/home.html"
+
+
 
 
 class LoginView(TemplateView):
