@@ -1,6 +1,8 @@
 coverage==4.0.3
 Django==1.9.6
 django-filter==0.13.0
+django-twitter-bootstrap==3.3.0
+django-twitter-bootstrap-form==0.1.0
 djangorestframework==3.3.3
 Markdown==2.6.6
 mock==2.0.0
