@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'modua',
     'modua_app',
+    'twitter_bootstrap',
 ]
 
 MIDDLEWARE_CLASSES = [
