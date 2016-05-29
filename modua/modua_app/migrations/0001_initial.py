@@ -41,7 +41,6 @@ class Migration(migrations.Migration):
             name='Definitions',
             fields=[
                 ('pk_definition_id', models.AutoField(editable=False, primary_key=True, serialize=False)),
-                ('word_character', extras.CharNullField(blank=True, max_length=600, null=True)),
                 ('definition', models.CharField(max_length=8000, null=True)),
                 ('transliteration', extras.CharNullField(blank=True, max_length=8000, null=True)),
                 ('total_lookups', models.IntegerField(null=True)),
