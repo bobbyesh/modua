@@ -10,13 +10,6 @@ from .views import Search
 from .models import Definitions
 
 
-class TestDefinition(object):
-
-    def __init__(self, term, definition, language):
-        self.term = term
-        self.definition = definition
-        self.locale = language
-
 
 class TestViews(APITestCase):
 
