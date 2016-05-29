@@ -82,7 +82,7 @@ class Definitions(models.Model):
     fk_user_contributor = models.ForeignKey(User, related_name='fk_user_contributor', null=True)
     fk_word_type_id = models.ForeignKey(WordTypes, related_name='fk_word_type_id', null=True)
     # TODO: Create fulltext index in DB
-    word_character = models.CharField(null=False, max_length=1000)
+    word_character = models.CharNullField(null=True, max_length=600, blank=True)
     definition = models.CharField(null=True, max_length=8000)
     transliteration = CharNullField(null=True, max_length=8000, blank=True)
     total_lookups = models.IntegerField(null=True)
