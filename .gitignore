@@ -5,4 +5,5 @@
 modua/.coverage
 modua/htmlcov
 db.sqlite3
+venv
 .gitignore
