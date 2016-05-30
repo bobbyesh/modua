@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from . import utils
+from .utils import segmentize, is_delimited
 
 
 class TestUtils(SimpleTestCase):
@@ -13,5 +13,10 @@ class TestUtils(SimpleTestCase):
         '''Test that the generator from search_segments yields a generator
         that produces the correct order
         '''
-        segments = utils.search_segments(self.test_string)
+        segments = segmentize(self.test_string)
         self.assertEqual(list(segments), self.test_list)
+
+    def test_is_delimited(self):
+        '''Test that the is_delimited function works'''
+        self.assertTrue(is_delimited('en-US'))
+        self.assertFalse(is_delimited('zh-Hanz'))
