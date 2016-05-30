@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.conf.urls import url
 from . import views
 
 urlpatterns = [
@@ -15,12 +15,12 @@ urlpatterns = [
     #
     # There is no '$' at the end of this URL pattern, so any key-value pairs
     # that follow will be passed to the view.
-    url(r'^/user/word-list/', views.WordListView.as_view(), name="word_list"),
+    url(r'^user/word-list/', views.WordListView.as_view(), name="word_list"),
 
     # TODO regex to match username and word, i.e., user/{username}/word/{word}
     # The tail end of this will have to have key value pairs indicating which
     # word and which language.
-    url(r'^/user/(username_regex_)/word/', views.WordDetailView(), name="word_detail"),
+    url(r'^user/(username_regex_)/word/', views.WordDetailView(), name="word_detail"),
 
 
     # TODO regex to match username, i.e., user/{username}/add-definition
@@ -29,6 +29,6 @@ urlpatterns = [
     #
     # There is no '$' at the end of this URL pattern, so any key-value pairs
     # that follow will be passed to the view.
-    url(r'^/user/(username_regex_)/word/add-definition/', views.AddDefinitionView(), name="add_definition"),
+    url(r'^user/(username_regex_)/word/add-definition/', views.AddDefinitionView(), name="add_definition"),
 
 ]

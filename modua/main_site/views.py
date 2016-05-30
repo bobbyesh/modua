@@ -1,10 +1,9 @@
-from django.views.generic import ListView, DetailView, TemplateView, FormView
+from django.views.generic import View, ListView, DetailView, TemplateView, FormView
+from django.contrib.auth.models import User
 
 
 class HomeView(TemplateView):
-    template_name = "main_site/home.html"
-
-
+    template_name = "home.html"
 
 
 class LoginView(TemplateView):
