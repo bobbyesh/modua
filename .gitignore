@@ -7,4 +7,4 @@ modua/.idea/
 modua/.coverage
 modua/htmlcov
 db.sqlite3
-.gitignore
+*jquery*
