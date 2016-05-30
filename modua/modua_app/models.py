@@ -92,14 +92,14 @@ class Definitions(models.Model):
     updated = models.DateTimeField(null=True, editable=False)
     archived_date = models.DateTimeField(null=True, editable=False)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if not self.pk_definition_id:
             self.added = timezone.now()
         self.updated = timezone.now()
         super(Definitions, self).save()
 
     def __str__(self):
-        return self.definition
+        return '%s' % self.word_character
 
 
 class Country(models.Model):

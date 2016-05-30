@@ -30,6 +30,16 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'main_site/static'),
+    os.path.join(BASE_DIR, 'main_site/static/main_site'),
+)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,7 +69,10 @@ ROOT_URLCONF = 'modua.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            'main_site/templates/main_site/',
+            'main_site/templates/',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,7 +99,7 @@ DATABASES = {
         # TODO: Remove above webbuild user and password once the django build is done.
         # 'USER': 'website',
         'PASSWORD': 'happytime3.14',
-        'HOST': 'local.dev',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
@@ -125,7 +138,5 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_URL = '/static/'
+

@@ -1,61 +1,54 @@
 from django.core.urlresolvers import reverse
-from rest_framework.test import APIRequestFactory, APITestCase
-from django.utils.six import BytesIO
-from rest_framework.parsers import JSONParser
-from .serializers import DefinitionSerializer
-from rest_framework.renderers import JSONRenderer
+from rest_framework.test import APITestCase
 import json
 
-from .views import Search
 from .models import Definitions
 
-
-class TestDefinition(object):
-
-    def __init__(self, term, definition, language):
-        self.term = term
-        self.definition = definition
-        self.locale = language
 
 
 class TestViews(APITestCase):
 
     text = "hello"
-    invalid_language = "blah-lang"
-    url = "/api/0.1/search/en-US/hello"
+    valid_lang = "en-US"
+    invalid_lang = "blah-lang"
+    url_one_word = "/api/0.1/search/en-US/hello"
+    url_nondelimited_word = "/api/0.1/search/zh-Hant/kool-aidxxxx"
     definition = "A greeting"
 
     def setUp(self):
-        entry = Definitions.objects.create(text=self.text,
-                                           language="zh-Hant",
+        Definitions.objects.create(word_character=self.text,
                                            definition=self.definition)
-
-        self.factory = APIRequestFactory()
+        Definitions.objects.create(word_character='kool-aid',
+                                   definition='the koolest drink ever')
 
     def test_search_status_code_200(self):
-        request = self.factory.get(reverse('search'), {'text': self.text,
-                                                       'language': 'zh-Hant'},
-                                   format='json')
-        response = Search.as_view()(request)
+        response = self.client.get(self.url_one_word, format='json')
         self.assertEqual(response.status_code, 200)
 
     def test_term_search(self):
-        '''
-        json_dict = {'text': self.text,
-                     'definition': self.definition,
-                     'language': 'zh-Hant'}
-        request = self.factory.get(reverse('search'), {'text': self.text,
-                                                       'language': 'zh-Hant'},
-                                   format='json')
-        '''
+        response = self.client.get(self.url_one_word, format='json')
+        json = response.json()
+        self.assertEqual(json, {'word_character': self.text,
+                                    'definition': self.definition,
+                                    'transliteration': None })
 
-        request = self.factory.get(self.url),
-        view = Search.as_view()
-        response = view(request)
-        response.render()
-        stream = BytesIO(response.content)
-        data = JSONParser().parse(stream)
-        self.assertEqual(data[0],
-                         json_dict,
-                         "Response content is the correct definition, "
-                         "text, and language")
+    def test_nondelimited_term_search(self):
+        response = self.client.get(self.url_nondelimited_word, format='json')
+        json = response.json()
+        self.assertEqual(json, {'word_character': 'kool-aid',
+                                    'definition': 'the koolest drink ever',
+                                    'transliteration': None
+                               })
+
+    def test_display(self):
+        print('\n\n')
+        response = self.client.get(self.url_nondelimited_word, format='json')
+        json = response.json()
+        print('GET ' + self.url_nondelimited_word)
+        print('response:   ' + str(json))
+        print('\n\n')
+        response = self.client.get(self.url_one_word, format='json')
+        json = response.json()
+        print('GET ' + self.url_one_word)
+        print('response:   ' + str(json))
+        print('\n\n')

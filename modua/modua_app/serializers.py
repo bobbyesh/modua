@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Definitions
 
 
-class DefinitionSerializer(serializers.ModelSerializer):
+class DefinitionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Definitions
-        fields = ('text', 'definition', 'language')
+        fields = ('word_character', 'definition', 'transliteration')
