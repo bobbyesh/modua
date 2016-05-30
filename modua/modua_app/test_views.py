@@ -7,7 +7,7 @@ from rest_framework.renderers import JSONRenderer
 import json
 
 from .views import Search
-from .models import Definition
+from .models import Definitions
 
 
 class TestDefinition(object):
@@ -22,13 +22,13 @@ class TestViews(APITestCase):
 
     text = "hello"
     invalid_language = "blah-lang"
-    url = "/api/0.1/search/"
+    url = "/api/0.1/search/en-US/hello"
     definition = "A greeting"
 
     def setUp(self):
-        entry = Definition.objects.create(text=self.text,
-                                          language="zh-Hant",
-                                          definition=self.definition)
+        entry = Definitions.objects.create(text=self.text,
+                                           language="zh-Hant",
+                                           definition=self.definition)
 
         self.factory = APIRequestFactory()
 
@@ -40,13 +40,16 @@ class TestViews(APITestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_term_search(self):
+        '''
         json_dict = {'text': self.text,
                      'definition': self.definition,
                      'language': 'zh-Hant'}
-
         request = self.factory.get(reverse('search'), {'text': self.text,
                                                        'language': 'zh-Hant'},
                                    format='json')
+        '''
+
+        request = self.factory.get(self.url),
         view = Search.as_view()
         response = view(request)
         response.render()
@@ -56,11 +59,3 @@ class TestViews(APITestCase):
                          json_dict,
                          "Response content is the correct definition, "
                          "text, and language")
-        '''
-        self.assertEqual(response.content,
-                         b'[{"text":"hello",'
-                         b'"definition":"A greeting",'
-                         b'"language":"zh-Hant"}]',
-                         "Response content is the correct definition, "
-                         "text, and language")
-         '''
