@@ -8,3 +8,7 @@ modua/.coverage
 modua/htmlcov
 db.sqlite3
 *jquery*
+.sql
+venv
+.gitignore
+>>>>>>> 2225ec48faaaf4f622f184fd42b5e714d2f60927

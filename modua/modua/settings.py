@@ -86,7 +86,7 @@ DATABASES = {
         # TODO: Remove above webbuild user and password once the django build is done.
         # 'USER': 'website',
         'PASSWORD': 'happytime3.14',
-        'HOST': 'local.dev',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
