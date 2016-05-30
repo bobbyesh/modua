@@ -1,4 +1,5 @@
 from django.views.generic import ListView, DetailView, TemplateView, FormView
+from django.contrib.auth.models import User
 
 
 class HomeView(TemplateView):
