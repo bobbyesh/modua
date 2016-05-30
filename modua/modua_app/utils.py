@@ -1,7 +1,8 @@
 # utils.py
 '''A utility package for MODUA'''
+import re
 
-def search_segments(string):
+def segmentize(string):
     '''Yields a generator of string in segmented form.
 
     Example:
@@ -13,3 +14,11 @@ def search_segments(string):
     for c in string:
         lexeme += c
         yield lexeme
+def is_delimited(tag):
+    '''Returns True of the language tag identifies a space delimited
+    language, otherwise returns False'''
+    subtags = re.split('-', tag)
+    if subtags[0] == 'en':
+        return True
+    if subtags[0] == 'zh':
+        return False
