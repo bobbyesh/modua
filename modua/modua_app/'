@@ -1,0 +1,34 @@
+from django.core.urlresolvers import reverse
+from rest_framework.test import APIRequestFactory, APITestCase
+from django.utils.six import BytesIO
+from rest_framework.parsers import JSONParser
+from .serializers import DefinitionSerializer
+from rest_framework.renderers import JSONRenderer
+import json
+
+from .views import Search
+from .models import Definitions
+
+
+
+class TestViews(APITestCase):
+
+    text = "hello"
+    valid_lang = "en-US"
+    invalid_lang = "blah-lang"
+    url = "/api/0.1/search/en-US/hello"
+    definition = "A greeting"
+
+    def setUp(self):
+        entry = Definitions.objects.create(text=self.text,
+                                           language=self.valid_lang,
+                                           definition=self.definition)
+
+        self.factory = APIRequestFactory()
+
+    def test_search_status_code_200(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_term_search(self):
+        response = self.client.get(self.url)
