@@ -19,16 +19,14 @@ class SearchView(APIView):
                 definition = Definitions.objects.get(word_character=word)
                 serializer = DefinitionsSerializer(definition, many=False)
             except ObjectDoesNotExist:
-                return Response(status_code=404)
+                return Response(status=404)
         else:
-            definitions = list()
-            for seg in segmentize(word):
-                definitions = self.get_all_subsegment_definitions(word)
+            definitions = self.get_all_subsegment_definitions(word)
             if not definitions:
-                return Response(status_code=404)
-            if len(definitions) == 1:
-                definition = definitions[0]
-                serializer = DefinitionsSerializer(definition, many=False)
+                return Response(status=404)
+            elif len(definitions) == 1:
+                only_definition = definitions[0]
+                serializer = DefinitionsSerializer(only_definition, many=False)
             else:
                 serializer = DefinitionsSerializer(definitions, many=True)
 
