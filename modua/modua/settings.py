@@ -91,6 +91,7 @@ WSGI_APPLICATION = 'modua.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -138,5 +139,9 @@ USE_L10N = True
 USE_TZ = True
 
 
-
-
+# The settings_local.py will overwrite only the settings specified therein.
+# Add settings_local.py to .gitignore to avoid messy version control. 
+try:
+    from .settings_local import *
+except ImportError:
+    pass
