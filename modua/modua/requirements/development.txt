@@ -1,4 +1,4 @@
-# test.txt
+# development.txt
 # Requirements file for maintaining dependencies.
 # Usage:
 #     python -m pip install -r test.txt
@@ -6,7 +6,7 @@
 # Includes requirements from base.txt
 -r base.txt
 
-# Requirements specific to testing
+# Requirements specific to development and testing
 coverage==4.0.3
 mock==2.0.0
 pbr==1.9.1
