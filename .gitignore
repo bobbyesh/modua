@@ -11,3 +11,5 @@ db.sqlite3
 .sql
 venv
 .gitignore
+*.swp
+settings_local.py
