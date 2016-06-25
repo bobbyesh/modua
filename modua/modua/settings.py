@@ -35,6 +35,8 @@ ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 STATICFILES_FINDERs = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -71,10 +73,6 @@ ROOT_URLCONF = 'modua.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            'modua/main_site/templates/main_site/',
-            'modua/main_site/templates/',
-        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
