@@ -64,3 +64,21 @@ class TestViews(APITestCase):
         '''
         response = self.client.get("/api/0.1/search/zh-Hant/term_not_in_DB", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_user_search_status_code_200(self):
+        '''
+        Passes if a valid search by a registered user returns a status code of 200.
+        '''
+        response = self.client.get("/api/0.1/user/john-doe/search/en-US/hello", format='json')
+        self.assertEqual(response.status_code, 200)
+
+'''
+    def test_user_valid_search(self):
+  #      Passes if registered user gets a correct json response for a valid search.
+        response = self.client.get("/api/0.1/user/john-doe/search/en-US/hello", format='json')
+        json = response.json()
+        self.assertEqual(json, {'word_character': "hello",
+                                    'definition': 'A greeting',
+                                    'transliteration': None })
+'''
+

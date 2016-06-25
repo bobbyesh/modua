@@ -41,3 +41,9 @@ class SearchView(APIView):
             except ObjectDoesNotExist:
                 pass
         return definitions
+
+
+class SearchByUserView(SearchView):
+
+    def get(self, request, user, language, word, format=None):
+        return Response(status=200)
