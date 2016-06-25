@@ -2,9 +2,9 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-
     # TODO regex to match word
     url(r'^$', views.HomeView.as_view(), name="home"),
+'''
     url(r'^login/$', views.LoginView.as_view(), name="login"),
 
     # TODO regex to match usernames, i.e., user/{username}
@@ -29,6 +29,6 @@ urlpatterns = [
     #
     # There is no '$' at the end of this URL pattern, so any key-value pairs
     # that follow will be passed to the view.
-    url(r'^user/(username_regex_)/word/add-definition/', views.AddDefinitionView(), name="add_definition"),
-
+    url(r'^user/(username_regex_)/word/add-definition/', views.AddDefinitionView().as_view(), name="add_definition"),
+'''
 ]

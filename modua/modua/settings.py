@@ -35,10 +35,11 @@ ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'main_site/static'),
-    os.path.join(BASE_DIR, 'main_site/static/main_site'),
-)
+
+STATICFILES_FINDERs = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -48,9 +49,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'twitter_bootstrap',
     'modua',
     'modua_app',
-    'twitter_bootstrap',
+    'main_site',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -70,8 +72,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'main_site/templates/main_site/',
-            'main_site/templates/',
+            'modua/main_site/templates/main_site/',
+            'modua/main_site/templates/',
         ],
         'APP_DIRS': True,
         'OPTIONS': {

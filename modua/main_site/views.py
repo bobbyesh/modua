@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class HomeView(TemplateView):
-    template_name = "home.html"
+    template_name = "main_site/home.html"
 
 
 class LoginView(TemplateView):
