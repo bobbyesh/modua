@@ -1,9 +1,10 @@
 from django.core.urlresolvers import reverse
+
 from rest_framework.test import APITestCase
 from rest_framework import status
 import json
 
-from .models import Definitions
+from .models import Definitions, User
 
 
 
@@ -15,6 +16,8 @@ class TestViews(APITestCase):
                                            definition="A greeting")
         Definitions.objects.create(word_character='kool-aid',
                                    definition='the koolest drink ever')
+        User.objects.create_user('john', 'john@gmail.com', 'password')
+
 
     def test_search_status_code_200(self):
         '''
@@ -69,13 +72,14 @@ class TestViews(APITestCase):
         '''
         Passes if a valid search by a registered user returns a status code of 200.
         '''
-        response = self.client.get("/api/0.1/user/john-doe/search/en-US/hello", format='json')
+        self.client.login(username='john', password='password')
+        response = self.client.get("/api/0.1/user-auth/search/en-US/hello", format='json')
         self.assertEqual(response.status_code, 200)
 
 '''
     def test_user_valid_search(self):
   #      Passes if registered user gets a correct json response for a valid search.
-        response = self.client.get("/api/0.1/user/john-doe/search/en-US/hello", format='json')
+        response = self.client.get("/api/0.1/user/john/search/en-US/hello", format='json')
         json = response.json()
         self.assertEqual(json, {'word_character': "hello",
                                     'definition': 'A greeting',

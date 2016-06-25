@@ -1,7 +1,10 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import AllowAny
 from django.http import HttpResponse
 
 from .models import Definitions
@@ -10,7 +13,8 @@ from .utils import segmentize, is_delimited
 
 
 class SearchView(APIView):
-
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (AllowAny,)
     renderer_classes = (JSONRenderer,)
 
     def get(self, request, language, word, format=None):
@@ -44,6 +48,9 @@ class SearchView(APIView):
 
 
 class SearchByUserView(SearchView):
-
-    def get(self, request, user, language, word, format=None):
-        return Response(status=200)
+         
+    def get(self, request, language, word, format=None):
+        if request.user is not None:
+            return Response(status=200)
+        return Response(status=404)
+# Users don't need a specific search, they need a save view, and a commit definition view
