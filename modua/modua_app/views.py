@@ -1,18 +1,20 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
 from django.http import HttpResponse
 
-from .models import Definitions
-from .serializers import DefinitionsSerializer
+from .models import Definitions, Languages
+from .serializers import DefinitionsSerializer, LanguagesSerializer
 from .utils import segmentize, is_delimited
 
 
 class SearchView(APIView):
+
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
     renderer_classes = (JSONRenderer,)
@@ -48,9 +50,17 @@ class SearchView(APIView):
 
 
 class SearchByUserView(SearchView):
-         
+    
+
     def get(self, request, language, word, format=None):
         if request.user is not None:
-            return Response(status=200)
+                return Response(status=200)
         return Response(status=404)
-# Users don't need a specific search, they need a save view, and a commit definition view
+
+
+class LanguageListView(ListAPIView):
+
+    queryset = Languages.objects.all()
+    serializer_class = LanguagesSerializer
+    permission_classes = (AllowAny,)
+    lookup_fields = ('language',)
