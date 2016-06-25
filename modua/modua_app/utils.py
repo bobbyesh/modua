@@ -14,6 +14,8 @@ def segmentize(string):
     for c in string:
         lexeme += c
         yield lexeme
+
+
 def is_delimited(tag):
     '''Returns True of the language tag identifies a space delimited
     language, otherwise returns False'''
