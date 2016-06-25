@@ -16,7 +16,7 @@ class Languages(models.Model):
     added = models.DateTimeField(null=True, editable=False)
     updated = models.DateTimeField(null=True, editable=False)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if not self.pk_languages_id:
             self.added = timezone.now()
         self.updated = timezone.now()
