@@ -10,4 +10,4 @@ db.sqlite3
 *jquery*
 .sql
 venv
-.gitignore
+*cedict_1_0_ts_utf-8_mdbg.txt
