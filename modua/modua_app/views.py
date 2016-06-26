@@ -1,8 +1,9 @@
+import pdb
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate
 from django.http import HttpResponse
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -14,39 +15,49 @@ from .utils import segmentize, is_delimited
 
 
 
-class SearchView(APIView):
+class SearchView(ListAPIView):
 
+    queryset = Definitions.objects.all()
+    serializer_class = DefinitionsSerializer
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
     renderer_classes = (JSONRenderer,)
 
-    def get(self, request, language, word, format=None):
-        if is_delimited(language):
-            try:
-                definition = Definitions.objects.get(word_character=word)
-                serializer = DefinitionsSerializer(definition, many=False)
-            except ObjectDoesNotExist:
-                return Response(status=404)
-        else:
-            definitions = self.get_all_subsegment_definitions(word)
-            if not definitions:
-                return Response(status=404)
-            elif len(definitions) == 1:
-                only_definition = definitions[0]
-                serializer = DefinitionsSerializer(only_definition, many=False)
-            else:
-                serializer = DefinitionsSerializer(definitions, many=True)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset:
+            return Response(status=404)
 
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def get_all_subsegment_definitions(self, word):
-        definitions = list()
-        for seg in segmentize(word):
-            try:
-                result = Definitions.objects.get(word_character=seg)
-                definitions.append(result)
-            except ObjectDoesNotExist:
-                pass
+    def get_queryset(self):
+        lang = self.kwargs['language']
+        word = self.kwargs['word']
+        if is_delimited(lang):
+            definitions = Definitions.objects.filter(
+                    word_character=word,
+                    fk_definitionlang=
+                        Languages.objects.filter(
+                            language=lang
+                        )
+            )
+        else:
+            definitions = None
+            segs = list(segmentize(self.kwargs['word']))
+            definitions = Definitions.objects.filter(
+                    word_character__in=segs,
+                    fk_definitionlang=
+                        Languages.objects.filter(
+                            language=lang
+                    )
+            )
+
         return definitions
 
 
