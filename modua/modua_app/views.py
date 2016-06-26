@@ -68,23 +68,3 @@ class LanguageWordlistView(ListAPIView):
         lang = self.kwargs['language']
         language_query = Languages.objects.filter(language=lang)
         return Definitions.objects.filter(fk_definitionlang=language_query)
-
-'''
-    def get(self, request, language, format=None):
-        queryset = self.get_queryset(language)
-        serializer = DefinitionsSerializer(queryset, many=True)
-        return Response(serializer.data)
-'''
-
-
-
-
-
-
-
-
-
-
-
-
-
