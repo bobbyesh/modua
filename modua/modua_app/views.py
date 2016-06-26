@@ -1,16 +1,17 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
-from django.http import HttpResponse
 
 from .models import Definitions, Languages
 from .serializers import DefinitionsSerializer, LanguagesSerializer
 from .utils import segmentize, is_delimited
+
 
 
 class SearchView(APIView):
@@ -49,18 +50,41 @@ class SearchView(APIView):
         return definitions
 
 
-class SearchByUserView(SearchView):
-    
-
-    def get(self, request, language, word, format=None):
-        if request.user is not None:
-                return Response(status=200)
-        return Response(status=404)
-
-
 class LanguageListView(ListAPIView):
 
     queryset = Languages.objects.all()
     serializer_class = LanguagesSerializer
     permission_classes = (AllowAny,)
     lookup_fields = ('language',)
+
+
+class LanguageWordlistView(ListAPIView):
+
+    permission_classes = (AllowAny,)
+    renderer_classes = (JSONRenderer,)
+    serializer_class = DefinitionsSerializer
+
+    def get_queryset(self):
+        lang = self.kwargs['language']
+        language_query = Languages.objects.filter(language=lang)
+        return Definitions.objects.filter(fk_definitionlang=language_query)
+
+'''
+    def get(self, request, language, format=None):
+        queryset = self.get_queryset(language)
+        serializer = DefinitionsSerializer(queryset, many=True)
+        return Response(serializer.data)
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+

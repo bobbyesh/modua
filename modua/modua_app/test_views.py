@@ -1,10 +1,14 @@
-from django.core.urlresolvers import reverse
-
-from rest_framework.test import APITestCase
-from rest_framework import status
 import json
+from collections import OrderedDict
+from django.core.urlresolvers import reverse
+from django.utils.six import BytesIO
+from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework import status
+from rest_framework.parsers import JSONParser
 
-from .models import Definitions, User
+from .models import Definitions, User, Languages
+from .views import LanguageWordlistView
+from .serializers import LanguagesSerializer, DefinitionsSerializer
 
 
 
@@ -73,16 +77,76 @@ class TestViews(APITestCase):
         Passes if a valid search by a registered user returns a status code of 200.
         '''
         self.client.login(username='john', password='password')
-        response = self.client.get("/api/0.1/user-auth/search/en-US/hello", format='json')
+        response = self.client.get("/api/0.1/search/en-US/hello", format='json')
         self.assertEqual(response.status_code, 200)
 
-'''
     def test_user_valid_search(self):
-  #      Passes if registered user gets a correct json response for a valid search.
-        response = self.client.get("/api/0.1/user/john/search/en-US/hello", format='json')
+        '''
+        Passes if registered user gets a correct json response for a valid search.
+        '''
+        self.client.login(username='john', password='password')
+        response = self.client.get("/api/0.1/search/en-US/hello", format='json')
         json = response.json()
         self.assertEqual(json, {'word_character': "hello",
                                     'definition': 'A greeting',
                                     'transliteration': None })
-'''
 
+    def test_language_list_one_language(self):
+        '''
+        Passes if /languages/ returns the correct json.
+        '''
+        Languages.objects.create(language='en')
+        response = self.client.get("/api/0.1/languages/", format='json')
+        json = response.json()[0]
+        self.assertEqual(json, {'language': 'en'})
+
+
+    def test_language_list_two_languages(self):
+        '''
+        Passes if /languages/ returns the correct json.
+        '''
+        Languages.objects.create(language='en')
+        Languages.objects.create(language='zh')
+        response = self.client.get("/api/0.1/languages/", format='json')
+        json = response.json()
+        self.assertEqual(json, [{'language': 'en'},
+                                {'language': 'zh'}])
+
+
+    def test_language_wordlist_view_only(self):
+        '''
+        Tests that the wordlist view returns all the dictionary entries for a given language.
+        '''
+        lang = Languages.objects.create(language='en')
+        lang = Languages.objects.get(language='en')
+        word = Definitions.objects.create(word_character='dude', definition='godly saying', transliteration=None,
+                                          fk_definitionlang=lang)
+        Definitions.objects.create(word_character="hello", definition="A greeting", 
+                                          fk_definitionlang=lang)
+
+        factory = APIRequestFactory()
+        request = factory.get('/api/0.1/language/en/', format='json')
+
+        view = LanguageWordlistView().as_view()
+        response = view(request, language='en')
+
+        test_results = sorted(
+                [
+                  {
+                      'word_character': 'hello', 
+                      'definition': 'A greeting',
+                      'transliteration': None 
+                  },
+                  {
+                      'word_character': 'dude', 
+                      'definition': 'godly saying',
+                      'transliteration': None 
+                  }
+                 ],
+            key=lambda t:t['word_character']
+        )
+
+        responses = sorted([response.data[0], response.data[1]], key=lambda t: t['word_character'])
+
+        for test, resp in zip(test_results, responses):
+            self.assertDictEqual(test, resp)

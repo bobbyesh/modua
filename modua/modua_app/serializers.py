@@ -3,6 +3,7 @@ from .models import Definitions, Languages
 
 
 class DefinitionsSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Definitions
         fields = ('word_character', 'definition', 'transliteration')
