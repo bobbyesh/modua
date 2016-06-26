@@ -16,10 +16,17 @@ class TestViews(APITestCase):
 
 
     def setUp(self):
+        eng = Languages.objects.create(language='en')
+        zh = Languages.objects.create(language='zh')
+
         Definitions.objects.create(word_character="hello",
-                                           definition="A greeting")
+                                           definition="A greeting",
+                                           fk_definitionlang=eng)
+
         Definitions.objects.create(word_character='kool-aid',
-                                   definition='the koolest drink ever')
+                                   definition='the koolest drink ever',
+                                   fk_definitionlang=zh)
+
         User.objects.create_user('john', 'john@gmail.com', 'password')
 
 
@@ -27,15 +34,15 @@ class TestViews(APITestCase):
         '''
         Passes if a valid search returns a status code of 200.
         '''
-        response = self.client.get("/api/0.1/search/en-US/hello", format='json')
+        response = self.client.get("/api/0.1/languages/en/hello", format='json')
         self.assertEqual(response.status_code, 200)
 
     def test_term_search(self):
         '''
         Passes if the json returned from a valid request is the correct json.
         '''
-        response = self.client.get("/api/0.1/search/en-US/hello", format='json')
-        json = response.json()
+        response = self.client.get("/api/0.1/languages/en/hello", format='json')
+        json = response.json()[0]
         self.assertEqual(json, {'word_character': "hello",
                                     'definition': 'A greeting',
                                     'transliteration': None })
@@ -44,7 +51,7 @@ class TestViews(APITestCase):
         '''
         Passes if a request for a word not in the dictionary returns a status code 404.
         '''
-        response = self.client.get("/api/0.1/search/en-US/term_not_in_DB", format='json')
+        response = self.client.get("/api/0.1/languages/en/term_not_in_DB", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
     def test_bad_url(self):
@@ -58,9 +65,9 @@ class TestViews(APITestCase):
         '''
         Passes if a the json returned from a valid search for a nondelimited word is correct.
         '''
-        response = self.client.get("/api/0.1/search/zh-Hant/kool-aidxxxx", format='json')
-        json = response.json()
-        self.assertEqual(json, {'word_character': 'kool-aid',
+        response = self.client.get("/api/0.1/languages/zh/kool-aidxxxx", format='json')
+        json = response.json()[0]
+        self.assertDictEqual(json, {'word_character': 'kool-aid',
                                     'definition': 'the koolest drink ever',
                                     'transliteration': None
                                })
@@ -69,27 +76,9 @@ class TestViews(APITestCase):
         '''
         Passes if a request for a nondelimited word that isn't in the database returns a 404 response.
         '''
-        response = self.client.get("/api/0.1/search/zh-Hant/term_not_in_DB", format='json')
+        response = self.client.get("/api/0.1/languages/zh/term_not_in_DB", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_user_search_status_code_200(self):
-        '''
-        Passes if a valid search by a registered user returns a status code of 200.
-        '''
-        self.client.login(username='john', password='password')
-        response = self.client.get("/api/0.1/search/en-US/hello", format='json')
-        self.assertEqual(response.status_code, 200)
-
-    def test_user_valid_search(self):
-        '''
-        Passes if registered user gets a correct json response for a valid search.
-        '''
-        self.client.login(username='john', password='password')
-        response = self.client.get("/api/0.1/search/en-US/hello", format='json')
-        json = response.json()
-        self.assertEqual(json, {'word_character': "hello",
-                                    'definition': 'A greeting',
-                                    'transliteration': None })
 
     def test_language_list_one_language(self):
         '''
@@ -108,6 +97,6 @@ class TestViews(APITestCase):
         Languages.objects.create(language='en')
         Languages.objects.create(language='zh')
         response = self.client.get("/api/0.1/languages/", format='json')
-        json = response.json()
-        self.assertEqual(json, [{'language': 'en'},
-                                {'language': 'zh'}])
+        json = response.json()[0]
+        self.assertDictEqual(json, {'language': 'en'},
+                                {'language': 'zh'})
