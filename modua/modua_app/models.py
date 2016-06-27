@@ -23,7 +23,7 @@ class Languages(models.Model):
         super(Languages, self).save()
 
     def __str__(self):
-        return self.language
+        return '%s' % self.language
 
 
 class DictionaryApis(models.Model):
