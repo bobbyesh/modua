@@ -23,29 +23,11 @@ class SearchView(ListAPIView):
     permission_classes = (AllowAny,)
     renderer_classes = (JSONRenderer,)
 
-    # TODO implement get() with default list(), but return 404 if list() returns response
-    # with no data
     def get(self, request, *args, **kwargs):
         response = self.list(request, *args, **kwargs)
         if not response.data:
             return Response(status=404)
         return self.list(request, *args, **kwargs)
-
-
-    '''
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        if not queryset:
-            return Response(status=404)
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    '''
 
     def get_queryset(self):
         lang = self.kwargs['language']
