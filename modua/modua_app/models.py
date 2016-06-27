@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from extras import CharNullField
 
-'''These models are currently only for testing.'''
-
 
 class Languages(models.Model):
     pk_languages_id = models.AutoField(null=False, primary_key=True, editable=False)

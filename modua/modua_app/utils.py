@@ -17,8 +17,11 @@ def segmentize(string):
 
 
 def is_delimited(tag):
-    '''Returns True of the language tag identifies a space delimited
+    '''Returns True if the language tag identifies a space delimited
     language, otherwise returns False'''
+    if type(tag) is not str:
+        tag = str(tag)
+
     subtags = re.split('-', tag)
     if subtags[0] == 'en':
         return True

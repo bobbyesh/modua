@@ -14,8 +14,24 @@ from .serializers import DefinitionsSerializer, LanguagesSerializer
 from .utils import segmentize, is_delimited
 
 
+class LanguageFilterMixin(object):
+    '''
+    Use for views that require identifying a single language from the
+    'language' url keyword.
 
-class SearchView(ListAPIView):
+    The set_language method automatically sets self.language to the
+    associated model instance, and sets self.delimited to True if the
+    language is delimited and False otherwise.
+    '''
+
+    def set_language(self):
+        self.language = Languages.objects.filter(
+                language=self.kwargs['language']
+        )
+        self.delimited = is_delimited(self.language)
+
+
+class SearchView(ListAPIView, LanguageFilterMixin):
 
     queryset = Definitions.objects.all()
     serializer_class = DefinitionsSerializer
@@ -30,25 +46,18 @@ class SearchView(ListAPIView):
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
-        lang = self.kwargs['language']
+        self.set_language()
         word = self.kwargs['word']
-        if is_delimited(lang):
+        if self.delimited:
             definitions = Definitions.objects.filter(
                     word_character=word,
-                    fk_definitionlang=
-                        Languages.objects.filter(
-                            language=lang
-                        )
+                    fk_definitionlang=self.language
             )
         else:
-            definitions = None
             segs = list(segmentize(self.kwargs['word']))
             definitions = Definitions.objects.filter(
                     word_character__in=segs,
-                    fk_definitionlang=
-                        Languages.objects.filter(
-                            language=lang
-                    )
+                    fk_definitionlang=self.language
             )
 
         return definitions
