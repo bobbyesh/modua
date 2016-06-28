@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import NotFound
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.reverse import reverse
 
 from .models import Definitions, Languages
 from .serializers import (
@@ -19,8 +21,12 @@ from .mixins import LanguageFilterMixin
 
 import pdb
 
-class APIRoot(GenericAPIView):
-    pass
+@api_view(['GET'])
+@permission_classes((AllowAny,))
+def api_root(request, format=None):
+    return Response({
+        'languages': reverse('language_list', request=request, format=format),
+        })
 
 class SearchView(ListAPIView, LanguageFilterMixin):
 
