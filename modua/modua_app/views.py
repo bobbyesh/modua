@@ -3,12 +3,16 @@ from django.http import HttpResponse
 
 from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
 
 from .models import Definitions, Languages
-from .serializers import DefinitionsSerializer, LanguagesSerializer
+from .serializers import (
+        DefinitionsSerializer, 
+        DefinitionsListSerializer, 
+        LanguagesSerializer
+        )
+
 from .utils import segmentize
 from .mixins import LanguageFilterMixin
 
@@ -20,7 +24,6 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     serializer_class = DefinitionsSerializer
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
-    renderer_classes = (JSONRenderer,)
 
     def get(self, request, *args, **kwargs):
         response = self.list(request, *args, **kwargs)
@@ -56,7 +59,6 @@ class LanguageListView(ListAPIView):
 class LanguageWordlistView(ListAPIView, LanguageFilterMixin):
 
     permission_classes = (AllowAny,)
-    renderer_classes = (JSONRenderer,)
     serializer_class = DefinitionsSerializer
 
     def get_queryset(self):
