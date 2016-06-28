@@ -1,8 +1,6 @@
-import pdb
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth import authenticate
 from django.http import HttpResponse
-from rest_framework.views import APIView
+
 from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -11,25 +9,10 @@ from rest_framework.permissions import AllowAny
 
 from .models import Definitions, Languages
 from .serializers import DefinitionsSerializer, LanguagesSerializer
-from .utils import segmentize, is_delimited
+from .utils import segmentize
+from .mixins import LanguageFilterMixin
 
-
-class LanguageFilterMixin(object):
-    '''
-    Use for views that require identifying a single language from the
-    'language' url keyword.
-
-    The set_language method automatically sets self.language to the
-    associated model instance, and sets self.delimited to True if the
-    language is delimited and False otherwise.
-    '''
-
-    def set_language(self):
-        self.language = Languages.objects.filter(
-                language=self.kwargs['language']
-        )
-        self.delimited = is_delimited(self.language)
-
+import pdb
 
 class SearchView(ListAPIView, LanguageFilterMixin):
 
@@ -46,7 +29,6 @@ class SearchView(ListAPIView, LanguageFilterMixin):
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.set_language()
         word = self.kwargs['word']
         if self.delimited:
             definitions = Definitions.objects.filter(
@@ -71,13 +53,11 @@ class LanguageListView(ListAPIView):
     lookup_fields = ('language',)
 
 
-class LanguageWordlistView(ListAPIView):
+class LanguageWordlistView(ListAPIView, LanguageFilterMixin):
 
     permission_classes = (AllowAny,)
     renderer_classes = (JSONRenderer,)
     serializer_class = DefinitionsSerializer
 
     def get_queryset(self):
-        lang = self.kwargs['language']
-        language_query = Languages.objects.filter(language=lang)
-        return Definitions.objects.filter(fk_definitionlang=language_query)
+        return Definitions.objects.filter(fk_definitionlang=self.language)
