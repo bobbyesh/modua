@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import NotFound
 
 from .models import Definitions, Languages
 from .serializers import (
@@ -18,6 +19,9 @@ from .mixins import LanguageFilterMixin
 
 import pdb
 
+class APIRoot(GenericAPIView):
+    pass
+
 class SearchView(ListAPIView, LanguageFilterMixin):
 
     queryset = Definitions.objects.all()
@@ -28,7 +32,7 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     def get(self, request, *args, **kwargs):
         response = self.list(request, *args, **kwargs)
         if not response.data:
-            return Response(status=404)
+            raise NotFound
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
