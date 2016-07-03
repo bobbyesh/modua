@@ -12,7 +12,6 @@ from rest_framework.reverse import reverse
 from .models import Definitions, Languages
 from .serializers import (
         DefinitionsSerializer, 
-        DefinitionsListSerializer, 
         LanguagesSerializer
         )
 
