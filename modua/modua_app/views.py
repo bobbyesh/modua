@@ -28,13 +28,18 @@ def api_root(request, format=None):
         })
 
 class SearchView(ListAPIView, LanguageFilterMixin):
-    """Handles requests searching for the definition of a word.
+    """Defines a GET method to return json for an individual :model:`modua_app.Definitions`.
 
-    Inherits `language` property from LanguageFilterMixin.  This
-    property is the Languages model associated with the url keyword
-    matched to 'language', and is used when querying for a word in
-    a particular language.
 
+    Attributes
+    ----------
+
+    delimited : boolean 
+        True if language is delimited, otherwise False. Inherited from `LanguageFilterMixin`.
+    language: :model:`modua_app.models.Languages` 
+        Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
+
+    Other attributes, args, and kwargs are the same as ListAPIView.
     """
 
     queryset = Definitions.objects.all()
@@ -43,19 +48,11 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        """
-        GET request for word definition.  Overrides ListAPIView's get() method.
+        """Get a word definition.  
         
-        URL keywords: word, language.
-
-        self.language is the matching language, if any. 
-        (inherited from LanguageFilterMixin)
+        Overrides ListAPIView's get() method.
         
-        :ivar delimited: boolean; True if language is delimited, otherwise False.
-        :ivar language: Languages model instance matching URL keyword 'language'.
-
         :raises NotFound: Word not found in dictionary database.
-
         """
 
         response = self.list(request, *args, **kwargs)
