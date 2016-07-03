@@ -28,6 +28,14 @@ def api_root(request, format=None):
         })
 
 class SearchView(ListAPIView, LanguageFilterMixin):
+    """Handles requests searching for the definition of a word.
+
+    Inherits `language` property from LanguageFilterMixin.  This
+    property is the Languages model associated with the url keyword
+    matched to 'language', and is used when querying for a word in
+    a particular language.
+
+    """
 
     queryset = Definitions.objects.all()
     serializer_class = DefinitionsSerializer
