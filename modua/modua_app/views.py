@@ -43,12 +43,32 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
+        """
+        GET request for word definition.  Overrides ListAPIView's get() method.
+        
+        URL keywords: word, language.
+
+        self.language is the matching language, if any. 
+        (inherited from LanguageFilterMixin)
+        
+        :ivar delimited: boolean; True if language is delimited, otherwise False.
+        :ivar language: Languages model instance matching URL keyword 'language'.
+
+        :raises NotFound: Word not found in dictionary database.
+
+        """
+
         response = self.list(request, *args, **kwargs)
         if not response.data:
             raise NotFound
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
+        """Overrides ListAPIView's get_queryset() method.
+
+        Returns a queryset of matches for 'word' URL keyword.
+        
+        """
         word = self.kwargs['word']
         if self.delimited:
             definitions = Definitions.objects.filter(
