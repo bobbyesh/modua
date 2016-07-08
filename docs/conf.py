@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# MODUA documentation build configuration file, created by
-# sphinx-quickstart on Thu Jul  7 19:43:15 2016.
+# Mouse Over Dictionary with User Accounts documentation build configuration file, created by
+# sphinx-quickstart on Fri Jul  8 16:06:59 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -32,10 +32,8 @@
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages',
+    'sphinx.ext.coverage',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,9 +53,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'MODUA'
-copyright = '2016, William Brown, Jack Chen, Sarath Shanker, Bobby Eshleman'
-author = 'William Brown, Jack Chen, Sarath Shanker, Bobby Eshleman'
+project = 'Mouse Over Dictionary with User Accounts'
+copyright = '2016, William Brown, Jack Chen, Bobby Eshleman'
+author = 'William Brown, Jack Chen, Bobby Eshleman'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -87,7 +85,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = []
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -140,7 +138,7 @@ html_theme = 'alabaster'
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = 'MODUA v0.1'
+# html_title = 'Mouse Over Dictionary with User Accounts v0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -240,7 +238,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'MODUAdoc'
+htmlhelp_basename = 'MouseOverDictionarywithUserAccountsdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -266,8 +264,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'MODUA.tex', 'MODUA Documentation',
-     'William Brown, Jack Chen, Sarath Shanker, Bobby Eshleman', 'manual'),
+    (master_doc, 'MouseOverDictionarywithUserAccounts.tex', 'Mouse Over Dictionary with User Accounts Documentation',
+     'William Brown, Jack Chen, Bobby Eshleman', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -302,7 +300,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'modua', 'MODUA Documentation',
+    (master_doc, 'mouseoverdictionarywithuseraccounts', 'Mouse Over Dictionary with User Accounts Documentation',
      [author], 1)
 ]
 
@@ -317,8 +315,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'MODUA', 'MODUA Documentation',
-     author, 'MODUA', 'One line description of project.',
+    (master_doc, 'MouseOverDictionarywithUserAccounts', 'Mouse Over Dictionary with User Accounts Documentation',
+     author, 'MouseOverDictionarywithUserAccounts', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -337,7 +335,3 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
