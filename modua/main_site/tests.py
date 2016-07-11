@@ -25,4 +25,4 @@ class HomePageTests(LiveServerTestCase):
         link = self.browser.find_element_by_name('registration')
         address = link.get_attribute('href')
         self.browser.get(address)
-        assert 'Registration' in self.browser.title
+        assert 'Register' in self.browser.title
