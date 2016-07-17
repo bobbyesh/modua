@@ -20,6 +20,10 @@ class RegistrationView(FormView):
         if form.is_valid():
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            User.objects.create(username=username,
+                                email=email,
+                                password=password)
         return super(RegistrationView, self).form_valid(form)
 
 class RegistrationSuccessView(TemplateView):
