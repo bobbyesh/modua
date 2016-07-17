@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 
 from .forms import RegistrationForm
 
+import pdb
+
 class HomeView(TemplateView):
     template_name = 'main_site/home.html'
 
@@ -13,6 +15,12 @@ class RegistrationView(FormView):
     template_name = 'main_site/register.html'
     form_class = RegistrationForm
     success_url = '/home/success/'
+
+    def form_valid(self, form):
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+        return super(RegistrationView, self).form_valid(form)
 
 class RegistrationSuccessView(TemplateView):
     template_name = 'main_site/success.html'
