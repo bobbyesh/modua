@@ -93,15 +93,25 @@ WSGI_APPLICATION = 'modua.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'modua',
         'USER': 'root_webbuild',
         # TODO: Remove above webbuild user and password once the django build is done.
         # 'USER': 'website',
         'PASSWORD': 'happytime3.14',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'modua',
+    #     'USER': 'root_webbuild',
+    #     # TODO: Remove above webbuild user and password once the django build is done.
+    #     # 'USER': 'website',
+    #     'PASSWORD': 'happytime3.14',
+    #     'HOST': 'localhost',
+    #     'PORT': '',
+    # }
 }
 
 
