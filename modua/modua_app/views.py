@@ -59,7 +59,7 @@ class SearchView(ListAPIView, LanguageFilterMixin):
         response = self.list(request, *args, **kwargs)
         if not response.data:
             raise NotFound
-        return self.list(request, *args, **kwargs)
+        return response
 
     def get_queryset(self):
         """Overrides ListAPIView's get_queryset() method.
