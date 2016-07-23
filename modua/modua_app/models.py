@@ -74,13 +74,13 @@ class WordTypes(models.Model):
 
 class Definitions(models.Model):
     pk_definition_id = models.AutoField(null=False, primary_key=True, editable=False)
-    fk_sourcelang = models.ForeignKey(Languages, related_name='fk_sourcelang', null=True)
-    fk_definitionlang = models.ForeignKey(Languages, related_name='fk_definitionlang', null=True)
+    language = models.ForeignKey(Languages, related_name='current_lang', null=True)
+    target = models.ForeignKey(Languages, related_name='target_lang', null=True)
     fk_dictionary_apis = models.ForeignKey(DictionaryApis, related_name='fk_dictionary_apis', null=True)
     fk_user_contributor = models.ForeignKey(User, related_name='fk_user_contributor', null=True)
     fk_word_type_id = models.ForeignKey(WordTypes, related_name='fk_word_type_id', null=True)
     # TODO: Create fulltext index in DB
-    word_character = CharNullField(null=True, max_length=600, blank=True)
+    word = CharNullField(null=True, max_length=600, blank=True)
     definition = models.CharField(null=True, max_length=8000)
     transliteration = CharNullField(null=True, max_length=8000, blank=True)
     total_lookups = models.IntegerField(null=True)
