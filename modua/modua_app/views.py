@@ -11,14 +11,12 @@ from rest_framework.reverse import reverse
 
 from .models import Definitions, Languages
 from .serializers import (
-        DefinitionsSerializer, 
+        DefinitionsSerializer,
         LanguagesSerializer
         )
 
 from .utils import segmentize
 from .mixins import LanguageFilterMixin
-
-import pdb
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
@@ -34,12 +32,14 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     Attributes
     ----------
 
-    delimited : boolean 
+    delimited : `boolean`
         True if language is delimited, otherwise False. Inherited from `LanguageFilterMixin`.
-    language: :model:`modua_app.models.Languages` 
+
+    language: :model:`modua_app.models.Languages`
         Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
 
     Other attributes, args, and kwargs are the same as ListAPIView.
+
     """
 
     queryset = Definitions.objects.all()
@@ -48,11 +48,12 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        """Get a word definition.  
-        
+        """Get a word definition.
+
         Overrides ListAPIView's get() method.
-        
+
         :raises NotFound: Word not found in dictionary database.
+
         """
 
         response = self.list(request, *args, **kwargs)
@@ -64,19 +65,19 @@ class SearchView(ListAPIView, LanguageFilterMixin):
         """Overrides ListAPIView's get_queryset() method.
 
         Returns a queryset of matches for 'word' URL keyword.
-        
+
         """
         word = self.kwargs['word']
         if self.delimited:
             definitions = Definitions.objects.filter(
-                    word_character=word,
-                    fk_definitionlang=self.language
+                    word=word,
+                    language=self.language
             )
         else:
             segs = list(segmentize(self.kwargs['word']))
             definitions = Definitions.objects.filter(
-                    word_character__in=segs,
-                    fk_definitionlang=self.language
+                    word__in=segs,
+                    language=self.language
             )
 
         return definitions
@@ -96,4 +97,4 @@ class LanguageWordlistView(ListAPIView, LanguageFilterMixin):
     serializer_class = DefinitionsSerializer
 
     def get_queryset(self):
-        return Definitions.objects.filter(fk_definitionlang=self.language)
+        return Definitions.objects.filter(language=self.language)

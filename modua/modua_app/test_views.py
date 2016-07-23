@@ -31,10 +31,10 @@ class TestViews(APITestCase):
         Tests that the wordlist view returns all the dictionary entries for a given language.
         '''
         lang = Languages.objects.create(language='en')
-        word = Definitions.objects.create(word_character='dude', definition='godly saying', transliteration=None,
-                                          fk_definitionlang=lang)
-        Definitions.objects.create(word_character="hello", definition="A greeting", 
-                                          fk_definitionlang=lang)
+        word = Definitions.objects.create(word='dude', definition='godly saying', transliteration=None,
+                                          language=lang)
+        Definitions.objects.create(word="hello", definition="A greeting", 
+                                          language=lang)
 
         factory = APIRequestFactory()
         request = factory.get('/api/0.1/languages/en/', format='json')
@@ -45,49 +45,49 @@ class TestViews(APITestCase):
         test_results = sorted(
                 [
                   {
-                      'word_character': 'hello', 
+                      'word': 'hello', 
                       'definition': 'A greeting',
                       'transliteration': None 
                   },
                   {
-                      'word_character': 'dude', 
+                      'word': 'dude', 
                       'definition': 'godly saying',
                       'transliteration': None 
                   }
                 ],
-            key=lambda t:t['word_character']
+            key=lambda t:t['word']
         )
 
-        responses = sorted([response.data[0], response.data[1]], key=lambda t: t['word_character'])
+        responses = sorted([response.data[0], response.data[1]], key=lambda t: t['word'])
 
         for test, resp in zip(test_results, responses):
             self.assertDictEqual(test, resp)
 
     def test_searchview(self):
         lang = Languages.objects.create(language='en')
-        Definitions.objects.create(word_character='dude', definition='godly saying', transliteration=None,
-                                          fk_definitionlang=lang)
+        Definitions.objects.create(word='dude', definition='godly saying', transliteration=None,
+                                          language=lang)
         factory = APIRequestFactory()
         request = factory.get('/api/0.1/languages/en/dude', format='json')
         dude = {
-                   'word_character': 'dude', 
+                   'word': 'dude',
                    'definition': 'godly saying',
-                   'transliteration': None 
+                   'transliteration': None
                }
         view = SearchView.as_view()
         response = view(request, language='en', word='dude')
         self.assertDictEqual(dude, response.data[0])
-    
+
     def test_searchview_no_term(self):
         lang = Languages.objects.create(language='en')
-        Definitions.objects.create(word_character='dude', definition='godly saying', transliteration=None,
-                                          fk_definitionlang=lang)
+        Definitions.objects.create(word='dude', definition='godly saying', transliteration=None,
+                                          language=lang)
         factory = APIRequestFactory()
         request = factory.get('/api/0.1/languages/en/no_term', format='json')
         dude = {
-                   'word_character': 'meek', 
+                   'word': 'meek',
                    'definition': 'godly saying',
-                   'transliteration': None 
+                   'transliteration': None
                }
         view = SearchView.as_view()
         response = view(request, language='en', word='meek')

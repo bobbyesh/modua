@@ -22,5 +22,3 @@ class LanguageFilterMixin(object):
         if not hasattr(self, '_is_delimited'):
             self._is_delimited = is_delimited(self.language)
         return self._is_delimited
-
-        

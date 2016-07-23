@@ -19,13 +19,13 @@ class TestViews(APITestCase):
         eng = Languages.objects.create(language='en')
         zh = Languages.objects.create(language='zh')
 
-        Definitions.objects.create(word_character="hello",
+        Definitions.objects.create(word="hello",
                                            definition="A greeting",
-                                           fk_definitionlang=eng)
+                                           language=eng)
 
-        Definitions.objects.create(word_character='kool-aid',
+        Definitions.objects.create(word='kool-aid',
                                    definition='the koolest drink ever',
-                                   fk_definitionlang=zh)
+                                   language=zh)
 
         User.objects.create_user('john', 'john@gmail.com', 'password')
 
@@ -43,7 +43,7 @@ class TestViews(APITestCase):
         '''
         response = self.client.get("/api/0.1/languages/en/hello", format='json')
         json = response.json()[0]
-        self.assertEqual(json, {'word_character': "hello",
+        self.assertEqual(json, {'word': "hello",
                                     'definition': 'A greeting',
                                     'transliteration': None })
     
@@ -67,11 +67,11 @@ class TestViews(APITestCase):
         '''
         response = self.client.get("/api/0.1/languages/zh/kool-aidxxxx", format='json')
         json = response.json()[0]
-        self.assertDictEqual(json, {'word_character': 'kool-aid',
+        self.assertDictEqual(json, {'word': 'kool-aid',
                                     'definition': 'the koolest drink ever',
                                     'transliteration': None
                                })
-    
+
     def test_bad_nondelimited_search(self):
         '''
         Passes if a request for a nondelimited word that isn't in the database returns a 404 response.
