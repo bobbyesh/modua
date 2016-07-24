@@ -11,9 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   modules/models
-   modules/views
-   modules/api
+   installation
+
 
 
 
