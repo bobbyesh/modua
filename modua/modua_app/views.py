@@ -2,6 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 
 from rest_framework.generics import ListAPIView, GenericAPIView
+from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import AllowAny
@@ -22,10 +24,11 @@ from .mixins import LanguageFilterMixin
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'languages': reverse('language_list', request=request, format=format),
+        'languages': reverse('language-list', request=request, format=format),
         })
 
-class SearchView(ListAPIView, LanguageFilterMixin):
+
+class DefinitionListView(APIView, LanguageFilterMixin):
     """Defines a GET method to return json for an individual :model:`modua_app.Definitions`.
 
 
@@ -38,16 +41,42 @@ class SearchView(ListAPIView, LanguageFilterMixin):
     language: :model:`modua_app.models.Languages`
         Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
 
-    Other attributes, args, and kwargs are the same as ListAPIView.
+    Other attributes, args, and kwargs are the same as APIView.
 
     """
 
-    queryset = Definitions.objects.all()
-    serializer_class = DefinitionsSerializer
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
+        queryset = Definitions.objects.filter(language=self.language)
+        serializer = DefinitionsSerializer(queryset, many=True, context= {'request': request})
+        return Response(serializer.data)
+
+
+
+
+class DefinitionDetailView(APIView, LanguageFilterMixin):
+    """Defines a GET method to return json for an individual :model:`modua_app.Definitions`.
+
+
+    Attributes
+    ----------
+
+    delimited : `boolean`
+        True if language is delimited, otherwise False. Inherited from `LanguageFilterMixin`.
+
+    language: :model:`modua_app.models.Languages`
+        Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
+
+    Other attributes, args, and kwargs are the same as APIView.
+
+    """
+
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (AllowAny,)
+
+    def get(self, request, format=None, *args, **kwargs):
         """Get a word definition.
 
         Overrides ListAPIView's get() method.
@@ -55,11 +84,10 @@ class SearchView(ListAPIView, LanguageFilterMixin):
         :raises NotFound: Word not found in dictionary database.
 
         """
+        queryset = Definitions.objects.filter(word=self.kwargs['word'], language=self.language)
+        serializer = DefinitionsSerializer(queryset, context= {'request': request})
+        return Response(serializer.data)
 
-        response = self.list(request, *args, **kwargs)
-        if not response.data:
-            raise NotFound
-        return response
 
     def get_queryset(self):
         """Overrides ListAPIView's get_queryset() method.
@@ -88,7 +116,6 @@ class LanguageListView(ListAPIView):
     queryset = Languages.objects.all()
     serializer_class = LanguagesSerializer
     permission_classes = (AllowAny,)
-    lookup_fields = ('language',)
 
 
 class LanguageWordlistView(ListAPIView, LanguageFilterMixin):

@@ -11,10 +11,16 @@ class DefinitionsSerializer(serializers.ModelSerializer):
 class LanguagesWordListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Languages
-        fields = ('language', 'words')
+        fields = ('language', 'word')
 
 
-class LanguagesSerializer(serializers.ModelSerializer):
+class LanguagesSerializer(serializers.HyperlinkedModelSerializer):
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name = 'definition-list',
+        lookup_field = 'language',
+    )
+
     class Meta:
         model = Languages
-        fields = ('language',)
+        fields = ('language', 'url')

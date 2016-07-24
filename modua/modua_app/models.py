@@ -97,7 +97,7 @@ class Definitions(models.Model):
         super(Definitions, self).save()
 
     def __str__(self):
-        return '%s' % self.word_character
+        return '%s' % self.word
 
 
 class Country(models.Model):
