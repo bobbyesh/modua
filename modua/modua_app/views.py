@@ -27,7 +27,7 @@ def api_root(request, format=None):
         'languages': reverse('language-list', request=request, format=format),
         })
 
-class DefinitionListView(APIView, LanguageFilterMixin):
+class DefinitionListView(ListAPIView, LanguageFilterMixin):
     """Defines a GET method to return json for a list of :model:`modua_app.Definitions`.
 
     Read-only.
@@ -42,17 +42,32 @@ class DefinitionListView(APIView, LanguageFilterMixin):
     language: :model:`modua_app.models.Languages`
         Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
 
-    Other attributes, args, and kwargs are the same as APIView.
+    Other attributes, args, and kwargs are the same as ListAPIView.
 
     """
 
+    queryset = Definitions.objects.all()
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
+    serializer_class = DefinitionsSerializer
 
-    def get(self, request, format=None, *args, **kwargs):
+    def get_queryset(self):
         queryset = Definitions.objects.filter(language=self.language)
+        return queryset
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = Definitions.objects.filter(language=self.language)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = DefinitionsSerializer(page, many=True, context= {'request': request})
+            return self.get_paginated_response(serializer.data)
         serializer = DefinitionsSerializer(queryset, many=True, context= {'request': request})
         return Response(serializer.data)
+
+
+    def get(self, request, format=None, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
 
 
