@@ -27,9 +27,10 @@ def api_root(request, format=None):
         'languages': reverse('language-list', request=request, format=format),
         })
 
-
 class DefinitionListView(APIView, LanguageFilterMixin):
-    """Defines a GET method to return json for an individual :model:`modua_app.Definitions`.
+    """Defines a GET method to return json for a list of :model:`modua_app.Definitions`.
+
+    Read-only.
 
 
     Attributes
@@ -56,8 +57,8 @@ class DefinitionListView(APIView, LanguageFilterMixin):
 
 
 
-class DefinitionDetailView(APIView, LanguageFilterMixin):
-    """Defines a GET method to return json for an individual :model:`modua_app.Definitions`.
+class DefinitionGenericView(APIView, LanguageFilterMixin):
+    """Defines a GET method to return json for an individual or a list of :model:`modua_app.Definitions`.
 
 
     Attributes
@@ -79,20 +80,19 @@ class DefinitionDetailView(APIView, LanguageFilterMixin):
     def get(self, request, format=None, *args, **kwargs):
         """Get a word definition.
 
-        Overrides ListAPIView's get() method.
+        Overrides APIView's get() method.
 
         :raises NotFound: Word not found in dictionary database.
 
         """
-        queryset = Definitions.objects.filter(word=self.kwargs['word'], language=self.language)
-        serializer = DefinitionsSerializer(queryset, context= {'request': request})
+        queryset = self.get_queryset()
+        many = len(queryset) > 1
+        serializer = DefinitionsSerializer(queryset, many=many, context= {'request': request})
         return Response(serializer.data)
 
 
     def get_queryset(self):
-        """Overrides ListAPIView's get_queryset() method.
-
-        Returns a queryset of matches for 'word' URL keyword.
+        """Returns a queryset of matches for 'word' URL keyword.
 
         """
         word = self.kwargs['word']

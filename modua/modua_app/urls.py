@@ -5,7 +5,7 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^languages/(?P<language>[\w-]+)/(?P<word>[\w-]+)', views.DefinitionDetailView.as_view(), name='definition-detail'),
+    url(r'^languages/(?P<language>[\w-]+)/(?P<word>[\w-]+)', views.DefinitionGenericView.as_view(), name='definition-generic'),
     url(r'^languages/(?P<language>[\w-]+)/', views.DefinitionListView.as_view(), name='definition-list'),
     url(r'^languages/', views.LanguageListView.as_view(), name='language-list'),
     url(r'^$', views.api_root, name='api-root'),
