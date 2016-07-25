@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Project Installation (For Developers) &mdash; Mouse Over Dictionary with User Accounts 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Mouse Over Dictionary with User Accounts 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to Mouse Over Dictionary with User Accounts’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="project-installation-for-developers">
+<h1>Project Installation (For Developers)<a class="headerlink" href="#project-installation-for-developers" title="Permalink to this headline">¶</a></h1>
+<p>Follow these directions in order if you are starting from scratch.  Some database dependencies are in the
+requirements.txt, so install those first, and only then move onto the database setup.</p>
+</div>
+<div class="section" id="dependencies-installation">
+<h1>Dependencies Installation<a class="headerlink" href="#dependencies-installation" title="Permalink to this headline">¶</a></h1>
+<p>sudo pip3 install -r modua/modua/requirements.txt</p>
+</div>
+<div class="section" id="database-installation-and-setup">
+<h1>Database Installation and Setup<a class="headerlink" href="#database-installation-and-setup" title="Permalink to this headline">¶</a></h1>
+<ol class="arabic">
+<li><p class="first">sudo apt-get install postgresql postgresql-contrib</p>
+</li>
+<li><p class="first">sudo apt-get install libpq-dev python-dev</p>
+</li>
+<li><p class="first">sudo pip3 install -r modua/modua/requirements.txt</p>
+</li>
+<li><p class="first">sudo su - postgres</p>
+</li>
+<li><p class="first">createdb modua</p>
+</li>
+<li><dl class="first docutils">
+<dt>createuser -P root_webbuild</dt>
+<dd><p class="first last">..note:  Type &#8216;happytime3.14&#8217; when prompted for the password (omit quotes)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">psql</p>
+</li>
+<li><p class="first">GRANT ALL PRIVILEGES ON DATABASE modua TO root_webbuild;</p>
+</li>
+<li><p class="first">ALTER USER root_webbuild CREATEDB;</p>
+</li>
+</ol>
+<p>Run &#8216;python3 manage.py test&#8217; and make sure the tests run.  Don&#8217;t mind if they fail or pass, just that there
+are no dependency or permission errors when the test_modua database is created.</p>
+<p>Installation is done.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Project Installation (For Developers)</a></li>
+<li><a class="reference internal" href="#dependencies-installation">Dependencies Installation</a></li>
+<li><a class="reference internal" href="#database-installation-and-setup">Database Installation and Setup</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Mouse Over Dictionary with User Accounts&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, William Brown, Jack Chen, Bobby Eshleman.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/installation.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
