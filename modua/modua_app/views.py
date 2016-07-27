@@ -17,8 +17,10 @@ from .serializers import (
         LanguagesSerializer
         )
 
-from .utils import segmentize
+from .utils import segmentize, all_combinations
 from .mixins import LanguageFilterMixin
+
+import pdb
 
 
 @api_view(['GET'])
@@ -52,13 +54,14 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
     permission_classes = (AllowAny,)
     serializer_class = DefinitionsSerializer
 
-    def get_queryset(self):
-        queryset = Definitions.objects.filter(language=self.language)
-        return queryset
 
+    def get(self, request, format=None, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
-        queryset = Definitions.objects.filter(language=self.language)
+        queryset = self.get_queryset()
+        if not queryset:
+            return Response(status=404)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = DefinitionsSerializer(page, many=True, context= {'request': request})
@@ -66,9 +69,37 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
         serializer = DefinitionsSerializer(queryset, many=True, context= {'request': request})
         return Response(serializer.data)
 
+    def get_queryset(self):
+        """If the URL doesn't contain a keyword `word`, then return all words in the language.
+        Otherwise, return all words in the language matching the keyword `word`.
 
-    def get(self, request, format=None, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        """
+        if 'word' not in self.kwargs:
+            return self.get_all_words()
+
+        return self.get_word_subset()
+
+    def get_all_words(self):
+        """Returns a queryset of all the words in URL keyword 'language'"""
+        queryset = Definitions.objects.filter(language=self.language)
+        return queryset
+
+    def get_word_subset(self):
+        """Returns a queryset of matches for 'word' and 'language' URL keywords."""
+        word = self.kwargs['word']
+        if self.delimited:
+            queryset = Definitions.objects.filter(
+                word=word,
+                language=self.language
+            )
+        else:
+            queryset = Definitions.objects.filter(
+                word__in=all_combinations(word),
+                language=self.language
+            )
+        return queryset
+
+
 
 
 class DefinitionGenericView(APIView, LanguageFilterMixin):
@@ -111,10 +142,16 @@ class DefinitionGenericView(APIView, LanguageFilterMixin):
 
         """
         word = self.kwargs['word']
-        definitions = Definitions.objects.filter(
-                          word=word,
-                          language=self.language
-        )
+        if self.delimited:
+            definitions = Definitions.objects.filter(
+                word=word,
+                language=self.language
+            )
+        else:
+            definitions = Definitions.objects.filter(
+                word__in=all_combinations(word),
+                language=self.language
+            )
         return definitions
 
 

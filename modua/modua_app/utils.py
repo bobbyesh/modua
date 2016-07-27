@@ -18,7 +18,7 @@ def segmentize(string):
 
 
 def all_combinations(string):
-    """Yields all possible combinations of substrings."""
+    """Returns a set of yields all possible combinations of substrings."""
     s = set()
     for i in range(len(string)):
         for seg in segmentize(string[i:]):
@@ -37,7 +37,3 @@ def is_delimited(tag):
         return True
     if subtags[0] == 'zh':
         return False
-
-if __name__ == '__main__':
-    result = all_combinations('abc')
-    assert result == {'abc', 'ab', 'bc', 'a','b', 'c'}

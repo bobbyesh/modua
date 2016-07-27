@@ -17,16 +17,13 @@ class TestViews(APITestCase):
 
 
     def setUp(self):
-        eng = Languages.objects.create(language='en')
-        zh = Languages.objects.create(language='zh')
+        self.eng = Languages.objects.create(language='en')
+        self.zh = Languages.objects.create(language='zh')
 
         Definitions.objects.create(word="hello",
                                            definition="A greeting",
-                                           language=eng)
+                                           language=self.eng)
 
-        Definitions.objects.create(word='kool-aid',
-                                   definition='the koolest drink ever',
-                                   language=zh)
 
         User.objects.create_user('john', 'john@gmail.com', 'password')
 
@@ -44,7 +41,8 @@ class TestViews(APITestCase):
         '''
         response = self.client.get("/api/0.1/languages/en/hello")
         json = response.json()
-        for result in json:
+        results = json['results']
+        for result in results:
             self.assertEqual(result['word'], 'hello')
 
     def test_bad_term_search(self):
@@ -63,9 +61,28 @@ class TestViews(APITestCase):
 
     def test_nondelimited_term_search(self):
         '''
-        Passes if a the json returned from a valid search for a nondelimited word is correct.
+        Passes if the json returned from a valid search for a nondelimited word is correct.
         '''
-        pass
+        tokens = {'㚻', '一派謊言', '一眨眼', '一派'}
+        for word in tokens:
+            Definitions.objects.create(
+                word=word,
+                definition='foo',
+                language=self.zh
+            )
+
+        queryset = Definitions.objects.filter(language=self.zh)
+        self.assertTrue(len(queryset) == len(tokens))
+
+        concat = ''.join(t for t in tokens)
+        response = self.client.get("/api/0.1/languages/zh/" + concat, format='json')
+        json = response.json()
+        results = json['results']
+        token_in_json = False
+        for obj in results:
+            if 'word' in obj:
+                self.assertTrue(obj['word'] in tokens)
+
 
     def test_bad_nondelimited_search(self):
         '''
