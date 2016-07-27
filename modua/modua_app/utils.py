@@ -2,6 +2,7 @@
 '''A utility package for MODUA'''
 import re
 
+
 def segmentize(string):
     '''Yields a generator of string in segmented form.
 
@@ -16,6 +17,15 @@ def segmentize(string):
         yield lexeme
 
 
+def all_combinations(string):
+    """Yields all possible combinations of substrings."""
+    s = set()
+    for i in range(len(string)):
+        for seg in segmentize(string[i:]):
+            s.add(seg)
+    return s
+
+
 def is_delimited(tag):
     '''Returns True if the language tag identifies a space delimited
     language, otherwise returns False'''
@@ -27,3 +37,7 @@ def is_delimited(tag):
         return True
     if subtags[0] == 'zh':
         return False
+
+if __name__ == '__main__':
+    result = all_combinations('abc')
+    assert result == {'abc', 'ab', 'bc', 'a','b', 'c'}

@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from .utils import segmentize, is_delimited
+from .utils import segmentize, is_delimited, all_combinations
 
 
 class TestUtils(SimpleTestCase):
@@ -20,3 +20,7 @@ class TestUtils(SimpleTestCase):
         '''Test that the is_delimited function works'''
         self.assertTrue(is_delimited('en-US'))
         self.assertFalse(is_delimited('zh-Hanz'))
+
+    def test_all_combinations(self):
+        result = all_combinations('abc')
+        self.assertTrue(result == {'abc', 'ab', 'bc', 'a','b', 'c'})
