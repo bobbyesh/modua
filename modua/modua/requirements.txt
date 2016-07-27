@@ -31,5 +31,6 @@ requests==2.4.3
 selenium==2.53.6
 six==1.10.0
 snowballstemmer==1.2.1
+tqdm==4.7.6
 urllib3==1.9.1
 wheel==0.24.0
