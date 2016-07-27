@@ -20,6 +20,7 @@ from .serializers import (
 from .utils import segmentize
 from .mixins import LanguageFilterMixin
 
+
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
@@ -70,8 +71,6 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
         return self.list(request, *args, **kwargs)
 
 
-
-
 class DefinitionGenericView(APIView, LanguageFilterMixin):
     """Defines a GET method to return json for an individual or a list of :model:`modua_app.Definitions`.
 
@@ -101,8 +100,9 @@ class DefinitionGenericView(APIView, LanguageFilterMixin):
 
         """
         queryset = self.get_queryset()
-        many = len(queryset) > 1
-        serializer = DefinitionsSerializer(queryset, many=many, context= {'request': request})
+        if not queryset:
+            return Response(status=404)
+        serializer = DefinitionsSerializer(queryset, many=True, context= {'request': request})
         return Response(serializer.data)
 
 
@@ -111,18 +111,10 @@ class DefinitionGenericView(APIView, LanguageFilterMixin):
 
         """
         word = self.kwargs['word']
-        if self.delimited:
-            definitions = Definitions.objects.filter(
-                    word=word,
-                    language=self.language
-            )
-        else:
-            segs = list(segmentize(self.kwargs['word']))
-            definitions = Definitions.objects.filter(
-                    word__in=segs,
-                    language=self.language
-            )
-
+        definitions = Definitions.objects.filter(
+                          word=word,
+                          language=self.language
+        )
         return definitions
 
 

@@ -2,7 +2,9 @@ import json
 from rest_framework.test import APITestCase, APIRequestFactory
 
 from .models import Definitions, User, Languages
-from .views import SearchView, LanguageWordlistView, LanguageListView
+from .views import DefinitionGenericView, LanguageWordlistView, LanguageListView
+
+import pdb
 
 
 
@@ -74,7 +76,7 @@ class TestViews(APITestCase):
                    'definition': 'godly saying',
                    'transliteration': None
                }
-        view = SearchView.as_view()
+        view = DefinitionGenericView.as_view()
         response = view(request, language='en', word='dude')
         self.assertDictEqual(dude, response.data[0])
 
@@ -89,6 +91,6 @@ class TestViews(APITestCase):
                    'definition': 'godly saying',
                    'transliteration': None
                }
-        view = SearchView.as_view()
-        response = view(request, language='en', word='meek')
+        view = DefinitionGenericView.as_view()
+        response = view(request, language='en', word='no_term')
         self.assertEqual(response.status_code, 404)
