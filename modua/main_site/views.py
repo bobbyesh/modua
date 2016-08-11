@@ -30,24 +30,20 @@ class RegistrationSuccessView(TemplateView):
     template_name = 'main_site/success.html'
 
 
-class SampleAnnotationView(TemplateView):
+class AnnotationView(TemplateView):
     template_name = 'main_site/annotation.html'
-    some_data = [{'word': 'hello',
-                    'definition': 'a greeting',
-                    'pk': 1},
-                   {'word': 'bye',
-                    'definition': 'a salutation',
-                    'pk': 2},
-                   {'word': 'house',
-                    'definition': 'a dwelling space',
-                    'pk': 3},
-                  ]
 
     def get_context_data(self, **kwargs):
-        context = super(SampleAnnotationView,
+        context = super(AnnotationView,
                         self).get_context_data(**kwargs)
-        context['word_data'] = self.some_data
+        word_list = [
+            {'word': 'hello', 'def': 'a greeting', 'pk': 1},
+            {'word': 'bye', 'def':'a salutation', 'pk': 2},
+            {'word': 'snow', 'def':'a cold thing', 'pk': 3},
+        ]
+        context['word_list'] =  word_list
         return context
+
 
 
 

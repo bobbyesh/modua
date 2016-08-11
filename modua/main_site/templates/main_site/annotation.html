@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block primary %}
+    <h1>Sample Page for word hovering</h1>
+    <div id="container">
+	<!-- WORD SPAN -->
+	{% for word in word_list %}
+    	<span id="trigger" data-pk="{{ word.pk }}">{{ word.word }} </span>.
+        <!-- HIDDEN / POP-UP DIV -->
+	<div id="pop-up" data-pk="{{ word.pk }}">
+            <h3>{{ word.word }}</h3>
+            <p>{{ word.def }}</p>              
+        </div>
+	{% endfor %}
+	</div>
+	
+{% endblock %}
