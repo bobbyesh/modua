@@ -29,6 +29,28 @@ class RegistrationView(FormView):
 class RegistrationSuccessView(TemplateView):
     template_name = 'main_site/success.html'
 
+
+class SampleAnnotationView(TemplateView):
+    template_name = 'main_site/annotation.html'
+    some_data = [{'word': 'hello',
+                    'definition': 'a greeting',
+                    'pk': 1},
+                   {'word': 'bye',
+                    'definition': 'a salutation',
+                    'pk': 2},
+                   {'word': 'house',
+                    'definition': 'a dwelling space',
+                    'pk': 3},
+                  ]
+
+    def get_context_data(self, **kwargs):
+        context = super(SampleAnnotationView,
+                        self).get_context_data(**kwargs)
+        context['word_data'] = self.some_data
+        return context
+
+
+
 class LoginView(TemplateView):
     pass
 
