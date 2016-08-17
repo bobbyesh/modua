@@ -9,6 +9,8 @@ from django.utils.decorators import method_decorator
 
 from .forms import RegistrationForm, AnnotationForm
 
+from wordfencer.parser import ChineseParser
+
 import pdb
 
 class HomeView(TemplateView):
@@ -44,6 +46,9 @@ class AnnotationView(FormView):
         if form.is_valid():
             text = form.cleaned_data['text']
             request.session['text'] = text
+            parser = ChineseParser()
+            words = parser.parse(text)
+            request.session['words'] = words
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -55,6 +60,7 @@ class AnnotationCompleteView(TemplateView):
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         context['text'] = request.session['text']
+        context['words'] = request.session['words']
         return self.render_to_response(context)
 
 

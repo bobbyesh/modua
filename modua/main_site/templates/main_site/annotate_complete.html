@@ -5,4 +5,11 @@
 
   {{ text }}
 
+
+  <br>
+  <br>
+
+  {% for word in words %}<span name="{{ word|lower }}" class="word">{{word}}</span>{% endfor %}
+
+
 {% endblock %}
