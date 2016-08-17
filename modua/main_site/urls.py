@@ -6,5 +6,6 @@ urlpatterns = [
     url(r'^registration/$', views.RegistrationView.as_view(), name="registration"),
     url(r'^success/$', views.RegistrationSuccessView.as_view(), name="registration-success"),
     url(r'^annotate/$', views.AnnotationView.as_view(), name="annotation"),
+    url(r'^annotate_complete/$', views.AnnotationCompleteView.as_view(), name="annotate-complete"),
 
 ]

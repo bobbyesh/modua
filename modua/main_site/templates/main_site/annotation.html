@@ -1,7 +1,16 @@
-{% extends 'base.html' %}
+{ extends 'base.html' %}
 {% load staticfiles %}
 {% block primary %}
     <h1>Sample Page for word hovering</h1>
+    <div id="container">
+        <form role="form" action="" method="post">
+	   {% csrf_token %}
+	   {{ form.as_p }}
+	   <button type="submit">Submit</button>
+	</form>
+    </div>
+					         
+    </form>
     <div id="container">
 	<!-- WORD SPAN -->
 	{% for word in word_list %}
@@ -12,6 +21,6 @@
             <p>{{ word.def }}</p>              
         </div>
 	{% endfor %}
-	</div>
+    </div>
 	
 {% endblock %}

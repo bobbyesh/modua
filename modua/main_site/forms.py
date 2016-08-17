@@ -7,4 +7,5 @@ class RegistrationForm(forms.ModelForm):
         model = User
         fields = ['username','email']
 
-
+class AnnotationForm(forms.Form):
+    text = forms.CharField(widget=forms.Textarea)

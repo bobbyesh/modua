@@ -3,8 +3,11 @@ from django.views.generic.edit import FormView
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
-from .forms import RegistrationForm
+from .forms import RegistrationForm, AnnotationForm
 
 import pdb
 
@@ -30,21 +33,29 @@ class RegistrationSuccessView(TemplateView):
     template_name = 'main_site/success.html'
 
 
-class AnnotationView(TemplateView):
+class AnnotationView(FormView):
     template_name = 'main_site/annotation.html'
+    form_class = AnnotationForm
+    success_url = '/home/annotate_complete/'
 
-    def get_context_data(self, **kwargs):
-        context = super(AnnotationView,
-                        self).get_context_data(**kwargs)
-        word_list = [
-            {'word': 'hello', 'def': 'a greeting', 'pk': 1},
-            {'word': 'bye', 'def':'a salutation', 'pk': 2},
-            {'word': 'snow', 'def':'a cold thing', 'pk': 3},
-        ]
-        context['word_list'] =  word_list
-        return context
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            text = form.cleaned_data['text']
+            request.session['text'] = text
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
+class AnnotationCompleteView(TemplateView):
+    template_name = 'main_site/annotate_complete.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context['text'] = request.session['text']
+        return self.render_to_response(context)
 
 
 class LoginView(TemplateView):
