@@ -3,6 +3,61 @@
 import re
 
 
+def build_html(**kwargs):
+    '''Builds an html element out of kwargs.
+
+    The :arg:`tag` and :arg:`content` arguments are required.  :arg:`tag` defines what type of
+    html tag, while :arg:`content` defines what is the actually content wrapped by the tag.
+    Any other keyword-value pairs are taken as attributes of the tag.
+
+    :Example:
+
+        >>> build_html(tag='div', content='hello world!')
+        '<div>hello world!</div>'
+        
+        >>> build_html(tag='div', content='hello world!', id='new', href='#')
+        '<div id="new" href="#">'hello world!"</div>
+
+    '''
+
+    if 'tag' not in kwargs:
+        raise Exception("Must contain kwarg `tag`.")
+    if 'content' not in kwargs:
+        raise Exception("Must contain kwarg `content`.")
+
+    # You can't use python's keyword `class` as a kwarg, so use `cls` instead.
+    # This code sets the 'class' kwarg to pass in for the html class attribute.
+    if 'cls' in kwargs:
+        kwargs['class'] = kwargs.pop('cls')
+
+    tag = kwargs.pop('tag')
+    content = kwargs.pop('content')
+
+    attributes = ''
+    for key, val in kwargs.items():
+        attributes += ' {}="{}" '.format(key, val)
+
+    open_tag = '<{tag} {attributes}>'.format(tag=tag, attributes=attributes)
+    closing_tag = '</{tag}>'.format(tag=tag)
+
+    return "{open_tag} {content} {closing_tag}".format(
+        open_tag=open_tag,
+        content=content,
+        closing_tag=closing_tag
+    )
+
+
+def build_popup_html(word, definition):
+    header = build_html(tag='h3',content=word)
+    div = build_html(tag='div', content=definition)
+    outer_span =  build_html(content=header + div, tag='div', name=word, cls='popup')
+    return outer_span
+
+
+def build_word_html(word):
+    return build_html(content=word, tag='span', name=word, cls='word')
+
+
 def segmentize(string):
     '''Yields a generator of string in segmented form.
 

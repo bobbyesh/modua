@@ -11,52 +11,22 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import RegistrationForm, AnnotationForm
 from modua_app.models import Definitions, Languages
+from modua_app.utils import build_html, build_popup_html, build_word_html
 
-from wordfencer.parser import ChineseParser, is_cjk_punctuation
+from wordfencer.parser import ChineseParser
 import pdb
 
 
+'''
 
-def build_html(**kwargs):
-    if 'tag' not in kwargs:
-        raise Exception("Must contain kwarg `tag`.")
-    if 'content' not in kwargs:
-        raise Exception("Must contain kwarg `content`.")
+..TODO:  Move build_html, build_popup_html, build_word_html into utils module, or start a core app (a la Two Scoops of Django)?
 
-    # You can't use python's keyword `class` as a kwarg, so use `cls` instead.
-    # This code sets the 'class' kwarg to pass in for the html class attribute.
-    if 'cls' in kwargs:
-        kwargs['class'] = kwargs['cls']
-
-    tag = kwargs.pop('tag')
-    content = kwargs.pop('content')
-
-    attributes = ''
-    for key, val in kwargs.items():
-        attributes += ' {}="{}" '.format(key, val)
-
-    open_tag = '<{tag} {attributes}>'.format(tag=tag, attributes=attributes)
-    closing_tag = '</{tag}>'.format(tag=tag)
-    return "{open_tag} {content} {closing_tag}".format(
-        open_tag=open_tag,
-        content=content,
-        closing_tag=closing_tag
-    )
-
-
-def build_popup_html(word, definition):
-    header = build_html(tag='h3',content=word)
-    div = build_html(tag='div', content=definition)
-    outer_span =  build_html(content=header + div, tag='div', name=word, cls='popup')
-    return outer_span
-
-
-def build_word_html(word):
-    return build_html(content=word, tag='span', name=word, cls='word')
+'''
 
 
 class HomeView(TemplateView):
     template_name = 'main_site/home.html'
+
 
 class RegistrationView(FormView):
     template_name = 'main_site/register.html'
@@ -72,6 +42,7 @@ class RegistrationView(FormView):
                                 email=email,
                                 password=password)
         return super(RegistrationView, self).form_valid(form)
+
 
 class RegistrationSuccessView(TemplateView):
     template_name = 'main_site/success.html'
@@ -95,13 +66,13 @@ class AnnotationView(FormView):
                 if len(word) > 1:
                     word_html = build_word_html(word)
                     words[idx] = word_html
-                    definitions = self.get_definition_or_empty(word)
+                    definitions = self.get_definitions_or_empty(word)
                     popups.append(build_popup_html(word, definitions))
                     # Any unicode category starting with a P is punctuation
                 elif not unicodedata.category(word).startswith('P'):
                     word_html = build_word_html(word)
                     words[idx] = word_html
-                    definitions = self.get_definition_or_empty(word)
+                    definitions = self.get_definitions_or_empty(word)
                     popups.append(build_popup_html(word, definitions))
 
             request.session['words'] = words
@@ -111,13 +82,14 @@ class AnnotationView(FormView):
             return self.form_invalid(form)
 
 
-    def get_definition_or_empty(self, word):
+    def get_definitions_or_empty(self, word):
         s = ''
         try:
             language = Languages.objects.get(language='zh')
             definitions = Definitions.objects.filter(word=word, language=language)
-            for d in definitions:
-                s += d.definition + ' / '
+            unique_definitions = list(set([x.definition for x in definitions]))
+            for definition in unique_definitions:
+                s += definition + ' / '
         except ObjectDoesNotExist:
             pass
         return s
@@ -151,4 +123,3 @@ class WordDetailView(DetailView):
 
 class AddDefinitionView(FormView):
     pass
-
