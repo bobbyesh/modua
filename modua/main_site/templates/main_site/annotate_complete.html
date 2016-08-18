@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
-
 {% load staticfiles %}
 {% block primary %}
 
-  {{ text }}
-
-
-  <br>
-  <br>
-
-  {% for word in words %}<span name="{{ word|lower }}" class="word">{{word}}</span>{% endfor %}
+  {% spaceless %}
+  {% for word in words %}
+       {{ word|safe }}
+  {% endfor %}
+  {% endspaceless %}
+  
+  {% spaceless %}
+  {% for popup in popups %}
+       {{ popup|safe }}
+  {% endfor %}
+  {% endspaceless %}
 
 
 {% endblock %}

@@ -25,8 +25,8 @@
  */
 
 var get_popup_elem = function(that) {
-    var pk = $(that).attr("data-pk");
-    var elem_name = 'div#pop-up[data-pk="' + pk + '"]'
+    var name = $(that).attr("name");
+    var elem_name = 'div.popup[name="' + name + '"]'
     console.log(elem_name);
     return $(elem_name);
 };
@@ -35,15 +35,19 @@ $(function() {
     var moveLeft = 20;
     var moveDown = 10;
 
-    $('span#trigger').hover(function(e) {
+    var onMouseEnter = function(e) {
         var elem = get_popup_elem(this);
         elem.show();
-    }, function() {
+    }
+
+    var onMouseLeave =  function(e) {
         var elem = get_popup_elem(this);
         elem.hide();
-    });
+    }
 
-    $('span#trigger').mousemove(function(e) {
+    $('span.word').hover(onMouseEnter, onMouseLeave);
+
+    $('span.word').mousemove(function(e) {
         var elem = get_popup_elem(this);
         elem.css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
     });

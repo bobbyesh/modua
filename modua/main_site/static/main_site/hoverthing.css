@@ -1,5 +1,5 @@
 /* HOVER STYLES */
-div#pop-up {
+div.popup {
     display: none;
     position: absolute;
     width: 280px;
