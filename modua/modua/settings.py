@@ -31,11 +31,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
+# These are setup to have the static folder in the root directory of the project.
+# This is different than the default Django implementation!
 
 STATIC_URL = '/static/'
-
-#STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_ROOT = ''
 STATICFILES_DIRS = [
     os.path.join('static'),
