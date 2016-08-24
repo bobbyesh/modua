@@ -3,6 +3,28 @@ from django.contrib.auth.models import User
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Div, Field, Layout
 
+
+class SigninForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)
+    username_or_email = forms.CharField()
+    class Meta:
+        model = User
+        fields = ['username']
+
+    def __init__(self, *args, **kwargs):
+        super(SigninForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        # form_action associates a view name
+        self.helper.form_action = 'signin'
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.layout = Layout(
+            Div('username_or_email', css_class='top-margin', template = 'landing/div_template.html'),
+            Div('password', css_class='top-margin'),
+        )
+
+
+
 class SignupForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     class Meta:

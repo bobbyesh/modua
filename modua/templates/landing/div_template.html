@@ -1,0 +1,5 @@
+<!-- This is designed for a Username/Email form field -->
+<div {% if div.css_id %}id="{{ div.css_id }}"{% endif %} 
+    {% if div.css_class %}class="{{ div.css_class }}"{% endif %} {{ div.flat_attrs|safe }}>
+	            {{ fields|safe }}
+</div>

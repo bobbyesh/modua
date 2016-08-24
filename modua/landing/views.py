@@ -1,6 +1,6 @@
 import unicodedata
 from django.views.generic import View, ListView, DetailView, TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import SignupForm, AnnotationForm
+from .forms import SignupForm, AnnotationForm, SigninForm
 from modua_app.models import Definitions, Languages
 from modua_app.utils import build_html, build_popup_html, build_word_html
 
@@ -28,25 +28,17 @@ class IndexView(TemplateView):
     template_name = 'landing/index.html'
 
 
-class SigninView(TemplateView):
+class SigninView(FormView):
+    model = User
     template_name = 'landing/signin.html'
+    form_class = SigninForm
 
 
-class SignupView(FormView):
+class SignupView(CreateView):
+    model = User
     template_name = 'landing/signup.html'
     form_class = SignupForm
     success_url = '/signup/success/'
-
-    def form_valid(self, form):
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            User.objects.create(username=username,
-                                email=email,
-                                password=password)
-        return super(SignupView, self).form_valid(form)
-
 
 class RegistrationSuccessView(TemplateView):
     template_name = 'landing/success.html'
