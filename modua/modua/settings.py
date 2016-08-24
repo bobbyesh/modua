@@ -45,6 +45,7 @@ STATICFILES_FINDERs = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'twitter_bootstrap',
+    'crispy_forms',
     'modua_app',
     'modua',
     'main_site',

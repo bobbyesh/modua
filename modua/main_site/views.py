@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import RegistrationForm, AnnotationForm
+from .forms import SignupForm, AnnotationForm
 from modua_app.models import Definitions, Languages
 from modua_app.utils import build_html, build_popup_html, build_word_html
 
@@ -28,10 +28,14 @@ class IndexView(TemplateView):
     template_name = 'main_site/index.html'
 
 
-class RegistrationView(FormView):
-    template_name = 'main_site/register.html'
-    form_class = RegistrationForm
-    success_url = '/home/success/'
+class SigninView(TemplateView):
+    template_name = 'main_site/signin.html'
+
+
+class SignupView(FormView):
+    template_name = 'main_site/signup.html'
+    form_class = SignupForm
+    success_url = '/signup/success/'
 
     def form_valid(self, form):
         if form.is_valid():
@@ -41,7 +45,7 @@ class RegistrationView(FormView):
             User.objects.create(username=username,
                                 email=email,
                                 password=password)
-        return super(RegistrationView, self).form_valid(form)
+        return super(SignupView, self).form_valid(form)
 
 
 class RegistrationSuccessView(TemplateView):
