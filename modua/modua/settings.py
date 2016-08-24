@@ -35,8 +35,11 @@ ALLOWED_HOSTS = []
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
+#STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = ''
+STATICFILES_DIRS = [
+    os.path.join('static'),
+]
 
 STATICFILES_FINDERs = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -74,7 +77,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': ['templates'],
-        'APP_DIRS': False,
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

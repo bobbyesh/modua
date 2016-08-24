@@ -24,8 +24,8 @@ import pdb
 '''
 
 
-class HomeView(TemplateView):
-    template_name = 'main_site/home.html'
+class IndexView(TemplateView):
+    template_name = 'main_site/index.html'
 
 
 class RegistrationView(FormView):
