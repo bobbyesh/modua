@@ -1,1 +1,0 @@
-from modua_app.models import *

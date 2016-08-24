@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'modua_app',
     'modua',
-    'main_site',
+    'landing',
 ]
 
 MIDDLEWARE_CLASSES = [

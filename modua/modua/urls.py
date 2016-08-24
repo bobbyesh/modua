@@ -1,3 +1,4 @@
+# urls.py
 """modua URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -18,7 +19,7 @@ from django.contrib import admin
 
 urlpatterns = [
 
-    url(r'^home/', include('main_site.urls')),
+    url(r'', include('landing.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/0.1/', include('modua_app.urls')),
 

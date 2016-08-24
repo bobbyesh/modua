@@ -25,15 +25,15 @@ import pdb
 
 
 class IndexView(TemplateView):
-    template_name = 'main_site/index.html'
+    template_name = 'landing/index.html'
 
 
 class SigninView(TemplateView):
-    template_name = 'main_site/signin.html'
+    template_name = 'landing/signin.html'
 
 
 class SignupView(FormView):
-    template_name = 'main_site/signup.html'
+    template_name = 'landing/signup.html'
     form_class = SignupForm
     success_url = '/signup/success/'
 
@@ -49,11 +49,11 @@ class SignupView(FormView):
 
 
 class RegistrationSuccessView(TemplateView):
-    template_name = 'main_site/success.html'
+    template_name = 'landing/success.html'
 
 
 class AnnotationView(FormView):
-    template_name = 'main_site/annotation.html'
+    template_name = 'landing/annotation.html'
     form_class = AnnotationForm
     success_url = '/home/annotate_complete/'
 
@@ -100,7 +100,7 @@ class AnnotationView(FormView):
 
 
 class AnnotationCompleteView(TemplateView):
-    template_name = 'main_site/annotate_complete.html'
+    template_name = 'landing/annotate_complete.html'
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
