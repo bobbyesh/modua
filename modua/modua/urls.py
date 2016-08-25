@@ -19,7 +19,7 @@ from django.contrib import admin
 
 urlpatterns = [
 
-    url(r'', include('landing.urls', namespace='landing')),
+    url(r'', include('landing.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/0.1/', include('modua_app.urls', namespace='modua_app')),
 

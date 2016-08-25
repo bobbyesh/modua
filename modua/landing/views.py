@@ -15,7 +15,10 @@ from modua_app.utils import build_html, build_popup_html, build_word_html
 
 '''
 
-..TODO:  Start a core app (a la Two Scoops of Django)?
+..TODO:  
+    
+    * Start a core app (a la Two Scoops of Django)?
+    * Fix Signin redirects
 
 '''
 
@@ -49,10 +52,21 @@ class SigninView(FormView):
         if user:
             l = Logger()
             l.log('Authenticated user, redirect to singin-complete')
+            '''
+
+            ..NOTE:  This is redirect should later be changed to the webapp
+
+            '''
             return redirect('signin-complete')
         else:
             l = Logger()
             l.log('User authentication failed, redirect to index')
+            '''
+
+            ..NOTE:  This is redirect should later be changed to the be an
+                     invalid user/password re-prompt.
+
+            '''
             return redirect('modua_app:api-root', request, format=None )
 
 
