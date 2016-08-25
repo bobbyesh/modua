@@ -14,3 +14,4 @@ venv
 *.swp
 settings_local.py
 modua/modua/requirements/cedict_1_0_ts_utf-8_mdbg.txt
+*.log

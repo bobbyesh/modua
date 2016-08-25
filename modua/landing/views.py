@@ -1,28 +1,37 @@
 import unicodedata
-from django.views.generic import View, ListView, DetailView, TemplateView
+from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.core.urlresolvers import reverse
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from django.contrib.auth import login, authenticate
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import redirect
+from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
 from modua_app.models import Definitions, Languages
 from modua_app.utils import build_html, build_popup_html, build_word_html
 
-from wordfencer.parser import ChineseParser
-import pdb
-
 
 '''
 
-..TODO:  Move build_html, build_popup_html, build_word_html into utils module, or start a core app (a la Two Scoops of Django)?
+..TODO:  Start a core app (a la Two Scoops of Django)?
 
 '''
 
+import logging
+class Logger(object):
+
+    def __init__(self):
+        logging.basicConfig(filename='log.log', level=logging.DEBUG)
+
+    def log(self, string):
+        logging.debug(string)
+
+
+class SigninCompleteView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('got it')
 
 class IndexView(TemplateView):
     template_name = 'landing/index.html'
@@ -33,21 +42,43 @@ class SigninView(FormView):
     template_name = 'landing/signin.html'
     form_class = SigninForm
 
+    def form_valid(self, form):
+        username = self.request.POST['username']
+        password = self.request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user:
+            l = Logger()
+            l.log('Authenticated user, redirect to singin-complete')
+            return redirect('signin-complete')
+        else:
+            l = Logger()
+            l.log('User authentication failed, redirect to index')
+            return redirect('modua_app:api-root', request, format=None )
 
-class SignupView(CreateView):
+
+class SignupView(FormView):
     model = User
     template_name = 'landing/signup.html'
     form_class = SignupForm
-    success_url = '/signup/success/'
+    success_url = reverse_lazy('signup-success')
 
-class RegistrationSuccessView(TemplateView):
+
+    def form_valid(self, form):
+        username = self.request.POST['username']
+        email = self.request.POST['email']
+        password = self.request.POST['password']
+        User.objects.create_user(username=username, email=email, password=password)
+        return super(FormView, self).form_valid(form)
+
+
+class SignupSuccessView(TemplateView):
     template_name = 'landing/success.html'
 
 
 class AnnotationView(FormView):
     template_name = 'landing/annotation.html'
     form_class = AnnotationForm
-    success_url = '/home/annotate_complete/'
+    success_url = reverse_lazy('annotate-complete')
 
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
@@ -100,22 +131,3 @@ class AnnotationCompleteView(TemplateView):
         context['words'] = request.session['words']
         context['popups'] = request.session['popups']
         return self.render_to_response(context)
-
-
-class LoginView(TemplateView):
-    pass
-
-
-class UserPageView(TemplateView):
-    pass
-
-
-class WordListView(ListView):
-    pass
-
-
-class WordDetailView(DetailView):
-    pass
-
-class AddDefinitionView(FormView):
-    pass

@@ -27,7 +27,7 @@ import pdb
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'languages': reverse('language-list', request=request, format=format),
+        'languages': reverse('modua_app:language-list', request=request, format=format),
         })
 
 class DefinitionListView(ListAPIView, LanguageFilterMixin):

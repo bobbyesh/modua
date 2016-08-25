@@ -6,10 +6,12 @@ from crispy_forms.layout import Submit, Div, Field, Layout
 
 class SigninForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
-    username_or_email = forms.CharField()
+    username = forms.CharField()
+    '''
     class Meta:
         model = User
         fields = ['username']
+    '''
 
     def __init__(self, *args, **kwargs):
         super(SigninForm, self).__init__(*args, **kwargs)
@@ -19,7 +21,7 @@ class SigninForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Submit'))
         self.helper.layout = Layout(
-            Div('username_or_email', css_class='top-margin', template = 'landing/div_template.html'),
+            Div('username', css_class='top-margin'),
             Div('password', css_class='top-margin'),
         )
 
