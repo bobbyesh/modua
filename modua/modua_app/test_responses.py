@@ -6,9 +6,9 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
-from .models import Definitions, User, Language
+from .models import Definition, User, Language
 from .views import LanguageWordlistView
-from .serializers import LanguageSerializer, DefinitionsSerializer
+from .serializers import LanguageSerializer, DefinitionSerializer
 
 import pdb
 
@@ -20,7 +20,7 @@ class TestViews(APITestCase):
         self.eng = Language.objects.create(language='en')
         self.zh = Language.objects.create(language='zh')
 
-        Definitions.objects.create(word="hello",
+        Definition.objects.create(word="hello",
                                            definition="A greeting",
                                            language=self.eng)
 
@@ -65,13 +65,13 @@ class TestViews(APITestCase):
         '''
         tokens = {'㚻', '一派謊言', '一眨眼', '一派'}
         for word in tokens:
-            Definitions.objects.create(
+            Definition.objects.create(
                 word=word,
                 definition='foo',
                 language=self.zh
             )
 
-        queryset = Definitions.objects.filter(language=self.zh)
+        queryset = Definition.objects.filter(language=self.zh)
         self.assertTrue(len(queryset) == len(tokens))
 
         concat = ''.join(t for t in tokens)
