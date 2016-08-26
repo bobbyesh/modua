@@ -73,13 +73,17 @@ class WordType(models.Model):
 
 
 class Definition(models.Model):
+    '''
+
+    ..TODO  Create fulltext index in DB
+
+    '''
     id = models.AutoField(null=False, primary_key=True, editable=False)
     language = models.ForeignKey(Language, related_name='current_lang', null=True)
     target = models.ForeignKey(Language, related_name='target_lang', null=True)
     dictionary_apis = models.ForeignKey(DictionaryAPI, related_name='dictionary_apis', null=True)
     user_contributor = models.ForeignKey(User, related_name='user_contributor', null=True)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
-    # TODO: Create fulltext index in DB
     word = CharNullField(null=True, max_length=600, blank=True)
     definition = models.CharField(null=True, max_length=8000)
     transliteration = CharNullField(null=True, max_length=8000, blank=True)
