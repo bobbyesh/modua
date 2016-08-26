@@ -1,5 +1,4 @@
 Babel==2.3.4
-Brlapi==0.6.2
 Django==1.9.6
 Jinja2==2.8
 Mako==1.0.0
