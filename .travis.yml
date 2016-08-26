@@ -1,10 +1,10 @@
 language: python
 python:
   - "3.5"
-  install: "pip install -r requirements.txt"
-  script: 
-    - python manage.py test
-  services:
-    - postgresql
-  before_script:
-    - psql -c 'create database travis_ci_test;' -U postgres
+install: "pip install -r requirements.txt"
+script: 
+  - python manage.py test
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
