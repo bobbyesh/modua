@@ -1,5 +1,5 @@
 from .utils import is_delimited
-from .models import Languages
+from .models import Language
 
 class LanguageFilterMixin(object):
     '''
@@ -12,7 +12,7 @@ class LanguageFilterMixin(object):
     @property
     def language(self):
         if not hasattr(self, '_language'):
-            self._language = Languages.objects.filter(
+            self._language = Language.objects.filter(
                     language=self.kwargs['language']
             )
         return self._language

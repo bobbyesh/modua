@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from modua_app.models import Definitions, Languages
+from modua_app.models import Definition, Language
 from modua_app.utils import build_html, build_popup_html, build_word_html
 
 
@@ -126,8 +126,8 @@ class AnnotationView(FormView):
     def get_definitions_or_empty(self, word):
         s = ''
         try:
-            language = Languages.objects.get(language='zh')
-            definitions = Definitions.objects.filter(word=word, language=language)
+            language = Language.objects.get(language='zh')
+            definitions = Definition.objects.filter(word=word, language=language)
             unique_definitions = list(set([x.definition for x in definitions]))
             for definition in unique_definitions:
                 s += definition + ' / '

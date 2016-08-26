@@ -6,9 +6,9 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 
-from .models import Definitions, User, Languages
+from .models import Definitions, User, Language
 from .views import LanguageWordlistView
-from .serializers import LanguagesSerializer, DefinitionsSerializer
+from .serializers import LanguageSerializer, DefinitionsSerializer
 
 import pdb
 
@@ -17,8 +17,8 @@ class TestViews(APITestCase):
 
 
     def setUp(self):
-        self.eng = Languages.objects.create(language='en')
-        self.zh = Languages.objects.create(language='zh')
+        self.eng = Language.objects.create(language='en')
+        self.zh = Language.objects.create(language='zh')
 
         Definitions.objects.create(word="hello",
                                            definition="A greeting",
@@ -99,7 +99,7 @@ class TestLanguageAPI(APITestCase):
         '''
         Passes if /languages/ returns the correct json.
         '''
-        Languages.objects.create(language='en')
+        Language.objects.create(language='en')
         response = self.client.get("/api/0.1/languages/", format='json')
         json = response.json()
         results = json['results']
@@ -112,8 +112,8 @@ class TestLanguageAPI(APITestCase):
         '''
         Passes if /languages/ returns the correct json.
         '''
-        Languages.objects.create(language='en')
-        Languages.objects.create(language='zh')
+        Language.objects.create(language='en')
+        Language.objects.create(language='zh')
         response = self.client.get("/api/0.1/languages/", format='json')
         json = response.json()
         results = json['results']

@@ -1,7 +1,7 @@
 #cedict_import.py
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
-from modua_app.models import Definitions, Languages
+from modua_app.models import Definitions, Language
 from . import cedict_parser
 
 
@@ -24,7 +24,7 @@ def store_def_boi(word, trans, def_arr):
 
         # Do the insertion
         # If there is more than one definition insert them both as different rows
-        zh = Languages.objects.get(language='zh')
+        zh = Language.objects.get(language='zh')
         for definition in def_arr:
             store_this_guy = Definitions(language=zh, word=word, transliteration=trans, definition=definition)
             store_this_guy.save()

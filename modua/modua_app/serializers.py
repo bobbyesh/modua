@@ -1,20 +1,20 @@
 from rest_framework import serializers
-from .models import Definitions, Languages
+from .models import Definition, Language
 
 
-class DefinitionsSerializer(serializers.ModelSerializer):
+class DefinitionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Definitions
+        model = Definition
         fields = ('word', 'definition', 'transliteration')
 
 
-class LanguagesWordListSerializer(serializers.ModelSerializer):
+class LanguageWordListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Languages
+        model = Language
         fields = ('language', 'word')
 
 
-class LanguagesSerializer(serializers.HyperlinkedModelSerializer):
+class LanguageSerializer(serializers.HyperlinkedModelSerializer):
 
     url = serializers.HyperlinkedIdentityField(
         view_name = 'definition-list',
@@ -22,5 +22,5 @@ class LanguagesSerializer(serializers.HyperlinkedModelSerializer):
     )
 
     class Meta:
-        model = Languages
+        model = Language
         fields = ('language', 'url')
