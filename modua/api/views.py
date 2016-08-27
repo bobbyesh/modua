@@ -27,11 +27,11 @@ import pdb
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'languages': reverse('modua_app:language-list', request=request, format=format),
+        'languages': reverse('api:language-list', request=request, format=format),
         })
 
 class DefinitionListView(ListAPIView, LanguageFilterMixin):
-    """Defines a GET method to return json for a list of :model:`modua_app.Definition`.
+    """Defines a GET method to return json for a list of :model:`api.Definition`.
 
     Read-only.
 
@@ -42,7 +42,7 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
     delimited : `boolean`
         True if language is delimited, otherwise False. Inherited from `LanguageFilterMixin`.
 
-    language: :model:`modua_app.models.Language`
+    language: :model:`api.models.Language`
         Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
 
     Other attributes, args, and kwargs are the same as ListAPIView.
@@ -103,7 +103,7 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
 
 
 class DefinitionGenericView(APIView, LanguageFilterMixin):
-    """Defines a GET method to return json for an individual or a list of :model:`modua_app.Definition`.
+    """Defines a GET method to return json for an individual or a list of :model:`api.Definition`.
 
 
     Attributes
@@ -112,7 +112,7 @@ class DefinitionGenericView(APIView, LanguageFilterMixin):
     delimited : `boolean`
         True if language is delimited, otherwise False. Inherited from `LanguageFilterMixin`.
 
-    language: :model:`modua_app.models.Language`
+    language: :model:`api.models.Language`
         Model instance matching URL keyword `language`. Inherited from `LanguageFilterMixin`
 
     Other attributes, args, and kwargs are the same as APIView.

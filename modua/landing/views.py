@@ -9,8 +9,8 @@ from django.shortcuts import redirect
 from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from modua_app.models import Definition, Language
-from modua_app.utils import build_html, build_popup_html, build_word_html
+from api.models import Definition, Language
+from api.utils import build_html, build_popup_html, build_word_html
 
 
 '''
@@ -67,7 +67,7 @@ class SigninView(FormView):
                      invalid user/password re-prompt.
 
             '''
-            return redirect('modua_app:api-root', request, format=None )
+            return redirect('api:api-root', request, format=None )
 
 
 class SignupView(FormView):

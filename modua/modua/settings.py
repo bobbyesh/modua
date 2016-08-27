@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'twitter_bootstrap',
     'crispy_forms',
-    'modua_app',
+    'api',
     'modua',
     'landing',
 ]

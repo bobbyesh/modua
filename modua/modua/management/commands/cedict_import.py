@@ -1,7 +1,7 @@
 #cedict_import.py
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
-from modua_app.models import Definitions, Language
+from api.models import Definitions, Language
 from . import cedict_parser
 
 
