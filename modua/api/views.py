@@ -30,6 +30,13 @@ def api_root(request, format=None):
         'languages': reverse('api:language-list', request=request, format=format),
         })
 
+class DefinitionListView(ListAPIView):
+    queryset = Definition.objects.all()
+    authentication_classes = (SessionAuthentication,)
+    permission_classes = (AllowAny,)
+    serializer_class = DefinitionSerializer
+
+'''
 class DefinitionListView(ListAPIView, LanguageFilterMixin):
     """Defines a GET method to return json for a list of :model:`api.Definition`.
 
@@ -98,6 +105,7 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
                 language=self.language
             )
         return queryset
+'''
 
 
 
