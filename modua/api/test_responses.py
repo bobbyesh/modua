@@ -45,7 +45,7 @@ class TestViews(APITestCase):
         User.objects.create_user('john', 'john@gmail.com', 'password')
 
 
-    def test_sentence(self):
+    def test_annotation(self):
         response = self.client.post("/api/0.1/languages/zh/sentence/", {'sentence':'我爱中国'}, format='json')
         print(response)
         import pdb
