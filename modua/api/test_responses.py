@@ -18,14 +18,38 @@ class TestViews(APITestCase):
 
     def setUp(self):
         self.eng = Language.objects.create(language='en')
-        self.zh = Language.objects.create(language='zh')
+        zh = Language.objects.create(language='zh')
 
         Definition.objects.create(word="hello",
                                            definition="A greeting",
                                            language=self.eng)
 
+        Definition.objects.create(
+            word="我",
+            definition="I",
+            language=zh,
+        )
+
+        Definition.objects.create(
+            word="爱",
+            definition="love",
+            language=zh,
+        )
+
+        Definition.objects.create(
+            word="中国",
+            definition="China",
+            language=zh,
+        )
 
         User.objects.create_user('john', 'john@gmail.com', 'password')
+
+
+    def test_sentence(self):
+        response = self.client.post("/api/0.1/languages/zh/sentence/", {'sentence':'我爱中国'}, format='json')
+        print(response)
+        import pdb
+        pdb.set_trace()
 
 
     def test_search_status_code_200(self):
