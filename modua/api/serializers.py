@@ -7,7 +7,7 @@ from .models import Definition, Language
 class DefinitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Definition
-        fields = ('word', 'definition', 'transliteration', 'language')
+        fields = ('word', 'definition', 'transliteration', 'language', 'id')
 
 
 class LanguageSerializer(serializers.ModelSerializer):
