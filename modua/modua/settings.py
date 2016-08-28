@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'api',
     'modua',
     'landing',
+    'core',
 ]
 
 MIDDLEWARE_CLASSES = [
