@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from core.behaviors import Timestampable
-from extras import CharNullField
+from core.fields import CharNullField
 
 
 class Definition(Timestampable, models.Model):

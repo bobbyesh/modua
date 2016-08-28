@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from core.fields import CharNullField
 
 
-
 class Timestampable(models.Model):
     create_date = models.DateTimeField(auto_add_now=True, null=True, editable=False)
     modified_date = models.DateTimeField(auto_now=True, null=True, editable=False)
