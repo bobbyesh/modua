@@ -11,7 +11,6 @@ class Language(Authorable, Editable, Timestampable, models.Model):
     .. TODO: Create fulltext index in DB
 
     '''
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     language = models.CharField(null=True, max_length=150)
     script = models.CharField(null=True, max_length=300)
 
@@ -20,7 +19,6 @@ class Language(Authorable, Editable, Timestampable, models.Model):
 
 
 class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     # TODO: Create fulltext index in DB
     name = models.CharField(null=True, max_length=150)
     # This should be Usage, notes, and known issues
@@ -40,7 +38,6 @@ class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
 
 
 class WordType(Authorable, Editable, Timestampable, models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     word_type = models.CharField(null=True, max_length=150)
 
     def __str__(self):
@@ -53,7 +50,6 @@ class Definition(Timestampable, models.Model):
     ..TODO  Create fulltext index in DB
 
     '''
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     language = models.ForeignKey(Language, related_name='current_lang', null=True)
     target = models.ForeignKey(Language, related_name='target_lang', null=True)
     dictionary_apis = models.ForeignKey(DictionaryAPI, related_name='dictionary_apis', null=True)
@@ -71,7 +67,6 @@ class Definition(Timestampable, models.Model):
 
 
 class Country(Authorable, Editable, Timestampable, models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     country_name = models.CharField(null=True, max_length=250)
 
     def __str__(self):
@@ -79,7 +74,6 @@ class Country(Authorable, Editable, Timestampable, models.Model):
 
 
 class Region(Authorable, Editable, Timestampable, models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     country_region = models.ForeignKey(Country, related_name='country_region', null=True)
     region = models.CharField(null=True, max_length=300)
 
@@ -88,7 +82,6 @@ class Region(Authorable, Editable, Timestampable, models.Model):
 
 
 class City(Authorable, Editable, Timestampable, models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     country_city = models.ForeignKey(Country, related_name='country_city', null=True)
     region_city = models.ForeignKey(Region, related_name='region_city', null=True)
     city_name = models.CharField(null=True, max_length=150)
@@ -98,6 +91,5 @@ class City(Authorable, Editable, Timestampable, models.Model):
 
 
 class UserDefinition(Timestampable, models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
     user_owner = models.ForeignKey(User, related_name='user_owner', null=True)
     definitions = models.ForeignKey(Definition, related_name='definitions', null=True)
