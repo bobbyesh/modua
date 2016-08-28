@@ -5,45 +5,6 @@ from core.behaviors import Timestampable
 from extras import CharNullField
 
 
-class Language(Authorable, Editable, Timestampable, models.Model):
-    '''
-
-    .. TODO: Create fulltext index in DB
-
-    '''
-    language = models.CharField(blank=True, max_length=150)
-    script = models.CharField(blank=True, max_length=300)
-
-    def __str__(self):
-        return '%s' % self.language
-
-
-class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
-    # TODO: Create fulltext index in DB
-    name = models.CharField(blank=True, max_length=150)
-    # This should be Usage, notes, and known issues
-    description = CharNullField(null=True, max_length=8000, blank=True)
-    api_type = models.CharField(blank=True, max_length=150)
-    # Actual site of the dictionary we want to use, not the URL from connecting to it
-    site = models.CharField(blank=True, max_length=2000)
-    # URL used if it's that's how we need to connect to the API
-    base_url = models.CharField(blank=True, max_length=2000)
-    # The API key if you need to register an application with the site - may not be necessary
-    api_key = models.CharField(blank=True, max_length=500)
-    # The key needed/issued to access the API - may not be necessary
-    id_key = models.CharField(blank=True, max_length=500)
-
-    def __str__(self):
-        return str(self.api_name)
-
-
-class WordType(Authorable, Editable, Timestampable, models.Model):
-    word_type = models.CharField(blank=True, max_length=150)
-
-    def __str__(self):
-        return str(self.word_type)
-
-
 class Definition(Timestampable, models.Model):
     '''
 
@@ -52,8 +13,8 @@ class Definition(Timestampable, models.Model):
     '''
     language = models.ForeignKey(Language, related_name='current_lang', null=True)
     target = models.ForeignKey(Language, related_name='target_lang', null=True)
-    dictionary_apis = models.ForeignKey(DictionaryAPI, related_name='dictionary_apis', null=True)
-    user_contributor = models.ForeignKey(User, related_name='user_contributor', null=True)
+    dictionary_api = models.ForeignKey(DictionaryAPI, related_name='dictionary_apis', null=True)
+    contributor = models.ForeignKey(User, related_name='contributors', null=True)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
     word = CharNullField(null=True, max_length=600, blank=True)
     definition = models.CharField(blank=True, max_length=8000)
@@ -66,11 +27,69 @@ class Definition(Timestampable, models.Model):
         return '%s' % self.word
 
 
+class Language(Authorable, Editable, Timestampable, models.Model):
+    '''
+
+    .. TODO: Create fulltext index in DB
+
+
+    '''
+
+    language = models.CharField(blank=True, max_length=150)
+    script = models.CharField(blank=True, max_length=300)
+
+    def __str__(self):
+        return self.language
+
+
+class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
+    '''
+
+    .. TODO: Create fulltext index in DB
+
+    :Fields:
+        `description`:
+            This should be Usage, notes, and known issues.
+
+        `site`:
+            Actual site of the dictionary we want to use, not the URL
+            from connecting to it.
+
+        `base_url`:
+            URL used if it's that's how we need to connect to the API.
+
+        `api_key`:
+            The API key if you need to register an application with the site - may not
+            be necessary.
+
+        `id_key`:
+            The key needed/issued to access the API - may not be necessary.
+
+    '''
+    name = models.CharField(blank=True, max_length=150)
+    description = CharNullField(null=True, max_length=8000, blank=True)
+    api_type = models.CharField(blank=True, max_length=150)
+    site = models.CharField(blank=True, max_length=2000)
+    base_url = models.CharField(blank=True, max_length=2000)
+    api_key = models.CharField(blank=True, max_length=500)
+    id_key = models.CharField(blank=True, max_length=500)
+
+    def __str__(self):
+        return str(self.api_name)
+
+
+class WordType(Authorable, Editable, Timestampable, models.Model):
+    word_type = models.CharField(blank=True, max_length=150)
+
+    def __str__(self):
+        return self.word_type
+
+
 class Country(Authorable, Editable, Timestampable, models.Model):
     country_name = models.CharField(blank=True, max_length=250)
 
     def __str__(self):
-        return str(self.country_name)
+        return self.country_name
 
 
 class Region(Authorable, Editable, Timestampable, models.Model):
@@ -87,7 +106,7 @@ class City(Authorable, Editable, Timestampable, models.Model):
     city_name = models.CharField(blank=True, max_length=150)
 
     def __str__(self):
-        return str(self.city_name)
+        return self.city_name
 
 
 class UserDefinition(Timestampable, models.Model):
