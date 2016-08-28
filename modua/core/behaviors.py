@@ -18,6 +18,7 @@ class Authorable(models.Model):
     class Meta:
         abstract = True
 
+
 class Editable(models.Model):
     editor = models.ForeignKey(User, related_name='editors', null=True)
 

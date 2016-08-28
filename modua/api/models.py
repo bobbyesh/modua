@@ -11,14 +11,14 @@ class Definition(Timestampable, models.Model):
     ..TODO  Create fulltext index in DB
 
     '''
-    language = models.ForeignKey(Language, related_name='current_lang', null=True)
+    language = models.OneToOneField(Language, related_name='language', null=True)
     target = models.ForeignKey(Language, related_name='target_lang', null=True)
-    dictionary_api = models.ForeignKey(DictionaryAPI, related_name='dictionary_apis', null=True)
-    contributor = models.ForeignKey(User, related_name='contributors', null=True)
+    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
+    contributor = models.OneToOneField(User, related_name='contributor', null=True)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
-    word = CharNullField(null=True, max_length=600, blank=True)
-    definition = models.CharField(blank=True, max_length=8000)
-    transliteration = CharNullField(null=True, max_length=8000, blank=True)
+    word = CharField(blank=True, max_length=600)
+    definition = models.CharField(max_length=8000)
+    transliteration = CharField(blank=True, max_length=8000)
     total_lookups = models.IntegerField(null=True)
     user_added = models.IntegerField(null=True)
     archived = models.BooleanField(default=False, null=False)
@@ -67,7 +67,7 @@ class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
 
     '''
     name = models.CharField(blank=True, max_length=150)
-    description = CharNullField(null=True, max_length=8000, blank=True)
+    description = CharField(blank=True, max_length=8000)
     api_type = models.CharField(blank=True, max_length=150)
     site = models.CharField(blank=True, max_length=2000)
     base_url = models.CharField(blank=True, max_length=2000)
@@ -86,14 +86,14 @@ class WordType(Authorable, Editable, Timestampable, models.Model):
 
 
 class Country(Authorable, Editable, Timestampable, models.Model):
-    country_name = models.CharField(blank=True, max_length=250)
+    country = models.CharField(blank=True, max_length=250)
 
     def __str__(self):
         return self.country_name
 
 
 class Region(Authorable, Editable, Timestampable, models.Model):
-    country_region = models.ForeignKey(Country, related_name='country_region', null=True)
+    country = models.OneToOneField(Country, related_name='country', null=True)
     region = models.CharField(blank=True, max_length=300)
 
     def __str__(self):
@@ -110,5 +110,5 @@ class City(Authorable, Editable, Timestampable, models.Model):
 
 
 class UserDefinition(Timestampable, models.Model):
-    user_owner = models.ForeignKey(User, related_name='user_owner', null=True)
+    user = models.ForeignKey(User, related_name='user', null=True)
     definitions = models.ForeignKey(Definition, related_name='definitions', null=True)
