@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from core.behaviors import Timestampable
+from core.behaviors import Timestampable, Authorable, Editable
 from core.fields import CharNullField
 
 
