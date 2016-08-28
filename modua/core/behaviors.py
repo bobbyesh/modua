@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from extras import CharNullField
+from core.fields import CharNullField
 
 
 
