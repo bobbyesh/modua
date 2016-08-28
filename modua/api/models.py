@@ -11,10 +11,10 @@ class Definition(Timestampable, models.Model):
     ..TODO  Create fulltext index in DB
 
     '''
-    language = models.OneToOneField(Language, related_name='language', null=True)
+    language = models.ForeignKey(Language, related_name='language', null=True)
     target = models.ForeignKey(Language, related_name='target_lang', null=True)
     api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
-    contributor = models.OneToOneField(User, related_name='contributor', null=True)
+    contributor = models.ForeignKey(User, related_name='contributor', null=True)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
     word = CharField(blank=True, max_length=600)
     definition = models.CharField(max_length=8000)
@@ -93,7 +93,7 @@ class Country(Authorable, Editable, Timestampable, models.Model):
 
 
 class Region(Authorable, Editable, Timestampable, models.Model):
-    country = models.OneToOneField(Country, related_name='country', null=True)
+    country = models.ForeignKey(Country, related_name='country', null=True)
     region = models.CharField(blank=True, max_length=300)
 
     def __str__(self):
