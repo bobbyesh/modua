@@ -21,6 +21,6 @@ urlpatterns = [
 
     url(r'', include('landing.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/0.1/', include('api.urls', namespace='api')),
+    url(r'^api/0.1/', include('api.urls')),
 
 ]
