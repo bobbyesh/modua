@@ -14,7 +14,7 @@ class LanguageFilterMixin(object):
         return self.language
 
     def get_target(self):
-        return self.language
+        return self.target
 
     @property
     def target(self):
@@ -27,9 +27,12 @@ class LanguageFilterMixin(object):
     @property
     def language(self):
         if not hasattr(self, '_language'):
-            self._language = Language.objects.get(
-                    language=self.kwargs['language']
-            )
+            if self.request.method == 'POST':
+                query = self.request.query_params['language']
+            elif self.request.METHOD == 'GET':
+                query = self.kwargs['language']
+            self._language = Language.objects.get(language=query)
+
         return self._language
 
     @property

@@ -1,9 +1,10 @@
-import json
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
+from mock import patch
 
+from .serializers import DefinitionSerializer
 from .models import Definition, User, Language
-from .views import LanguageListView, DefinitionListView, DefinitionDetailView
+from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView
 
 
 class LanguageListTestCase(APITestCase):
@@ -95,14 +96,68 @@ class DefinitionDetailTestCase(APITestCase):
         response = self.view(request, language='en', word='cool', id='9999')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
 class AnnotateTestCase(APITestCase):
     def setUp(self):
-        language = Language.objects.create(language='zh')
+        english = Language.objects.create(language='en')
+        chinese = Language.objects.create(language='zh')
         Definition.objects.create(
-            language=language,
-            target=language,
-            word='',
-            translation='not hot',
+            language=chinese,
+            target=english,
+            word='我',
+            translation='I',
         )
-        self.view = DefinitionDetailView.as_view()
+        Definition.objects.create(
+            language=chinese,
+            target=english,
+            word='是',
+            translation='am',
+        )
+        Definition.objects.create(
+            language=chinese,
+            target=english,
+            word='美国',
+            translation='America',
+        )
+        Definition.objects.create(
+            language=chinese,
+            target=english,
+            word='人',
+            translation='person',
+        )
+        self.view = AnnotationView.as_view()
         self.factory = APIRequestFactory()
+
+    @patch('wordfencer.parser.ChineseParser.parse')
+    def test_correct_query_status_200(self, parse):
+        parse.return_value = ['我','是','美国','人']
+        url = '/api/0.1/annotate/?string=我是美国人&language=zh&target=en'
+        request = self.factory.post(url, {'string': '我是美国人', 'language': 'zh', 'target': 'en'})
+        response = self.view(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch('wordfencer.parser.ChineseParser.parse')
+    def test_correct_query_result(self, parse):
+        tokens = ['我','是','美国','人']
+        parse.return_value = tokens
+        url = '/api/0.1/annotate/?string=我是美国人&language=zh&target=en'
+        request = self.factory.post(url, {'string': '我是美国人', 'language': 'zh', 'target': 'en'})
+        response = self.view(request)
+
+        expected = self.expected_result(tokens)
+        self.assertEqual(response.data, expected)
+
+    def expected_result(self, tokens):
+        language = Language.objects.get(language='zh')
+        target = Language.objects.get(language='en')
+        queryset = Definition.objects.filter(word__in=tokens, language=language, target=target)
+        serializer = DefinitionSerializer(queryset, many=True)
+        return serializer.data
+
+
+    def test_empty_query_returns_404(self):
+        url = '/api/0.1/annotate/?string&language=zh&target=en'
+        request = self.factory.post(url, {'string': '', 'language': 'zh', 'target': 'en'})
+        response = self.view(request)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+

@@ -22,16 +22,17 @@ def api_root(request, format=None):
         })
 
 
-class SentenceView(APIView):
+class AnnotationView(APIView, LanguageFilterMixin):
     permission_classes = (AllowAny,)
 
-    def post(self, request, language):
-        if language == 'zh':
+    def post(self, request, *args, **kwargs):
+        if request.data['language'] == 'zh':
             parser = ChineseParser()
-            tokens = parser.parse(request.data['sentence'])
-            language_query = Language.objects.get(language='zh')
-            queryset = Definition.objects.filter(word__in=tokens, language=language_query)
-            serializer = DefinitionSerializer(queryset)
+            tokens = parser.parse(request.data['string'])
+            queryset = Definition.objects.filter(word__in=tokens, language=self.language, target=self.target)
+            if len(queryset) == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            serializer = DefinitionSerializer(queryset, many=True)
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
