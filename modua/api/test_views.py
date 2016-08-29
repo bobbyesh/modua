@@ -6,7 +6,7 @@ from .models import Definition, User, Language
 from .views import LanguageListView, DefinitionListView, DefinitionDetailView
 
 
-class TestLanguageListView(APITestCase):
+class LanguageListTestCase(APITestCase):
 
     def setUp(self):
         Language.objects.create(language='en')
@@ -21,19 +21,19 @@ class TestLanguageListView(APITestCase):
         self.assertContains(response, 'zh')
 
 
-class TestDefinitionListView(APITestCase):
+class DefinitionListTestCase(APITestCase):
 
     def setUp(self):
         language = Language.objects.create(language='en')
         Definition.objects.create(
-            source=language,
+            language=language,
             target=language,
             word='cool',
             translation='not hot',
         )
 
         Definition.objects.create(
-            source=language,
+            language=language,
             target=language,
             word='building',
             translation='a thing in cities',
@@ -42,7 +42,7 @@ class TestDefinitionListView(APITestCase):
         chinese = Language.objects.create(language='zh')
 
         Definition.objects.create(
-            source=chinese,
+            language=chinese,
             target=chinese,
             word='chineseword',
             translation='some translation',
@@ -62,12 +62,12 @@ class TestDefinitionListView(APITestCase):
         self.assertNotContains(self.response, 'chineseword')
 
 
-class DefinitionDetailViewTestCase(APITestCase):
+class DefinitionDetailTestCase(APITestCase):
 
     def setUp(self):
         language = Language.objects.create(language='en')
-        d = Definition.objects.create(
-            source=language,
+        Definition.objects.create(
+            language=language,
             target=language,
             word='cool',
             translation='not hot',
@@ -94,3 +94,15 @@ class DefinitionDetailViewTestCase(APITestCase):
         request = self.factory.get('/api/0.1/languages/en/cool/9999/')
         response = self.view(request, language='en', word='cool', id='9999')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class AnnotateTestCase(APITestCase):
+    def setUp(self):
+        language = Language.objects.create(language='zh')
+        Definition.objects.create(
+            language=language,
+            target=language,
+            word='',
+            translation='not hot',
+        )
+        self.view = DefinitionDetailView.as_view()
+        self.factory = APIRequestFactory()

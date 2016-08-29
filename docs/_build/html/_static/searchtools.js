@@ -448,7 +448,7 @@ var Search = {
                     });
                   }});
         } else {
-          // no source available, just display title
+          // no language available, just display title
           Search.output.append(listItem);
           listItem.slideDown(5, function() {
             displayNextItem();

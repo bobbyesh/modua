@@ -74,7 +74,7 @@ class Definition(Timestampable, Contributable, models.Model):
 
     word = models.CharField(blank=True, max_length=600)
     translation = models.CharField(max_length=8000)
-    source = models.ForeignKey(Language, related_name='source_language')
+    language = models.ForeignKey(Language, related_name='source_language')
     target = models.ForeignKey(Language, related_name='target_language')
     transliteration = models.CharField(blank=True, max_length=8000)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
@@ -86,7 +86,7 @@ class Definition(Timestampable, Contributable, models.Model):
     archived = models.BooleanField(default=False, null=False)
 
     def __str__(self):
-        return '{}'.format(self.translation)
+        return self.word
 
 
 class Country(Contributable, Editable, Timestampable, models.Model):

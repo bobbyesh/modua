@@ -18,7 +18,7 @@ from .mixins import LanguageFilterMixin
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'languages': reverse('api:language-list', request=request, format=format),
+        'languages': reverse('language-list', request=request, format=format),
         })
 
 
@@ -45,10 +45,12 @@ class DefinitionDetailView(RetrieveAPIView, LanguageFilterMixin):
 
     def get(self, request, *args, **kwargs):
         word = kwargs['word']
-        id = int(kwargs['id'])
-        result = get_object_or_404(Definition, id=id, word=word, target=self.language)
+        id = kwargs['id']
+        result = get_object_or_404(Definition, id=id, word=word, language=self.language)
         serializer = self.get_serializer(result, many=False)
         return Response(serializer.data)
+
+
 
 
 class DefinitionListView(ListAPIView, LanguageFilterMixin):
@@ -58,15 +60,40 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
     serializer_class = DefinitionSerializer
 
     def list(self, request, *args, **kwargs):
-        if 'word' in kwargs:
-            word = kwargs['word']
-            queryset = Definition.objects.filter(word=word, target=self.get_language())
-            serializer = DefinitionSerializer(queryset, many=True)
+        if self.requesting_one_word() and self.requesting_target_language_translation():
+            queryset = self.single_word_to_target_language()
+        elif self.requesting_one_word() and not self.requesting_target_language_translation():
+            queryset = self.all_translations_for_word()
         else:
-            queryset = Definition.objects.filter(target=self.get_language())
-            serializer = DefinitionSerializer(queryset, many=True)
+            queryset = self.all_words_in_language()
 
+        serializer = DefinitionSerializer(queryset, many=True)
+
+        if len(queryset) == 0:
+            return Response(serializer.data, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.data)
+
+    def single_word_to_target_language(self):
+        return Definition.objects.filter(word=self.kwargs['word'], language=self.language, target=self.target)
+
+    def all_translations_for_word(self):
+        return Definition.objects.filter(word=self.kwargs['word'], language=self.language)
+
+    def all_words_in_language(self):
+        return Definition.objects.filter(language=self.language)
+
+    def requesting_one_word(self):
+        return 'word' in self.kwargs
+
+    def requesting_target_language_translation(self):
+        return 'target' in self.request.query_params
+
+    def requesting_all_translations(self):
+        return 'word' in self.kwargs and 'target' not in self.request.query_params
+
+    def requesting_all_words_in_language(self):
+        return 'word' not in self.kwargs
+
 
 
 class LanguageListView(ListAPIView):
