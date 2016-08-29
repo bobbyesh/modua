@@ -1,13 +1,21 @@
 language: python
 python:
-  - "3.5"
-install: "pip3 install -r requirements.txt"
-script: 
-  - python3 manage.py makemigrations api
-  - python3 manage.py migrate
-  - python3 manage.py test
+- '3.5'
+install: pip3 install -r requirements.txt
+script:
+- python3 manage.py makemigrations api
+- python3 manage.py migrate
+- python3 manage.py test
 services:
-  - postgresql
+- postgresql
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
-  - cd modua
+- psql -c 'create database travis_ci_test;' -U postgres
+- cd modua
+deploy:
+  provider: heroku
+  api_key:
+    secure: BBkQyGEPX5xn8T3DOjAaspmh6GeymA6wm/pS3zpvIJYEeFt8ARuICd/jVT/dNvt1E6KFahdaZv67JLJLmDTKuUXv9h4uN62QxM9Keizfu1uu7sk0hnM2o28tpYC421ecR9DpgaxzMSHMJC90VSjvRcV3HnNtf/f7tHHjJ5kQkpI2a8FjWFVrwXR51Oc0to8u8HUjNlnDDL1tN/3s26cpMs+jBlRzchWXTqf6vyOqok5saUprQB/4TeRDCeamqNxV9aFTgzgb4arQbDqzRYVOfJf9mPlvgl0qrX0JeCzCrLtmHjXyWGstZonRqAiCG4RPzBwP7jjMNN2xrZenxp0yvwdyhUBioJkx9iWPwNO9Gz8a8abJbByb9U4DrkmxdXUAVObjIMhYapQQ0tgPgPlhS1x58PWx1PZJIvr/oPTYfcA//1paFvyjQPjqURXxAgw7QCXWeoA0cnttU6gIHCSBKJatkb2V98WJO/2i2G/D8GaGRHLcnCTY9JRY9sjNTGH+sdgO5kHxy4kI7Mn4HUz9krBL3tqTyU+Ne5ozJxkuwQ9lweiSdKTRfF+y2TwiHKIBN6UxacOzKHeNvFCbEt83zhQikNMzczlV2KDzM2IjUL/Spgdg5rasHoOANt7d5cKd6srAGNU+mZ2BTT31rGiBOwAZuRBUDhc3xKclSlRoZIQ=
+  app: modua
+  on:
+    repo: bobbyesh/modua
+    branch: staging
