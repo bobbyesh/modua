@@ -1,14 +1,12 @@
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
 
 from rest_framework.generics import ListAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.views import APIView
-from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import AllowAny
-from rest_framework.exceptions import NotFound
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
 from wordfencer.parser import ChineseParser
@@ -20,8 +18,6 @@ from .serializers import (
         )
 
 from .mixins import LanguageFilterMixin
-
-import pdb
 
 
 @api_view(['GET'])
@@ -47,16 +43,28 @@ class SentenceView(APIView):
 
 
 class DefinitionDetailView(RetrieveAPIView):
-    '''
-
-    ..TODO:  Enforce word and language are correct.
-
-    '''
     queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
     serializer_class = DefinitionSerializer
-    lookup_field = 'id'
+
+    def get(self, request, *args, **kwargs):
+        raise Exception("this is good")
+        word = kwargs['word']
+        language = kwargs['language']
+        id = kwargs['id']
+        try:
+            result = Definition.objects.get(word=word, target=language, id=id)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        print(result)
+        import ipdb; ipdb.set_trace()
+        serializer = self.get_serializer(result, many=False)
+        return Response(serializer.data)
+
+
+
 
 
 class DefinitionListView(ListAPIView, LanguageFilterMixin):
@@ -66,6 +74,8 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
     serializer_class = DefinitionSerializer
 
     def list(self, request, *args, **kwargs):
+        import pdb;pdb.set_trace()
+        raise Exception("this sucks")
         if 'word' in kwargs:
             word = kwargs['word']
             queryset = Definition.objects.filter(word=word, target=self.get_language())
