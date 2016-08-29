@@ -3,7 +3,7 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
 
 from .models import Definition, User, Language
-from .views import LanguageListView, DefinitionListView
+from .views import LanguageListView, DefinitionListView, DefinitionDetailView
 
 
 class TestLanguageListView(APITestCase):
@@ -62,7 +62,7 @@ class TestDefinitionListView(APITestCase):
         self.assertNotContains(self.response, 'chineseword')
 
 
-class TestDefinitionDetailView(APITestCase):
+class DefinitionDetailViewTestCase(APITestCase):
 
     def setUp(self):
         language = Language.objects.create(language='en')
@@ -72,7 +72,7 @@ class TestDefinitionDetailView(APITestCase):
             word='cool',
             translation='not hot',
         )
-        self.view = DefinitionListView.as_view()
+        self.view = DefinitionDetailView.as_view()
         self.factory = APIRequestFactory()
 
     def test_does_contain_word(self):
@@ -83,17 +83,14 @@ class TestDefinitionDetailView(APITestCase):
     def test_wrong_language_raises_404(self):
         request = self.factory.get('/api/0.1/languages/zh/cool/2/')
         response = self.view(request, language='zh', word='cool', id='2')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_wrong_word_raises_404(self):
         request = self.factory.get('/api/0.1/languages/en/basketball/3/')
         response = self.view(request, language='en', word='basketball', id='3')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_wrong_id_raises_404(self):
         request = self.factory.get('/api/0.1/languages/en/cool/9999/')
         response = self.view(request, language='en', word='cool', id='9999')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

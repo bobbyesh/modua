@@ -1,6 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
-
 from rest_framework.generics import ListAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,11 +10,7 @@ from rest_framework.reverse import reverse
 from wordfencer.parser import ChineseParser
 
 from .models import Definition, Language
-from .serializers import (
-        DefinitionSerializer,
-        LanguageSerializer
-        )
-
+from .serializers import DefinitionSerializer, LanguageSerializer
 from .mixins import LanguageFilterMixin
 
 
@@ -26,6 +20,7 @@ def api_root(request, format=None):
     return Response({
         'languages': reverse('api:language-list', request=request, format=format),
         })
+
 
 class SentenceView(APIView):
     permission_classes = (AllowAny,)
@@ -42,29 +37,18 @@ class SentenceView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class DefinitionDetailView(RetrieveAPIView):
+class DefinitionDetailView(RetrieveAPIView, LanguageFilterMixin):
     queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
     serializer_class = DefinitionSerializer
 
     def get(self, request, *args, **kwargs):
-        raise Exception("this is good")
         word = kwargs['word']
-        language = kwargs['language']
-        id = kwargs['id']
-        try:
-            result = Definition.objects.get(word=word, target=language, id=id)
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        print(result)
-        import ipdb; ipdb.set_trace()
+        id = int(kwargs['id'])
+        result = get_object_or_404(Definition, id=id, word=word, target=self.language)
         serializer = self.get_serializer(result, many=False)
         return Response(serializer.data)
-
-
-
 
 
 class DefinitionListView(ListAPIView, LanguageFilterMixin):
@@ -74,8 +58,6 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
     serializer_class = DefinitionSerializer
 
     def list(self, request, *args, **kwargs):
-        import pdb;pdb.set_trace()
-        raise Exception("this sucks")
         if 'word' in kwargs:
             word = kwargs['word']
             queryset = Definition.objects.filter(word=word, target=self.get_language())
@@ -85,6 +67,7 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
             serializer = DefinitionSerializer(queryset, many=True)
 
         return Response(serializer.data)
+
 
 class LanguageListView(ListAPIView):
 
