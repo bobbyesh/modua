@@ -1,45 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 from core.behaviors import Timestampable, Authorable, Editable
-from core.fields import CharNullField
-
-
-class Definition(Timestampable, models.Model):
-    '''
-
-    ..TODO  Create fulltext index in DB
-
-    '''
-    language = models.ForeignKey(Language, related_name='language', null=True)
-    target = models.ForeignKey(Language, related_name='target_lang', null=True)
-    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
-    contributor = models.ForeignKey(User, related_name='contributor', null=True)
-    word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
-    word = CharField(blank=True, max_length=600)
-    definition = models.CharField(max_length=8000)
-    transliteration = CharField(blank=True, max_length=8000)
-    total_lookups = models.IntegerField(null=True)
-    user_added = models.IntegerField(null=True)
-    archived = models.BooleanField(default=False, null=False)
-
-    def __str__(self):
-        return '%s' % self.word
-
-
-class Language(Authorable, Editable, Timestampable, models.Model):
-    '''
-
-    .. TODO: Create fulltext index in DB
-
-
-    '''
-
-    language = models.CharField(blank=True, max_length=150)
-    script = models.CharField(blank=True, max_length=300)
-
-    def __str__(self):
-        return self.language
 
 
 class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
@@ -67,7 +28,7 @@ class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
 
     '''
     name = models.CharField(blank=True, max_length=150)
-    description = CharField(blank=True, max_length=8000)
+    description = models.CharField(blank=True, max_length=8000)
     api_type = models.CharField(blank=True, max_length=150)
     site = models.CharField(blank=True, max_length=2000)
     base_url = models.CharField(blank=True, max_length=2000)
@@ -85,6 +46,46 @@ class WordType(Authorable, Editable, Timestampable, models.Model):
         return self.word_type
 
 
+class Language(Authorable, Editable, Timestampable, models.Model):
+    '''
+
+    .. TODO: Create fulltext index in DB
+
+
+    '''
+
+    language = models.CharField(blank=True, max_length=150)
+    script = models.CharField(blank=True, max_length=300)
+
+    def __str__(self):
+        return self.language
+
+
+
+
+class Definition(Timestampable, models.Model):
+    '''
+
+    ..TODO  Create fulltext index in DB
+
+    '''
+
+    source = models.ForeignKey(Language, related_name='source_language', null=True)
+    target = models.ForeignKey(Language, related_name='target_language', null=True)
+    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
+    contributor = models.ForeignKey(User, related_name='contributor', null=True)
+    word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
+    word = models.CharField(blank=True, max_length=600)
+    definition = models.CharField(max_length=8000)
+    transliteration = models.CharField(blank=True, max_length=8000)
+    total_lookups = models.IntegerField(null=True)
+    user_added = models.IntegerField(null=True)
+    archived = models.BooleanField(default=False, null=False)
+
+    def __str__(self):
+        return '%s' % self.word
+
+
 class Country(Authorable, Editable, Timestampable, models.Model):
     country = models.CharField(blank=True, max_length=250)
 
@@ -93,7 +94,7 @@ class Country(Authorable, Editable, Timestampable, models.Model):
 
 
 class Region(Authorable, Editable, Timestampable, models.Model):
-    country = models.ForeignKey(Country, related_name='country', null=True)
+    country = models.ForeignKey(Country, related_name='country_region', null=True)
     region = models.CharField(blank=True, max_length=300)
 
     def __str__(self):
