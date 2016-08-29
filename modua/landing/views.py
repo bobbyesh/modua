@@ -10,14 +10,13 @@ from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
 from api.models import Definition, Language
-from api.utils import build_html, build_popup_html, build_word_html
+from core.utils import build_html, build_popup_html, build_word_html
 
 
 '''
 
 ..TODO:  
     
-    * Start a core app (a la Two Scoops of Django)?
     * Fix Signin redirects
 
 '''

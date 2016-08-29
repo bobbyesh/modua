@@ -19,8 +19,7 @@ from .serializers import (
         LanguageSerializer
         )
 
-from .utils import segmentize, all_combinations
-from .mixins import LanguageFilterMixin, MultipleFieldLookupMixin
+from .mixins import LanguageFilterMixin
 
 import pdb
 
@@ -60,11 +59,22 @@ class DefinitionDetailView(RetrieveAPIView):
     lookup_field = 'id'
 
 
-class DefinitionListView(ListAPIView):
+class DefinitionListView(ListAPIView, LanguageFilterMixin):
     queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
     serializer_class = DefinitionSerializer
+
+    def list(self, request, *args, **kwargs):
+        if 'word' in kwargs:
+            word = kwargs['word']
+            queryset = Definition.objects.filter(word=word, target=self.get_language())
+            serializer = DefinitionSerializer(queryset, many=True)
+        else:
+            queryset = Definition.objects.filter(target=self.get_language())
+            serializer = DefinitionSerializer(queryset, many=True)
+
+        return Response(serializer.data)
 
 class LanguageListView(ListAPIView):
 
@@ -72,11 +82,3 @@ class LanguageListView(ListAPIView):
     serializer_class = LanguageSerializer
     permission_classes = (AllowAny,)
 
-
-class LanguageWordlistView(ListAPIView, LanguageFilterMixin):
-
-    permission_classes = (AllowAny,)
-    serializer_class = DefinitionSerializer
-
-    def get_queryset(self):
-        return Definition.objects.filter(language=self.language)
