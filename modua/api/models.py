@@ -1,175 +1,118 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
-from extras import CharNullField
+from core.behaviors import Timestampable, Contributable, Editable
 
 
-class Language(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    user_added = models.ForeignKey(User, related_name='user_added_lang', null=True)
-    user_updated = models.ForeignKey(User, related_name='user_updated_lang', null=True)
-    #TODO: Create fulltext index in DB
-    language = models.CharField(null=True, max_length=150)
-    script = models.CharField(null=True, max_length=300)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
+class DictionaryAPI(Timestampable, models.Model):
+    '''
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(Language, self).save()
+    .. TODO: Create fulltext index in DB
 
-    def __str__(self):
-        return '%s' % self.language
+    :Fields:
+        `description`:
+            This should be Usage, notes, and known issues.
 
+        `site`:
+            Actual site of the dictionary we want to use, not the URL
+            from connecting to it.
 
-class DictionaryAPI(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    user_added = models.ForeignKey(User, related_name='user_added_dictionary_api', null=True)
-    user_updated = models.ForeignKey(User, related_name='user_updated_dictionary_api', null=True)
-    # TODO: Create fulltext index in DB
-    name = models.CharField(null=True, max_length=150)
-    # This should be Usage, notes, and known issues
-    description = CharNullField(null=True, max_length=8000, blank=True)
-    api_type = models.CharField(null=True, max_length=150)
-    # Actual site of the dictionary we want to use, not the URL from connecting to it
-    site = models.CharField(null=True, max_length=2000)
-    # URL used if it's that's how we need to connect to the API
-    base_url = models.CharField(null=True, max_length=2000)
-    # The API key if you need to register an application with the site - may not be necessary
-    api_key = models.CharField(null=True, max_length=500)
-    # The key needed/issued to access the API - may not be necessary
-    id_key = models.CharField(null=True, max_length=500)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
+        `base_url`:
+            URL used if it's that's how we need to connect to the API.
 
-    def save(self):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(DictionaryAPI, self).save()
+        `api_key`:
+            The API key if you need to register an application with the site - may not
+            be necessary.
+
+        `id_key`:
+            The key needed/issued to access the API - may not be necessary.
+
+    '''
+    name = models.CharField(blank=True, max_length=150)
+    description = models.CharField(blank=True, max_length=8000)
+    api_type = models.CharField(blank=True, max_length=150)
+    site = models.CharField(blank=True, max_length=2000)
+    base_url = models.CharField(blank=True, max_length=2000)
+    api_key = models.CharField(blank=True, max_length=500)
+    id_key = models.CharField(blank=True, max_length=500)
 
     def __str__(self):
-        return self.api_name
+        return str(self.api_name)
 
 
-class WordType(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    user_added = models.ForeignKey(User, related_name='user_added_wordtype', null=True)
-    user_updated = models.ForeignKey(User, related_name='user_updated_wordtype', null=True)
-    word_type = models.CharField(null=True, max_length=150)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-
-    def save(self):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(WordType, self).save()
+class WordType(Contributable, Editable, Timestampable, models.Model):
+    word_type = models.CharField(blank=True, max_length=150)
 
     def __str__(self):
         return self.word_type
 
 
-class Definition(models.Model):
+class Language(Contributable, Editable, Timestampable, models.Model):
+    '''
+
+    .. TODO: Create fulltext index in DB
+
+
+    '''
+
+    language = models.CharField(blank=True, max_length=150)
+    script = models.CharField(blank=True, max_length=300)
+
+    def __str__(self):
+        return self.language
+
+
+class Context(models.Model):
+    text = models.TextField(blank=True)
+
+
+class Definition(Timestampable, Contributable, models.Model):
     '''
 
     ..TODO  Create fulltext index in DB
 
     '''
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    language = models.ForeignKey(Language, related_name='current_lang', null=True)
-    target = models.ForeignKey(Language, related_name='target_lang', null=True)
-    dictionary_apis = models.ForeignKey(DictionaryAPI, related_name='dictionary_apis', null=True)
-    user_contributor = models.ForeignKey(User, related_name='user_contributor', null=True)
+
+    word = models.CharField(blank=True, max_length=600)
+    translation = models.CharField(max_length=8000)
+    source = models.ForeignKey(Language, related_name='source_language')
+    target = models.ForeignKey(Language, related_name='target_language')
+    transliteration = models.CharField(blank=True, max_length=8000)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
-    word = CharNullField(null=True, max_length=600, blank=True)
-    definition = models.CharField(null=True, max_length=8000)
-    transliteration = CharNullField(null=True, max_length=8000, blank=True)
+    context = models.ForeignKey(Context, related_name='context_definitions', null=True)
+
+    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
     total_lookups = models.IntegerField(null=True)
     user_added = models.IntegerField(null=True)
     archived = models.BooleanField(default=False, null=False)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-    archived_date = models.DateTimeField(null=True, editable=False)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(Definition, self).save()
 
     def __str__(self):
-        return '%s' % self.word
+        return '{}'.format(self.translation)
 
 
-class Country(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    user_added = models.ForeignKey(User, related_name='user_added_country', null=True)
-    user_updated = models.ForeignKey(User, related_name='user_updated_country', null=True)
-    country_name = models.CharField(null=True, max_length=250)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-
-    def save(self):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(Country, self).save()
+class Country(Contributable, Editable, Timestampable, models.Model):
+    country = models.CharField(blank=True, max_length=250)
 
     def __str__(self):
         return self.country_name
 
 
-class Region(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    country_region = models.ForeignKey(Country, related_name='country_region', null=True)
-    user_added = models.ForeignKey(User, related_name='user_added_region', null=True)
-    user_updated = models.ForeignKey(User, related_name='user_updated_region', null=True)
-    region = models.CharField(null=True, max_length=300)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-
-    def save(self):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(Region, self).save()
+class Region(Contributable, Editable, Timestampable, models.Model):
+    country = models.ForeignKey(Country, related_name='country_region', null=True)
+    region = models.CharField(blank=True, max_length=300)
 
     def __str__(self):
         return self.region
 
 
-class City(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
+class City(Contributable, Editable, Timestampable, models.Model):
     country_city = models.ForeignKey(Country, related_name='country_city', null=True)
     region_city = models.ForeignKey(Region, related_name='region_city', null=True)
-    user_added = models.ForeignKey(User, related_name='user_added_city', null=True)
-    user_updated = models.ForeignKey(User, related_name='user_updated_city', null=True)
-    city_name = models.CharField(null=True, max_length=150)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-
-    def save(self):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(City, self).save()
+    city_name = models.CharField(blank=True, max_length=150)
 
     def __str__(self):
         return self.city_name
 
 
-class UserDefinition(models.Model):
-    id = models.AutoField(null=False, primary_key=True, editable=False)
-    user_owner = models.ForeignKey(User, related_name='user_owner', null=True)
+class UserDefinition(Timestampable, models.Model):
+    user = models.ForeignKey(User, related_name='user', null=True)
     definitions = models.ForeignKey(Definition, related_name='definitions', null=True)
-    added = models.DateTimeField(null=True, editable=False)
-    updated = models.DateTimeField(null=True, editable=False)
-
-    def save(self):
-        if not self.id:
-            self.added = timezone.now()
-        self.updated = timezone.now()
-        super(UserDefinition, self).save()
