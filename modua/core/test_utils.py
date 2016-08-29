@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from modua.core.utils import segmentize, is_delimited, all_combinations
+from .utils import segmentize, is_delimited, all_combinations
 
 
 class TestUtils(SimpleTestCase):

@@ -46,8 +46,12 @@ class DefinitionDetailView(RetrieveAPIView, LanguageFilterMixin):
 
     def get(self, request, *args, **kwargs):
         word = kwargs['word']
-        id = kwargs['id']
-        result = get_object_or_404(Definition, id=id, word=word, language=self.language)
+        id = int(kwargs['id'])
+        try:
+            result = Definition.objects.get(id=id, word=word, language=self.language)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         serializer = self.get_serializer(result, many=False)
         return Response(serializer.data)
 

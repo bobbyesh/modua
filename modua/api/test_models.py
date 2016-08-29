@@ -9,14 +9,14 @@ class TestUserActivity(TestCase):
         english = Language.objects.create(language='en')
         spanish = Language.objects.create(language='es')
         self.definition = Definition.objects.create(
-            source=english,
+            language=english,
             target=spanish,
             word='hey',
             translation='hola',
             contributor=self.user
         )
         self.definition = Definition.objects.create(
-            source=english,
+            language=english,
             target=spanish,
             word='how',
             translation='como',
@@ -32,14 +32,14 @@ class TestOneLanguage(TestCase):
 
     def test_two_creates(self):
         english = Language.objects.create(language='en')
-        Definition.objects.create(source=english, target=english, word='foo', translation='bar')
-        Definition.objects.create(source=english, target=english, word='smoke', translation='screen')
+        Definition.objects.create(language=english, target=english, word='foo', translation='bar')
+        Definition.objects.create(language=english, target=english, word='smoke', translation='screen')
         result = Definition.objects.all()
         self.assertTrue(len(result) == 2)
 
     def test_one_create(self):
         english = Language.objects.create(language='en')
-        Definition.objects.create(source=english, target=english, word='foo', translation='bar')
+        Definition.objects.create(language=english, target=english, word='foo', translation='bar')
         result = Definition.objects.all()
         self.assertFalse(len(result) == 2)
 
@@ -50,9 +50,9 @@ class TestOneLanguage(TestCase):
 
     def test_two_word_creates(self):
         english = Language.objects.create(language='en')
-        Definition.objects.create(source=english, target=english, word='foo', translation='bar')
-        Definition.objects.create(source=english, target=english, word='smoke', translation='screen')
-        result = Definition.objects.filter(source=english)
+        Definition.objects.create(language=english, target=english, word='foo', translation='bar')
+        Definition.objects.create(language=english, target=english, word='smoke', translation='screen')
+        result = Definition.objects.filter(language=english)
         self.assertTrue(len(result) == 2)
 
 
@@ -61,12 +61,12 @@ class TestTwoLanguages(TestCase):
     def test_languages(self):
         english = Language.objects.create(language='en')
         spanish = Language.objects.create(language='es')
-        Definition.objects.create(source=english, target=spanish, word='english_word1', translation='spanish_def1')
-        Definition.objects.create(source=english, target=spanish, word='english_word2', translation='spanish_def2')
+        Definition.objects.create(language=english, target=spanish, word='english_word1', translation='spanish_def1')
+        Definition.objects.create(language=english, target=spanish, word='english_word2', translation='spanish_def2')
 
-        Definition.objects.create(source=spanish, target=english, word='spanish_word1', translation='english_definition1')
-        Definition.objects.create(source=spanish, target=english, word='spanish_word2', translation='english_definition2')
-        english_result = Definition.objects.filter(source=english)
-        spanish_result = Definition.objects.filter(source=spanish)
+        Definition.objects.create(language=spanish, target=english, word='spanish_word1', translation='english_definition1')
+        Definition.objects.create(language=spanish, target=english, word='spanish_word2', translation='english_definition2')
+        english_result = Definition.objects.filter(language=english)
+        spanish_result = Definition.objects.filter(language=spanish)
         self.assertTrue(len(english_result) == 2)
         self.assertTrue(len(spanish_result) == 2)

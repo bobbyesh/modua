@@ -77,8 +77,10 @@ class DefinitionDetailTestCase(APITestCase):
         self.factory = APIRequestFactory()
 
     def test_does_contain_word(self):
+        id = Definition.objects.get(word='cool').id
+        id = str(id)
         request = self.factory.get('/api/0.1/languages/en/cool/1/')
-        self.response = self.view(request, language='en', word='cool', id='1')
+        self.response = self.view(request, language='en', word='cool', id=id)
         self.assertContains(self.response, 'cool')
 
     def test_wrong_language_raises_404(self):
