@@ -10,15 +10,15 @@ class Timestampable(models.Model):
         abstract = True
 
 
-class Authorable(models.Model):
-    author = models.ForeignKey(User, related_name='%(app_label)s_%(class)s_authors', null=True)
+class Contributable(models.Model):
+    contributor = models.ForeignKey(User, related_name='%(app_label)s_%(class)s_contributor', null=True)
 
     class Meta:
         abstract = True
 
 
 class Editable(models.Model):
-    editor = models.ForeignKey(User, related_name='%(app_label)s_%(class)s_editors', null=True)
+    editor = models.ForeignKey(User, related_name='%(app_label)s_%(class)s_editor', null=True)
 
     class Meta:
         abstract = True

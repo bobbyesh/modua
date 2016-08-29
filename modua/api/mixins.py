@@ -1,4 +1,4 @@
-from .utils import is_delimited
+from core.utils import is_delimited
 from .models import Language
 
 class LanguageFilterMixin(object):

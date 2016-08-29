@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from core.behaviors import Timestampable, Authorable, Editable
+from core.behaviors import Timestampable, Contributable, Editable
 
 
-class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
+class DictionaryAPI(Timestampable, models.Model):
     '''
 
     .. TODO: Create fulltext index in DB
@@ -39,14 +39,14 @@ class DictionaryAPI(Authorable, Editable, Timestampable, models.Model):
         return str(self.api_name)
 
 
-class WordType(Authorable, Editable, Timestampable, models.Model):
+class WordType(Contributable, Editable, Timestampable, models.Model):
     word_type = models.CharField(blank=True, max_length=150)
 
     def __str__(self):
         return self.word_type
 
 
-class Language(Authorable, Editable, Timestampable, models.Model):
+class Language(Contributable, Editable, Timestampable, models.Model):
     '''
 
     .. TODO: Create fulltext index in DB
@@ -61,39 +61,42 @@ class Language(Authorable, Editable, Timestampable, models.Model):
         return self.language
 
 
+class Context(models.Model):
+    text = models.TextField(blank=True)
 
 
-class Definition(Timestampable, models.Model):
+class Definition(Timestampable, Contributable, models.Model):
     '''
 
     ..TODO  Create fulltext index in DB
 
     '''
 
-    source = models.ForeignKey(Language, related_name='source_language', null=True)
-    target = models.ForeignKey(Language, related_name='target_language', null=True)
-    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
-    contributor = models.ForeignKey(User, related_name='contributor', null=True)
-    word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
     word = models.CharField(blank=True, max_length=600)
-    definition = models.CharField(max_length=8000)
+    translation = models.CharField(max_length=8000)
+    source = models.ForeignKey(Language, related_name='source_language')
+    target = models.ForeignKey(Language, related_name='target_language')
     transliteration = models.CharField(blank=True, max_length=8000)
+    word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
+    context = models.ForeignKey(Context, related_name='context_definitions', null=True)
+
+    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
     total_lookups = models.IntegerField(null=True)
     user_added = models.IntegerField(null=True)
     archived = models.BooleanField(default=False, null=False)
 
     def __str__(self):
-        return '%s' % self.word
+        return '{}'.format(self.translation)
 
 
-class Country(Authorable, Editable, Timestampable, models.Model):
+class Country(Contributable, Editable, Timestampable, models.Model):
     country = models.CharField(blank=True, max_length=250)
 
     def __str__(self):
         return self.country_name
 
 
-class Region(Authorable, Editable, Timestampable, models.Model):
+class Region(Contributable, Editable, Timestampable, models.Model):
     country = models.ForeignKey(Country, related_name='country_region', null=True)
     region = models.CharField(blank=True, max_length=300)
 
@@ -101,7 +104,7 @@ class Region(Authorable, Editable, Timestampable, models.Model):
         return self.region
 
 
-class City(Authorable, Editable, Timestampable, models.Model):
+class City(Contributable, Editable, Timestampable, models.Model):
     country_city = models.ForeignKey(Country, related_name='country_city', null=True)
     region_city = models.ForeignKey(Region, related_name='region_city', null=True)
     city_name = models.CharField(blank=True, max_length=150)

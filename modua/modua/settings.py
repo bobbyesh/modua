@@ -56,10 +56,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'twitter_bootstrap',
     'crispy_forms',
+    'core',
     'api',
     'modua',
     'landing',
-    'core',
 ]
 
 MIDDLEWARE_CLASSES = [

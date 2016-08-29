@@ -1,26 +1,18 @@
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
-
-from rest_framework.generics import ListAPIView, GenericAPIView
-from rest_framework.views import APIView
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import AllowAny
-from rest_framework.exceptions import NotFound
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.views import APIView
 
+from core.utils import all_combinations
+from .mixins import LanguageFilterMixin
 from .models import Definition, Language
 from .serializers import (
         DefinitionSerializer,
         LanguageSerializer
         )
-
-from .utils import segmentize, all_combinations
-from .mixins import LanguageFilterMixin
-
-import pdb
 
 
 @api_view(['GET'])
