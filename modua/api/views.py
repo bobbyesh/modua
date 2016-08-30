@@ -28,11 +28,16 @@ class AnnotationView(APIView, LanguageFilterMixin):
         if request.data['language'] == 'zh':
             parser = ChineseParser()
             tokens = parser.parse(request.data['string'])
-            queryset = Definition.objects.filter(word__in=tokens, language=self.language, target=self.target)
-            if len(queryset) == 0:
+            serialized = []
+            for t in tokens:
+                qset = Definition.objects.filter(word=t, language=self.language, target=self.target)
+                serializer = DefinitionSerializer(qset, many=True)
+                serialized.append(serializer.data)
+
+            if len(serialized) == 0:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            serializer = DefinitionSerializer(queryset, many=True)
-            return Response(serializer.data)
+
+            return Response(serialized)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

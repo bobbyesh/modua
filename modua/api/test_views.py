@@ -145,16 +145,19 @@ class AnnotateTestCase(APITestCase):
         url = '/api/0.1/annotate/?string=我是美国人&language=zh&target=en'
         request = self.factory.post(url, {'string': '我是美国人', 'language': 'zh', 'target': 'en'})
         response = self.view(request)
-
         expected = self.expected_result(tokens)
         self.assertEqual(response.data, expected)
 
     def expected_result(self, tokens):
         language = Language.objects.get(language='zh')
         target = Language.objects.get(language='en')
-        queryset = Definition.objects.filter(word__in=tokens, language=language, target=target)
-        serializer = DefinitionSerializer(queryset, many=True)
-        return serializer.data
+        serialized = []
+        for t in tokens:
+            qset = Definition.objects.filter(word=t, language=language, target=target)
+            serializer = DefinitionSerializer(qset, many=True)
+            serialized.append(serializer.data)
+
+        return serialized
 
 
     def test_empty_query_returns_404(self):
