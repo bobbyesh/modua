@@ -19,9 +19,50 @@
   <!-- This style block is just for testing and development. -->
   </head>
 <body>
-{% block body %}
+<div class="container">
+<div class="row">
+<nav class="navbar navbar-default" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="iconbar">A</span>
+            <span class="icon-bar">B</span>
+            <span class="icon-bar">C</span>
+        </button>
+        <a class="navbar-brand" href="#">Modua</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav">
+            <li><a href="#">My Collection</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mandarin Chinese<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">English</a></li>
+                    <li><a href="#">Spanish</a></li>
+                    <li><a href="#">Add Another...</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">username20<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">My Language Stats</a></li>
+                    <li><a href="#">Account Settings</a></li>
+                    <li><a href="#">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div><!-- /.navbar-collapse -->
+</nav>
+</div>
+{% block contents %}
 {% endblock %}
 
+</div>
 </body>
 <footer>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
