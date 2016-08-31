@@ -18,10 +18,8 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
-
     url(r'', include('landing.urls')),
-    url(r'^webapp/', include('webapp.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/0.1/', include('api.urls')),
-
+    url(r'^webapp/', include('webapp.urls')),
 ]
