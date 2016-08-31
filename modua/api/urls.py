@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
 
@@ -13,5 +12,3 @@ urlpatterns = [
     url(r'^annotate/', views.AnnotationView.as_view(), name='annotation'),
     url(r'^languages/(?P<language>[\w-]+)/$', views.DefinitionListView.as_view(), name='language-definitions'),
 ]
-
-#urlpatterns = format_suffix_patterns(urlpatterns)
