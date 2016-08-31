@@ -1,5 +1,10 @@
 {%  extends 'webapp/base.html' %}
 {% load staticfiles %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'webapp/css/style.css' %}"/>
+{%  endblock %}
+
 {% block body %}
   <body>
 
