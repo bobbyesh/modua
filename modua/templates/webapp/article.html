@@ -1,137 +1,78 @@
-{%  extends 'webapp/base.html' %}
+{% extends 'webapp/base.html' %}
 {% load staticfiles %}
 
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'webapp/css/style.css' %}"/>
-{%  endblock %}
-
 {% block body %}
-  <body>
+    <nav class="navbar navbar-default" role="navigation">
+    	<!-- Brand and toggle get grouped for better mobile display -->
+    	<div class="navbar-header">
+    		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+    			<span class="sr-only">Toggle navigation</span>
+    			<span class="iconbar">A</span>
+    			<span class="icon-bar">B</span>
+    			<span class="icon-bar">C</span>
+    		</button>
+    		<a class="navbar-brand" href="#">Modua</a>
+    	</div>
 
-    <div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<nav class="navbar navbar-default" role="navigation">
-				<div class="navbar-header">
-					 
-					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-						 <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
-					</button> <a class="navbar-brand" href="#">Brand</a>
-				</div>
-				
-				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-					<ul class="nav navbar-nav">
-						<li class="active">
-							<a href="#">Link</a>
-						</li>
-						<li>
-							<a href="#">Link</a>
-						</li>
-						<li class="dropdown">
-							 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown<strong class="caret"></strong></a>
-							<ul class="dropdown-menu">
-								<li>
-									<a href="#">Action</a>
-								</li>
-								<li>
-									<a href="#">Another action</a>
-								</li>
-								<li>
-									<a href="#">Something else here</a>
-								</li>
-								<li class="divider">
-								</li>
-								<li>
-									<a href="#">Separated link</a>
-								</li>
-								<li class="divider">
-								</li>
-								<li>
-									<a href="#">One more separated link</a>
-								</li>
-							</ul>
-						</li>
-					</ul>
-					<form class="navbar-form navbar-left" role="search">
-						<div class="form-group">
-							<input type="text" class="form-control">
-						</div> 
-						<button type="submit" class="btn btn-default">
-							Submit
-						</button>
-					</form>
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<a href="#">Link</a>
-						</li>
-						<li class="dropdown">
-							 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown<strong class="caret"></strong></a>
-							<ul class="dropdown-menu">
-								<li>
-									<a href="#">Action</a>
-								</li>
-								<li>
-									<a href="#">Another action</a>
-								</li>
-								<li>
-									<a href="#">Something else here</a>
-								</li>
-								<li class="divider">
-								</li>
-								<li>
-									<a href="#">Separated link</a>
-								</li>
-							</ul>
-						</li>
-					</ul>
-				</div>
-				
-			</nav>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-1">
-			 
-			<button type="button" class="btn btn-default">
-				Default
-			</button>
-		</div>
-		<div class="col-md-10">
-			<h3>
-				h3. Lorem ipsum dolor sit amet.
-			</h3>
-			<p>
-				Lorem ipsum dolor sit amet, <strong>consectetur adipiscing elit</strong>. Aliquam eget sapien sapien. Curabitur in metus urna. In hac habitasse platea dictumst. Phasellus eu sem sapien, sed vestibulum velit. Nam purus nibh, lacinia non faucibus et, pharetra in dolor. Sed iaculis posuere diam ut cursus. <em>Morbi commodo sodales nisi id sodales. Proin consectetur, nisi id commodo imperdiet, metus nunc consequat lectus, id bibendum diam velit et dui.</em> Proin massa magna, vulputate nec bibendum nec, posuere nec lacus. <small>Aliquam mi erat, aliquam vel luctus eu, pharetra quis elit. Nulla euismod ultrices massa, et feugiat ipsum consequat eu.</small>
-			</p>
-		</div>
-		<div class="col-md-1">
-			<ul>
-				<li>
-					Lorem ipsum dolor sit amet
-				</li>
-				<li>
-					Consectetur adipiscing elit
-				</li>
-				<li>
-					Integer molestie lorem at massa
-				</li>
-				<li>
-					Facilisis in pretium nisl aliquet
-				</li>
-				<li>
-					Nulla volutpat aliquam velit
-				</li>
-				<li>
-					Faucibus porta lacus fringilla vel
-				</li>
-				<li>
-					Aenean sit amet erat nunc
-				</li>
-				<li>
-					Eget porttitor lorem
-				</li>
-			</ul>
-		</div>
-	</div>
-</div>
-{% endblock %}
+    	<!-- Collect the nav links, forms, and other content for toggling -->
+    	<div class="collapse navbar-collapse navbar-ex1-collapse">
+    		<ul class="nav navbar-nav">
+    			<li><a href="#">My Collection</a></li>
+    		</ul>
+    		<ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mandarin Chinese<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">English</a></li>
+                        <li><a href="#">Spanish</a></li>
+                        <li><a href="#">Add Another...</a></li>
+                    </ul>
+                </li>
+    			<li class="dropdown">
+    				<a href="#" class="dropdown-toggle" data-toggle="dropdown">username20<b class="caret"></b></a>
+    				<ul class="dropdown-menu">
+    					<li><a href="#">My Language Stats</a></li>
+    					<li><a href="#">Account Settings</a></li>
+    					<li><a href="#">Logout</a></li>
+    				</ul>
+    			</li>
+    		</ul>
+    	</div><!-- /.navbar-collapse -->
+    </nav>
+
+    <div class="row">
+        <div class="col-md-2">
+            <div class="article-info">
+                <h5>Word Counts</h5>
+                <div>Unknown: <strong>100</strong></div>
+                <div>Known: <strong>200</strong></div>
+                <div>Learning: <strong>50</strong></div>
+            </div>
+        </div>
+
+        <div class="col-md-10">
+            <div class="article">
+            <h3>
+                函数式思维: 以函数式的方式思考，第 1 部分
+            </h3>
+            <p>by Neal Ford</p>
+            <p>
+
+                本系列<span class="unknown">文章</span>旨在将您的<span class="learning">思维</span>方式向函数式思维方式调整，使您以全新的角度来思考常见问题，并提高您的日常编码工作。本系列介绍了函数式编程概念，函数式编程在 Java 语言中运行的框架、在 JVM 上运行的函数式编程语言、以及语言设计未来的一些方向。本系列主要面向了解 Java 以及其抽象层的工作方式，但缺乏函数式语言使用经验的开发人员。
+                假如您是位伐木<span class="unknown">工人</span>，如果您拥有最好的<span class="unknown">斧子</span>，那您将会是林场中最能干的伐木<span class="unknown">工人</span>。忽然有一天，有人向您展示并推荐一个新型伐木工具，电锯。这个销售人员很善于推销，于是您购买了电锯，但不知道如何使用。于是您就参照以前的模式来用，举起电锯用力地挥向树木。您很快就会得出结论，电锯这种新工具只不过是一种时尚，最后还是改用斧子来砍树。这时，有人过来告诉您如何正确使用电锯。
+                您可以参考这个故事，但是要把电锯 替换为函数式编程。这是个全新的编程范式，并不像<span class="well-known">学习</span>一门新语言那么简单。毕竟，语言语法只是细节问题。难点在于学习不同的思维 方式。这就是我的切入点 — 电锯使用者与函数式程序员。
+                欢迎关注 函数式思维。本系列<span class="unknown">文章</span>将介绍函数式编程相关主题，但<span class="well-known">内容</span>不仅限于函数式编程语言。相关内容包括，以 “函数式” 方式来编写代码将会涉及设计、权衡、不同的可重用构建模块、以及一些其他见解。我会尽量多地在 Java（或者与 Java 类似的语言）中展示函数式编程的概念，然后会转向其他语言，来展示在 Java 语言中所没有的功能。我不会立即对 monads（见 ）这类新知识进行深入的介绍。相反，我会逐步地向您展示一种新的思考问题方式（可能您已在某些地方采用了，只不过没有留意）。
+                本期及下一期将会对函数式编程的一些相关主题做一简单介绍，其中<span class="well-known">包括</span>一些核心概念。有些<span class="learning">概念</span>将在后续部分做详细介绍。作为主体部分的开始，我将向您介绍一个问题的两种不同实现方式，一个采用命令式编写，另一个采用函数式编写。
+                数字分类器
+
+            </p>
+            <p>
+                当谈到不同编程风格时，<span class="learning">必须</span>有可供对比的<span class="unknown">代码</span>。第一个例子是在 The Productive Programmer（见 ）一书，和 “演化架构与紧急设计：测试驱动设计，第 1 部分”，以及 “演化架构与紧急设计：测试驱动设计，第 2 部分”（ developerWorks 系列文章 演化架构与紧急设计 中的两部分内容）中出现的另一种形式的编码问题。选取这些内容是由于这两篇文章深入地描述了代码设计问题。这些文章中有关设计的内容没有错误，但是我想在此处给出一个采用不同设计的理由。
+                要求是，给出任何大于 1 的正整数时，必须将其分类为 perfect、abundant、或者 deficient。perfect 数是其因子（factor）（不包括该数本身）加起来等于该数。类似地，abundant 数是其所有因子的和大于该数，而 deficient 数是其因子的和小于该数。
+                命令式数字分类器
+            </p>
+            </div>
+        </div>
+
+    </div>
+{%  endblock %}

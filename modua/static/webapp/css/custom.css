@@ -1,0 +1,92 @@
+.navbar {
+    color: #1E1E1F;
+    border: none;
+    background-color: #FFFBF5;
+    border-bottom: 1px solid #1E1E1F;
+}
+
+.navbar-nav {
+    color: #1E1E1F;
+    border: none;
+    background-color: #FFFBF5;
+
+}
+
+
+.unknown {
+    background-color: rgba(205,30,38, 0.8)
+}
+
+.learning {
+    background-color: rgba(230,180,38, 0.8)
+}
+
+.well-known {
+    background-color: rgba(30,220,38, 0.8)
+}
+
+
+body {
+    color: #1E1E1F;
+    background-color: #FFFBF5;
+    margin: 3%;
+}
+
+h3 {
+    font-size: 250%;
+}
+
+p {
+    color: #1E1E1F;
+    font-size: 170%;
+}
+
+.container {
+
+    border-top: 1px solid black;
+    clear: both;
+}
+
+div.header {
+    clear: both;
+}
+
+.article {
+    width: 50em;
+    line-height: 2;
+    margin: auto 2em auto 2em;
+    padding-left: 30px;
+}
+
+.article-info {
+    margin: auto 2em;
+
+}
+
+
+.info-container {
+    font-family: 'Vollkorn', serif;
+    float: left;
+    width: 150px;
+    margin: 0;
+    padding-right: 1em;
+}
+
+h1.header {
+    float: left;
+}
+
+
+ul {
+    list-style-type: none;
+    background-color: #333;
+}
+
+li {
+    float: right;
+}
+
+html {
+    background-color: #FFFBF5;
+    font-family: 'Vollkorn', serif;
+}
