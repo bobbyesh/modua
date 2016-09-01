@@ -10,4 +10,4 @@ class HomeView(TemplateView):
 
 class ArticleView(TemplateView):
 
-    template_name = 'webapp/article.html'
+    template_name = 'webapp/sample.html'

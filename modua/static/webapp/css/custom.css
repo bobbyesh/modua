@@ -14,15 +14,15 @@
 
 
 .unknown {
-    background-color: rgba(205,30,38, 0.8)
+    background-color: rgba(255,90, 67, 0.8)
 }
 
 .learning {
     background-color: rgba(230,180,38, 0.8)
 }
 
-.well-known {
-    background-color: rgba(30,220,38, 0.8)
+.new {
+    background-color: rgba(79,103,255, 0.3)
 }
 
 

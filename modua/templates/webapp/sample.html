@@ -1,0 +1,36 @@
+{% extends 'webapp/base.html' %}
+{% load staticfiles %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-md-2">
+            <div class="article-info">
+                <h5>Word Counts</h5>
+                <div>Unknown: <strong><span class="unknown">100</span></strong></div>
+                <div>New: <strong><span class="new">200</span></strong></div>
+                <div>Learning: <strong><span class="learning">50</span></strong></div>
+            </div>
+        </div>
+
+        <div class="col-md-10">
+            <div class="article">
+            <h3>
+                {{ title }}
+            </h3>
+                {% if author %}
+                    <p>by {{ author }}</p>
+                {%  endif  %}
+            <p>
+                {% for token in tokens %}
+                    {% if token.klass %}
+                        <span class="{{ token.klass }}">token</span>
+                    {% else %}
+                        {{ token }}
+                    {% endif %}
+                {% endfor %}
+            </p>
+            </div>
+        </div>
+
+    </div>
+{%  endblock %}
