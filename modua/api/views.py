@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
 from wordfencer.parser import ChineseParser
 
+from services import fetch_article
 from .models import Definition, Language
 from .serializers import DefinitionSerializer, LanguageSerializer
 from .mixins import LanguageFilterMixin
@@ -19,6 +20,22 @@ def api_root(request, format=None):
     return Response({
         'languages': reverse('language-list', request=request, format=format),
         })
+
+
+class URLFetchView(APIView, LanguageFilterMixin):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        if request.data['language'] == 'zh':
+            language = request.data['language']
+            url = request.data['url']
+            article = Article.objects.filter(url=url)
+            if not article:
+                text = fetch_article(url, language)
+                Article.objects.create(text=text, url=url, language=self.language)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 
 class AnnotationView(APIView, LanguageFilterMixin):

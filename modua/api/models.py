@@ -117,3 +117,8 @@ class City(Contributable, Editable, Timestampable, models.Model):
 class UserDefinition(Timestampable, models.Model):
     user = models.ForeignKey(User, related_name='user', null=True)
     definitions = models.ForeignKey(Definition, related_name='definitions', null=True)
+
+class Article(models.Model):
+    url = models.CharField(blank=True)
+    text = models.TextField(blank=False)
+    language = models.ForeignKey(Language, related_name='articles')

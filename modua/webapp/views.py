@@ -1,11 +1,7 @@
-from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from core.utils import klassified
 from core.services import fetch_article, tokenize_text
 
-
-class URLImportView(FormView):
-    
 
 class HomeView(TemplateView):
 
