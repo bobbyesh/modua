@@ -6,6 +6,7 @@ from django.contrib.auth import login, authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
+from rest_framework.authtoken.models import Token
 from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
@@ -48,15 +49,9 @@ class SigninView(FormView):
         username = self.request.POST['username']
         password = self.request.POST['password']
         user = authenticate(username=username, password=password)
-        if user:
-            l = Logger()
-            l.log('Authenticated user, redirect to singin-complete')
-            '''
-
-            ..NOTE:  This is redirect should later be changed to the webapp
-
-            '''
-            return redirect('signin-complete')
+        if user.is_authenticated():
+            login(self.request, user)
+            return redirect('home')
         else:
             l = Logger()
             l.log('User authentication failed, redirect to index')
@@ -66,27 +61,26 @@ class SigninView(FormView):
                      invalid user/password re-prompt.
 
             '''
-            return redirect('api:api-root', request, format=None )
+            return redirect('invalid-userinfo', self.request, format=None )
 
 
 class SignupView(FormView):
     model = User
     template_name = 'landing/signup.html'
     form_class = SignupForm
-    success_url = reverse_lazy('signup-success')
-
+    success_url = reverse_lazy('home')
 
     def form_valid(self, form):
         username = self.request.POST['username']
         email = self.request.POST['email']
         password = self.request.POST['password']
-        User.objects.create_user(username=username, email=email, password=password)
+        user = User.objects.create_user(username=username, email=email, password=password)
+        Token.objects.create(user=user)
         return super(FormView, self).form_valid(form)
 
 
 class SignupSuccessView(TemplateView):
     template_name = 'landing/success.html'
-
 
 class AnnotationView(FormView):
     template_name = 'landing/annotation.html'
