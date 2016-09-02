@@ -22,3 +22,10 @@ class Editable(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Ownable(models.Model):
+    owner = models.ForeignKey(User, related_name='%(app_label)s_%(class)s_owner', null=True)
+
+    class Meta:
+        abstract = True

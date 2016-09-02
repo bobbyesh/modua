@@ -2,14 +2,15 @@ from rest_framework.generics import ListAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 
-from services import fetch_article
-from .models import Definition, Language
+from core.services import fetch_article
+from .models import Definition, Language, Article
 from .serializers import DefinitionSerializer, LanguageSerializer
 from .mixins import LanguageFilterMixin
 
@@ -22,20 +23,33 @@ def api_root(request, format=None):
         })
 
 
-class URLFetchView(APIView, LanguageFilterMixin):
+class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
+    authentication_classes = (TokenAuthentication, )
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
+        user = request.user
+        if not self.language:
+            return Response(
+                {
+                    'message': 'Language "{}" not found'.format(request.data['language']),
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         if request.data['language'] == 'zh':
             language = request.data['language']
             url = request.data['url']
             article = Article.objects.filter(url=url)
             if not article:
                 text = fetch_article(url, language)
-                Article.objects.create(text=text, url=url, language=self.language)
+                Article.objects.create(text=text, url=url, language=self.language, owner=user)
+
+            import pdb;pdb.set_trace()
+            return Response(status=status.HTTP_200_OK)
+
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
 
 
 class AnnotationView(APIView, LanguageFilterMixin):

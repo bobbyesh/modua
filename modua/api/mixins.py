@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from core.utils import is_delimited
 from .models import Language
 
@@ -18,20 +19,35 @@ class LanguageFilterMixin(object):
 
     @property
     def target(self):
+        ''' Sets self.target to the Language model instance according to the url
+        keyword `target`.
+
+        '''
         if not hasattr(self, '_target'):
-            self._target = Language.objects.get(
-                language=self.request.query_params['target']
-            )
+            try:
+                self._target = Language.objects.get(
+                    language=self.request.query_params['target']
+                )
+            except ObjectDoesNotExist:
+                self._target = None
+
         return self._target
 
     @property
     def language(self):
+        ''' Sets self.language to the Language model instance according to the url
+        keyword `language`.
+
+        '''
         if not hasattr(self, '_language'):
             if self.request.method == 'POST':
                 query = self.request.query_params['language']
             elif self.request.method == 'GET':
                 query = self.kwargs['language']
-            self._language = Language.objects.get(language=query)
+            try:
+                self._language = Language.objects.get(language=query)
+            except ObjectDoesNotExist:
+                self._language = None
 
         return self._language
 

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from core.behaviors import Timestampable, Contributable, Editable
+from core.behaviors import Timestampable, Contributable, Editable, Ownable
 
 
 class DictionaryAPI(Timestampable, models.Model):
@@ -47,13 +47,6 @@ class WordType(Contributable, Editable, Timestampable, models.Model):
 
 
 class Language(Contributable, Editable, Timestampable, models.Model):
-    '''
-
-    .. TODO: Create fulltext index in DB
-
-
-    '''
-
     language = models.CharField(blank=True, max_length=150)
     script = models.CharField(blank=True, max_length=300)
     delimited = models.BooleanField(default=True)
@@ -62,14 +55,15 @@ class Language(Contributable, Editable, Timestampable, models.Model):
         return self.language
 
 
-class Context(models.Model):
-    text = models.TextField(blank=True)
+class Article(Ownable, models.Model):
+    url = models.CharField(max_length=2000, blank=True)
+    text = models.TextField(blank=False)
+    language = models.ForeignKey(Language, related_name='api_article_language')
 
 
 class Definition(Timestampable, Contributable, models.Model):
     '''
 
-    ..TODO  Create fulltext index in DB
 
     '''
 
@@ -79,7 +73,7 @@ class Definition(Timestampable, Contributable, models.Model):
     target = models.ForeignKey(Language, related_name='target_language')
     transliteration = models.CharField(blank=True, max_length=8000)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
-    context = models.ForeignKey(Context, related_name='context_definitions', null=True)
+    article = models.ForeignKey(Article, related_name='article_definitions', null=True)
 
     api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
     total_lookups = models.IntegerField(null=True)
@@ -118,7 +112,5 @@ class UserDefinition(Timestampable, models.Model):
     user = models.ForeignKey(User, related_name='user', null=True)
     definitions = models.ForeignKey(Definition, related_name='definitions', null=True)
 
-class Article(models.Model):
-    url = models.CharField(blank=True)
-    text = models.TextField(blank=False)
-    language = models.ForeignKey(Language, related_name='articles')
+
+

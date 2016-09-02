@@ -1,10 +1,44 @@
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
+from rest_framework.test import force_authenticate
+from rest_framework.authtoken.models import Token
 from mock import patch
 
 from .serializers import DefinitionSerializer
 from .models import Definition, User, Language
-from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView
+from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView, URLImportView
+
+
+class URLImportTestCase(APITestCase):
+
+    def setUp(self):
+        Language.objects.create(language='zh')
+        self.user = User.objects.create(username='johndoe', email='jdoe@gmail.com', password='password')
+        self.token = Token.objects.create(user=self.user)
+
+    def test_url_import_response_200(self):
+        request = self.get_request()
+        response = URLImportView.as_view()(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+    def test_url_multiple_fetch_200(self):
+        request = self.get_request()
+        URLImportView.as_view()(request)
+
+        request = self.get_request()
+        response = URLImportView.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def get_request(self):
+        factory = APIRequestFactory()
+        url = 'http://www.fox2008.cn/Article/2009/20090406192831_21829.html'
+        request_url = '/api/0.1/import?url={}&language=zh'.format(url)
+        request = factory.post(request_url, {'url': url, 'language': 'zh'})
+        force_authenticate(request, user=self.user, token=self.token.key)
+        return request
+
 
 
 class LanguageListTestCase(APITestCase):
