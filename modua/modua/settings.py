@@ -37,6 +37,8 @@ ALLOWED_HOSTS = []
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 # Extra places for collectstatic to find static files.
 
+LOGIN_URL = 'signin'
+
 STATIC_URL = '/static/'
 STATIC_ROOT = ''
 STATICFILES_DIRS = [
