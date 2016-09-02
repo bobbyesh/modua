@@ -1,6 +1,36 @@
 # utils.py
 '''A utility package for MODUA'''
 import re
+import configparser
+import os
+import requests
+
+
+class Token(object):
+    '''Defines a class for use in templates.
+
+    Effectively gives the `str` class a `klass` property.
+
+    '''
+
+    def __init__(self, string, klass):
+        self.string = string
+        self.klass = klass
+
+    def __str__(self, string):
+        return self.string
+
+    def __eq__(self, string):
+        self.string = string
+
+
+def get_api_response(url):
+    path = os.path.abspath(os.path.dirname(__file__)) + '/data/config.ini'
+    config = configparser.ConfigParser()
+    config.read(path)
+    token = config['READABILITY']['token']
+    base_url = 'https://readability.com/api/content/v1/parser'
+    return requests.get(base_url, {'token': token, 'url': url})
 
 
 def build_html(**kwargs):
