@@ -45,7 +45,6 @@ class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
                 text = fetch_article(url, language)
                 Article.objects.create(text=text, url=url, language=self.language, owner=user)
 
-            import pdb;pdb.set_trace()
             return Response(status=status.HTTP_200_OK)
 
         else:

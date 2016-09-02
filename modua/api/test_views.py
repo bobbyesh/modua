@@ -31,6 +31,7 @@ class URLImportTestCase(APITestCase):
         response = URLImportView.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+
     def get_request(self):
         factory = APIRequestFactory()
         url = 'http://www.fox2008.cn/Article/2009/20090406192831_21829.html'
@@ -38,6 +39,15 @@ class URLImportTestCase(APITestCase):
         request = factory.post(request_url, {'url': url, 'language': 'zh'})
         force_authenticate(request, user=self.user, token=self.token.key)
         return request
+
+    def test_wrong_language_response_is_404(self):
+        factory = APIRequestFactory()
+        url = 'http://www.fox2008.cn/Article/2009/20090406192831_21829.html'
+        request_url = '/api/0.1/import?url={}&language=foo'.format(url)
+        request = factory.post(request_url, {'url': url, 'language': 'foo'})
+        force_authenticate(request, user=self.user, token=self.token.key)
+        response = URLImportView.as_view()(request)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 
