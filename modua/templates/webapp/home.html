@@ -5,37 +5,18 @@
 
 {% block contents %}
 
-				<div class="col-md-10">
+			<div class="col-md-10">
+                {% for article in articles %}
 					<h2>
-						Heading
+						{{ article.heading }}
 					</h2>
 					<p>
-						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
+                        <!-- should be about 230 characters -->
+						{{ article.preview }}
 					</p>
 					<p>
 						<a class="btn" href="#">View details »</a>
 					</p>
-					<h2>
-						Heading
-					</h2>
-					<p>
-						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-					</p>
-					<p>
-						<a class="btn" href="#">View details »</a>
-					</p>
-					<h2>
-						Heading
-					</h2>
-					<p>
-						Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-					</p>
-					<p>
-						<a class="btn" href="#">View details »</a>
-					</p>
-				</div>
+                {% endfor %}
 			</div>
-		</div>
-	</div>
-</div>
   {% endblock %}
