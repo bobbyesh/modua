@@ -17,11 +17,15 @@ class Token(object):
         self.string = string
         self.klass = klass
 
-    def __str__(self, string):
+    def __str__(self):
         return self.string
 
     def __eq__(self, string):
         self.string = string
+
+
+def klassified_tokens(tokens):
+    return [Token(elem, 'new') for elem in tokens]
 
 
 def get_api_response(url):
