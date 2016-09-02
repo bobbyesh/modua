@@ -24,7 +24,7 @@ class Token(object):
         self.string = string
 
 
-def klassified_tokens(tokens):
+def klassified(tokens):
     return [Token(elem, 'new') for elem in tokens]
 
 
