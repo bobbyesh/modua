@@ -51,6 +51,9 @@ class ArticleView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
+        # get article id
+        # put article in context
+        # return context
         text = fetch_article('http://www.fox2008.cn/Article/2009/20090406000000_21827.html', 'zh')
         context['tokens'] = klassified(tokenize_text(text))
         return context
