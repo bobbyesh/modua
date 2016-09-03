@@ -9,13 +9,12 @@
     <div class="row">
         <div class="span2">
         <!-- Button trigger modal -->
-        <button class="btn btn-primary btn-small glyphicon glyphicon-plus" data-toggle="modal" data-target="#myModalNorm">
+        <button class="btn btn-primary btn-small glyphicon glyphicon-plus" data-toggle="modal" data-target="#modal-url">
         </button>
         </div>
 
         <!-- Modal -->
-        <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog"
-             aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modal-url" tabindex="-1" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <!-- Modal Header -->
@@ -25,22 +24,15 @@
                             <span aria-hidden="true">&times;</span>
                             <span class="sr-only">Close</span>
                         </button>
-                        <h4 class="modal-title" id="myModalLabel">
+                        <h4 class="modal-title" >
                             Import a webpage to your reader
                         </h4>
                     </div>
 
                     <!-- Modal Body -->
                     <div class="modal-body">
-
-                        <form role="form">
-                            <div class="form-group">
-                                <label for="url">Add the page url here:</label>
-                                <input type="url" class="form-control"
-                                       id="url" placeholder="http://www.example.com"/>
-                            </div>
-                            <button type="submit" class="btn btn-default">Submit</button>
-                        </form>
+                                {% load crispy_forms_tags %}
+                                {% crispy form %}
                     </div>
                 </div>
             </div>
