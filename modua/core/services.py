@@ -1,5 +1,7 @@
 from newspaper import Article
 from wordfencer.parser import ChineseParser
+import bs4
+import requests
 
 
 def fetch_article(url, language):
@@ -8,7 +10,14 @@ def fetch_article(url, language):
     a = Article(url, language=language)
     a.download()
     a.parse()
-    return a.title, a.text
+    if not a.title:
+        r = requests.get(url)
+        html = bs4.BeautifulSoup(r.text)
+        title = str(html.text.title)
+    else:
+        title = a.title
+
+    return title, a.text
 
 def tokenize_text(text):
     p = ChineseParser()

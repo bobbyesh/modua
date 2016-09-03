@@ -63,7 +63,7 @@ class Article(Ownable, models.Model):
 
     @property
     def preview(self):
-        return str(self.text)[:150] + '...'
+        return str(self.text)[:50] + '...'
 
 
 class Definition(Timestampable, Contributable, models.Model):

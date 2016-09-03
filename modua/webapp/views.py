@@ -39,7 +39,7 @@ class HomeView(FormView, LoginRequiredMixin):
         else:
             title, text = fetch_article(url, language='zh')
 
-        Article.objects.get_or_create(text=text, url=url, language=language, owner=user)
+        Article.objects.get_or_create(title=title, text=text, url=url, language=language, owner=user)
         return super(HomeView, self).form_valid(form)
 
 
