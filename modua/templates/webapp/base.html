@@ -19,7 +19,7 @@
   <!-- This style block is just for testing and development. -->
   </head>
 <body>
-<div class="container">
+<div class="container base">
 <div class="row">
 <nav class="navbar navbar-default" role="navigation">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -35,20 +35,17 @@
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav">
-            <li><a href="#">My Collection</a></li>
-        </ul>
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mandarin Chinese<b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Languages<b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">English</a></li>
-                    <li><a href="#">Spanish</a></li>
-                    <li><a href="#">Add Another...</a></li>
+                    {% for language in languages %}
+                        <li><a href="#">{{ language }}</a></li>
+                    {% endfor %}
                 </ul>
             </li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">username20<b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.username }}<b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li><a href="#">My Language Stats</a></li>
                     <li><a href="#">Account Settings</a></li>
@@ -59,10 +56,10 @@
     </div><!-- /.navbar-collapse -->
 </nav>
 </div>
+</div>
 {% block contents %}
 {% endblock %}
 
-</div>
 </body>
 <footer>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>

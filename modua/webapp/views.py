@@ -16,7 +16,7 @@ class HomeView(TemplateView, LoginRequiredMixin):
         context = super(HomeView, self).get_context_data(**kwargs)
         articles = self.request.user.api_article_owner.all()
         context['articles'] = articles
-        import pdb;pdb.set_trace()
+        context['user'] = self.request.user
         return context
 
 class ArticleView(TemplateView):

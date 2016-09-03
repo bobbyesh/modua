@@ -11,30 +11,8 @@ from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
 from api.models import Definition, Language
-from core.utils import build_html, build_popup_html, build_word_html
+from core.utils import build_popup_html, build_word_html
 
-
-'''
-
-..TODO:  
-    
-    * Fix Signin redirects
-
-'''
-
-import logging
-class Logger(object):
-
-    def __init__(self):
-        logging.basicConfig(filename='log.log', level=logging.DEBUG)
-
-    def log(self, string):
-        logging.debug(string)
-
-
-class SigninCompleteView(View):
-    def get(self, request, *args, **kwargs):
-        return HttpResponse('got it')
 
 class IndexView(TemplateView):
     template_name = 'landing/index.html'
@@ -53,12 +31,9 @@ class SigninView(FormView):
             login(self.request, user)
             return redirect('home')
         else:
-            l = Logger()
-            l.log('User authentication failed, redirect to index')
             '''
 
-            ..NOTE:  This is redirect should later be changed to the be an
-                     invalid user/password re-prompt.
+            .. TODO: Create reasonable invalid user redirection.
 
             '''
             return redirect('invalid-userinfo', self.request, format=None )
@@ -81,6 +56,7 @@ class SignupView(FormView):
 
 class SignupSuccessView(TemplateView):
     template_name = 'landing/success.html'
+
 
 class AnnotationView(FormView):
     template_name = 'landing/annotation.html'

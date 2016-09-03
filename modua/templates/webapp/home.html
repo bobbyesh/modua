@@ -5,8 +5,50 @@
 
 {% block contents %}
 
-			<div class="col-md-10">
-                {% for article in articles %}
+    <div class="container">
+    <div class="row">
+        <div class="span2">
+        <!-- Button trigger modal -->
+        <button class="btn btn-primary btn-small glyphicon glyphicon-plus" data-toggle="modal" data-target="#myModalNorm">
+        </button>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog"
+             aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <button type="button" class="close"
+                                data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Import a webpage to your reader
+                        </h4>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+
+                        <form role="form">
+                            <div class="form-group">
+                                <label for="url">Add the page url here:</label>
+                                <input type="url" class="form-control"
+                                       id="url" placeholder="http://www.example.com"/>
+                            </div>
+                            <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="span10">
+            {% for article in articles %}
 					<h2>
 						{{ article.heading }}
 					</h2>
@@ -19,4 +61,6 @@
 					</p>
                 {% endfor %}
 			</div>
+    </div> <!-- row -->
+    </div> <!-- container -->
   {% endblock %}
