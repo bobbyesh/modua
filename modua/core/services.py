@@ -8,7 +8,7 @@ def fetch_article(url, language):
     a = Article(url, language=language)
     a.download()
     a.parse()
-    return a.text
+    return a.title, a.text
 
 def tokenize_text(text):
     p = ChineseParser()

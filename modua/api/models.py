@@ -56,9 +56,14 @@ class Language(Contributable, Editable, Timestampable, models.Model):
 
 
 class Article(Ownable, models.Model):
+    title = models.CharField(max_length=2000, blank=True)
     url = models.CharField(max_length=2000, blank=True)
     text = models.TextField(blank=False)
     language = models.ForeignKey(Language, related_name='api_article_language')
+
+    @property
+    def preview(self):
+        return str(self.text)[:150] + '...'
 
 
 class Definition(Timestampable, Contributable, models.Model):

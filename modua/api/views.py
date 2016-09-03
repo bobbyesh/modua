@@ -42,8 +42,8 @@ class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
             url = request.data['url']
             article = Article.objects.filter(url=url)
             if not article:
-                text = fetch_article(url, language)
-                Article.objects.create(text=text, url=url, language=self.language, owner=user)
+                title, text = fetch_article(url, language)
+                Article.objects.create(title=title, text=text, url=url, language=self.language, owner=user)
 
             return Response(status=status.HTTP_200_OK)
 

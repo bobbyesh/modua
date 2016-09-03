@@ -35,10 +35,9 @@ class HomeView(FormView, LoginRequiredMixin):
         language = Language.objects.get(language='zh')
         article = Article.objects.filter(url=url)
         if article:
-            text = article.text
+            text = article[0].text
         else:
-            text = fetch_article(url, language='zh')
-            import pdb;pdb.set_trace()
+            title, text = fetch_article(url, language='zh')
 
         Article.objects.get_or_create(text=text, url=url, language=language, owner=user)
         return super(HomeView, self).form_valid(form)
