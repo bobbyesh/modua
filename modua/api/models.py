@@ -87,8 +87,6 @@ class Word(Ownable, models.Model):
     transliteration = models.CharField(blank=True, max_length=8000)
     article = models.ManyToManyField(Article)
 
-    unique_together = ('word', 'ease')
-
     def __str__(self):
         return self.word
 
@@ -109,8 +107,6 @@ class Word(Ownable, models.Model):
         language, created = Language.objects.get_or_create(language=language, delimited=delimited)
         self.language = language
         self.save()
-
-
 
 
 class Definition(Timestampable, Contributable, models.Model):

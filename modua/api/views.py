@@ -10,8 +10,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 
 from core.services import fetch_article
-from .models import Definition, Language, Article
-from .serializers import DefinitionSerializer, LanguageSerializer
+from .models import Definition, Language, Article, Word
+from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer
 from .mixins import LanguageFilterMixin
 
 
@@ -23,16 +23,33 @@ def api_root(request, format=None):
         })
 
 
-class UpdateWordView(UpdateAPIView):
+class UpdateWordView(UpdateAPIView, LanguageFilterMixin):
     authentication_classes = (TokenAuthentication, )
     permission_classes = (AllowAny,)
-    serializer_class = DefinitionSerializer
-
-    def get_queryset(self):
-        pass
+    serializer_class = WordSerializer
 
     def patch(self, request, *args, **kwargs):
-        pass
+        username = request.query_params['username']
+        password = request.query_params['password']
+        assert username == self.request.user.username
+        assert password == self.request.user.password
+
+        words = Word.objects.filter(word=self.request.data['word'], language=self.language, users__username=self.request.user.username)
+        if len(words) > 1:
+            raise Exception("There should not be more than one word per user")
+        if len(words) == 0:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        word = words[0]
+        if 'ease' in request.query_params:
+            word.ease = request.query_params['ease']
+            word.save()
+
+        serializer = WordSerializer(word)
+        return Response(serializer.data)
+
+
+
 
 
 
@@ -88,16 +105,15 @@ class AnnotationView(APIView, LanguageFilterMixin):
 
 
 class DefinitionDetailView(RetrieveAPIView, LanguageFilterMixin):
-    queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowAny,)
-    serializer_class = DefinitionSerializer
+    serializer_class = WordSerializer
 
     def get(self, request, *args, **kwargs):
         word = kwargs['word']
         id = int(kwargs['id'])
         try:
-            result = Definition.objects.get(id=id, word=word, language=self.language)
+            result = Word.objects.get(id=id, word=word, language=self.language)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -128,10 +144,21 @@ class DefinitionListView(ListAPIView, LanguageFilterMixin):
         return Response(serializer.data)
 
     def single_word_to_target_language(self):
-        return Definition.objects.filter(word=self.kwargs['word'], language=self.language, target=self.target)
+        try:
+            word = self.get_word()
+        except:
+            return []
+        return Definition.objects.filter(word=word, language=self.target)
 
     def all_translations_for_word(self):
-        return Definition.objects.filter(word=self.kwargs['word'], language=self.language)
+        try:
+            word = self.get_word()
+        except:
+            return []
+        return Definition.objects.filter(word=word)
+
+    def get_word(self):
+        return Word.objects.get(word=self.kwargs['word'], language=self.language)
 
     def all_words_in_language(self):
         return Definition.objects.filter(language=self.language)

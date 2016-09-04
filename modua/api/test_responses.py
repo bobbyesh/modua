@@ -1,41 +1,14 @@
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
 
-from .models import Definition, User, Language
+from .models import User, Language, Word
 
 class TestViews(APITestCase):
 
 
     def setUp(self):
-        eng = Language.objects.create(language='en')
-        zh = Language.objects.create(language='zh')
-
-        Definition.objects.create(word="hello",
-                                  translation="A greeting",
-                                  language=eng,
-                                  target=eng)
-
-        Definition.objects.create(
-            word="我",
-            translation="I",
-            language=zh,
-            target=eng,
-        )
-
-        Definition.objects.create(
-            word="爱",
-            translation="love",
-            language=zh,
-            target=eng,
-        )
-
-        Definition.objects.create(
-            word="中国",
-            translation="China",
-            language=zh,
-            target=eng,
-        )
-
+        for chinese, english in [("我", "I"), ("爱", "love"), ("中国", "China")]:
+            Word.create(word=chinese, language='zh', definition=english, definition_language='en')
         User.objects.create_user('john', 'john@gmail.com', 'password')
 
 
@@ -43,6 +16,7 @@ class TestViews(APITestCase):
         '''
         Passes if a valid search returns a status code of 200.
         '''
+        Word.create(word='hello', language='en', definition='a greeating', definition_language='zh')
         response = self.client.get("/api/0.1/languages/en/hello/")
         self.assertEqual(response.status_code, 200)
 
@@ -50,6 +24,7 @@ class TestViews(APITestCase):
         '''
         Passes if the json returned from a valid request is the correct json.
         '''
+        Word.create(word='hello', language='en', definition='a greeating', definition_language='zh')
         response = self.client.get("/api/0.1/languages/en/hello/")
         self.assertContains(response, 'hello')
 
@@ -89,19 +64,3 @@ class TestLanguageAPI(APITestCase):
         expected = {'language': 'en'}
         for d in results:
             self.assertTrue(d['language'] == expected['language'])
-
-
-    def test_language_list_two_languages(self):
-        '''
-        Passes if /languages/ returns the correct json.
-        '''
-        Language.objects.create(language='en')
-        Language.objects.create(language='zh')
-        response = self.client.get("/api/0.1/languages/", format='json')
-        json = response.json()
-        results = json['results']
-        results = sorted(results, key=lambda x: x['language'])
-        expected = [{'language': 'en'}, {'language': 'zh'}]
-        expected = sorted(expected, key=lambda x: x['language'])
-        for x,y in zip(results, expected):
-            self.assertTrue(x['language'] == y['language'])

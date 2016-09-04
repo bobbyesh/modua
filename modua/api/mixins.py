@@ -40,10 +40,7 @@ class LanguageFilterMixin(object):
 
         '''
         if not hasattr(self, '_language'):
-            if self.request.method == 'POST':
-                query = self.request.query_params['language']
-            elif self.request.method == 'GET':
-                query = self.kwargs['language']
+            query = self.get_language()
             try:
                 self._language = Language.objects.get(language=query)
             except ObjectDoesNotExist:
@@ -56,3 +53,9 @@ class LanguageFilterMixin(object):
         if not hasattr(self, '_is_delimited'):
             self._is_delimited = is_delimited(self.language)
         return self._is_delimited
+
+    def get_language(self):
+        if 'language' in self.kwargs:
+            return self.kwargs['language']
+
+        return self.request.data['language']
