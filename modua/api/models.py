@@ -5,8 +5,17 @@ from django.core.urlresolvers import reverse
 from core.behaviors import Timestampable, Contributable, Editable, Ownable
 
 
+class Language(Contributable, Editable, Timestampable, models.Model):
+    language = models.CharField(blank=True, max_length=150)
+    script = models.CharField(blank=True, max_length=300)
+    delimited = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.language
+
+
 class DictionaryAPI(Timestampable, models.Model):
-    '''
+    """
 
     .. TODO: Create fulltext index in DB
 
@@ -28,7 +37,8 @@ class DictionaryAPI(Timestampable, models.Model):
         `id_key`:
             The key needed/issued to access the API - may not be necessary.
 
-    '''
+    """
+
     name = models.CharField(blank=True, max_length=150)
     description = models.CharField(blank=True, max_length=8000)
     api_type = models.CharField(blank=True, max_length=150)
@@ -36,6 +46,7 @@ class DictionaryAPI(Timestampable, models.Model):
     base_url = models.CharField(blank=True, max_length=2000)
     api_key = models.CharField(blank=True, max_length=500)
     id_key = models.CharField(blank=True, max_length=500)
+    language = models.ForeignKey(Language, related_name='apis', null=True)
 
     def __str__(self):
         return str(self.api_name)
@@ -46,15 +57,6 @@ class WordType(Contributable, Editable, Timestampable, models.Model):
 
     def __str__(self):
         return self.word_type
-
-
-class Language(Contributable, Editable, Timestampable, models.Model):
-    language = models.CharField(blank=True, max_length=150)
-    script = models.CharField(blank=True, max_length=300)
-    delimited = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.language
 
 
 class Article(Ownable, models.Model):
@@ -80,35 +82,42 @@ class Article(Ownable, models.Model):
 class Word(Ownable, models.Model):
     word = models.CharField(blank=True, max_length=600)
     users = models.ManyToManyField(User)
-    ease = models.CharField(
-        blank=True,
-        max_length=20,
-    )
+    ease = models.CharField(blank=True, max_length=20)
+    language = models.ForeignKey(Language)
+    transliteration = models.CharField(blank=True, max_length=8000)
+    article = models.ManyToManyField(Article)
+
+    unique_together = ('word', 'ease')
 
     def __str__(self):
         return self.word
 
+    @classmethod
+    def create(cls, word, language, definition, definition_language, ease='', transliteration=''):
+        l, created = Language.objects.get_or_create(language=language)
+        definition_l, created = Language.objects.get_or_create(language=definition_language)
+        word_instance =  cls(word=word, language=l, ease=ease, transliteration=transliteration)
+        word_instance.save()
+        Definition.objects.get_or_create(word=word_instance, language=definition_l, definition=definition)
+        return word_instance
+
+    def add_definition(self, language, definition):
+        query_instance, created = Language.objects.get_or_create(language=language)
+        Definition.objects.get_or_create(word=self, language=query_instance, definition=definition)
+
+    def set_language(self, language, delimited=True):
+        language, created = Language.objects.get_or_create(language=language, delimited=delimited)
+        self.language = language
+        self.save()
+
+
 
 
 class Definition(Timestampable, Contributable, models.Model):
-    word = models.CharField(blank=True, max_length=600)
-    translation = models.CharField(max_length=8000)
-    language = models.ForeignKey(Language, related_name='source_language')
-    target = models.ForeignKey(Language, related_name='target_language')
-    transliteration = models.CharField(blank=True, max_length=8000)
+    word = models.ForeignKey(Word)
+    definition = models.CharField(max_length=8000)
+    language = models.ForeignKey(Language)
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
-    article = models.ForeignKey(Article, related_name='article_definitions', null=True)
-
-    api = models.ForeignKey(DictionaryAPI, related_name='apis', null=True)
-    total_lookups = models.IntegerField(null=True)
-    user_added = models.IntegerField(null=True)
-    archived = models.BooleanField(default=False, null=False)
-
-    users = models.ManyToManyField(User)
-    ease = models.CharField(
-        blank=True,
-        max_length=20,
-    )
 
     def __str__(self):
         return self.translation
@@ -136,11 +145,3 @@ class City(Contributable, Editable, Timestampable, models.Model):
 
     def __str__(self):
         return self.city_name
-
-
-class UserDefinition(Timestampable, models.Model):
-    user = models.ForeignKey(User, related_name='user', null=True)
-    definitions = models.ForeignKey(Definition, related_name='definitions', null=True)
-
-
-
