@@ -4,6 +4,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import ObjectDoesNotExist
 from api.models import Article, Language
 
 
@@ -44,7 +45,7 @@ class HomeView(FormView, LoginRequiredMixin):
 
 
 @method_decorator(login_required, name='dispatch')
-class ArticleView(TemplateView):
+class ArticleView(TemplateView, UserMixin):
 
     template_name = 'webapp/sample.html'
 
@@ -54,5 +55,25 @@ class ArticleView(TemplateView):
         slug = kwargs['slug']
         article = Article.objects.get(slug=slug)
         text = article.text
-        context['tokens'] = klassified(tokenize_text(text))
+
+        tokens = []
+        for token in tokenize_text(text):
+            if is_punctuation(token):
+                tokens.append(token)
+            else:
+                word = Word.objects.filter(word=token, language=self.language, users__user=user)
+                if word:
+                    assert len(word) == 1
+                    word = word[0]
+                else:
+                    try:
+                        word = Word.objects.get(word=token, language.self.language)
+                    except ObjectDoesNotExist:
+                        word = token
+
+            tokens.append(word)
+
+
+
+        context['tokens'] = tokens
         return context

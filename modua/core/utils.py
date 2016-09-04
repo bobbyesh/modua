@@ -4,6 +4,7 @@ import re
 import configparser
 import os
 import requests
+import unicodedata
 
 
 class Token(object):
@@ -126,3 +127,10 @@ def is_delimited(tag):
         return True
     if subtags[0] == 'zh':
         return False
+
+
+def is_punctuation(char):
+    if len(char) != 1:
+        return False
+    return unicodedata.category(char).startswith('P')
+
