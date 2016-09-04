@@ -63,15 +63,10 @@ class Article(Ownable, models.Model):
 
     @property
     def preview(self):
-        return str(self.text)[:50] + '...'
+        return str(self.text)[:50] + ' ...'
 
 
 class Definition(Timestampable, Contributable, models.Model):
-    '''
-
-
-    '''
-
     word = models.CharField(blank=True, max_length=600)
     translation = models.CharField(max_length=8000)
     language = models.ForeignKey(Language, related_name='source_language')
@@ -84,6 +79,8 @@ class Definition(Timestampable, Contributable, models.Model):
     total_lookups = models.IntegerField(null=True)
     user_added = models.IntegerField(null=True)
     archived = models.BooleanField(default=False, null=False)
+
+    users = models.ManyToManyField(User)
 
     def __str__(self):
         return self.word

@@ -7,6 +7,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
 from rest_framework.authtoken.models import Token
+from rest_framework import status
+from rest_framework.response import Response
 from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
@@ -36,7 +38,7 @@ class SigninView(FormView):
             .. TODO: Create reasonable invalid user redirection.
 
             '''
-            return redirect('invalid-userinfo', self.request, format=None )
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class SignupView(FormView):

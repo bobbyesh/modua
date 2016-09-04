@@ -2,6 +2,32 @@ from django.test import TestCase
 from .models import Definition, User, Language
 
 
+class DefinitionTestCase(TestCase):
+
+    def test_definition_users(self):
+        '''Test that the Definition model's `users` ManyToMany field is operating correctly.'''
+        user = User.objects.create_user(username='johndoe', email='john@site.com', password='password')
+        english = Language.objects.create(language='en')
+        spanish = Language.objects.create(language='es')
+        pairs = [('hey','hola'), ('lets go', 'vaminos'), ('school', 'escuela')]
+        for word, translation in pairs:
+            Definition.objects.create(
+                language=english,
+                target=spanish,
+                word=word,
+                translation=translation
+            )
+        instance = Definition.objects.filter(language=english, target=spanish, word='hey')[0]
+        instance.users.add(user)
+
+        self.assertEqual(len(user.definition_set.all()), 1)
+
+
+
+
+
+
+
 class TestUserActivity(TestCase):
 
     def setUp(self):
