@@ -43,15 +43,16 @@ class HomeView(FormView, LoginRequiredMixin):
         return super(HomeView, self).form_valid(form)
 
 
+@method_decorator(login_required, name='dispatch')
 class ArticleView(TemplateView):
 
     template_name = 'webapp/sample.html'
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
-        # get article id
-        # put article in context
-        # return context
-        text = fetch_article('http://www.fox2008.cn/Article/2009/20090406000000_21827.html', 'zh')
+        user = self.request.user
+        slug = kwargs['slug']
+        article = Article.objects.get(slug=slug)
+        text = article.text
         context['tokens'] = klassified(tokenize_text(text))
         return context
