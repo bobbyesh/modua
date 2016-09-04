@@ -43,8 +43,6 @@ class HomeView(FormView, LoginRequiredMixin):
         return super(HomeView, self).form_valid(form)
 
 
-
-
 class ArticleView(TemplateView):
 
     template_name = 'webapp/sample.html'

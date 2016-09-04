@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import Definition, User, Language
+from .models import Definition, User, Language, Article
 
 
 class DefinitionTestCase(TestCase):
@@ -60,6 +60,15 @@ class DefinitionTestCase(TestCase):
 
         self.assertTrue(len(same.users.all()) == 2)
         self.assertTrue(len(different_ease1.users.all()) == 1)
+
+
+class ArticleTestCase(TestCase):
+
+    def test_slugify(self):
+        l = Language.objects.create(language='en')
+        a = Article.objects.create(title='some title', text='some text', language=l)
+        self.assertTrue(a.slug == 'some-title')
+
 
 
 

@@ -1,6 +1,7 @@
-from django.core.validators import RegexValidator
+from django.utils.text import slugify
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from core.behaviors import Timestampable, Contributable, Editable, Ownable
 
 
@@ -61,11 +62,20 @@ class Article(Ownable, models.Model):
     url = models.CharField(max_length=2000, blank=True)
     text = models.TextField(blank=False)
     language = models.ForeignKey(Language, related_name='api_article_language')
-    slug = models.SlugField(max_length=40)
+    slug = models.SlugField(max_length=40, allow_unicode=True)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.slug = slugify(self.title, allow_unicode=True)
+        super(Article, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('article', kwargs={'slug': str(self.slug)})
 
     @property
     def preview(self):
         return str(self.text)[:50] + ' ...'
+
 
 
 class Definition(Timestampable, Contributable, models.Model):
