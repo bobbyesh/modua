@@ -6,7 +6,7 @@ from mock import patch
 
 from .serializers import DefinitionSerializer
 from .models import Definition, User, Language
-from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView, URLImportView
+from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView, URLImportView, UpdateWordView
 
 
 class URLImportTestCase(APITestCase):
@@ -49,6 +49,50 @@ class URLImportTestCase(APITestCase):
         response = URLImportView.as_view()(request)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
+class UpdateWordTestCase(APITestCase):
+
+    def setUp(self):
+        self.english = Language.objects.create(language='en')
+        self.spanish = Language.objects.create(language='es')
+        self.password = 'password'
+        self.username = 'john'
+        self.user = User.objects.create(username=self.username, email='jdoe@gmail.com', password=self.password)
+        self.word = Definition.objects.create(
+            word='hey',
+            language=self.english,
+            target=self.spanish,
+            translation='hola',
+            ease='hard'
+        )
+        self.word.users.add(self.user)
+        self.token = Token.objects.create(user=self.user)
+
+    def test_update_ease(self):
+        factory = APIRequestFactory()
+        expected_ease = 'easy'
+        request_url = '/api/0.1/language/{}word/?token={}&username={}&password={}&ease{}'.format(
+            self.word,
+            self.token,
+            self.username,
+            self.password,
+            expected_ease
+        )
+        kwargs = {
+            'word': self.word,
+            'token': self.token,
+            'username': self.username,
+            'password': self.password,
+            'ease': expected_ease
+        }
+
+        request = factory.patch(request_url, kwargs)
+        response = UpdateWordView.as_view()(request)
+        resulting_ease = self.user.definition_set.filter(word=self.word)[0].ease
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(expected_ease, response)
+        self.assertEqual(expected_ease, str(resulting_ease))
 
 
 class LanguageListTestCase(APITestCase):

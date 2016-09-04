@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, GenericAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -21,6 +21,21 @@ def api_root(request, format=None):
     return Response({
         'languages': reverse('language-list', request=request, format=format),
         })
+
+
+class UpdateWordView(UpdateAPIView):
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (AllowAny,)
+    serializer_class = DefinitionSerializer
+
+    def get_queryset(self):
+        pass
+
+    def patch(self, request, *args, **kwargs):
+        pass
+
+
+
 
 
 class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):

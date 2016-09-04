@@ -10,6 +10,7 @@ class DefinitionSerializer(serializers.ModelSerializer):
 
 
 class LanguageSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Language
         fields = ('language', 'id')

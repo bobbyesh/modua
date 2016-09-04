@@ -77,6 +77,18 @@ class Article(Ownable, models.Model):
         return str(self.text)[:50] + ' ...'
 
 
+class Word(Ownable, models.Model):
+    word = models.CharField(blank=True, max_length=600)
+    users = models.ManyToManyField(User)
+    ease = models.CharField(
+        blank=True,
+        max_length=20,
+    )
+
+    def __str__(self):
+        return self.word
+
+
 
 class Definition(Timestampable, Contributable, models.Model):
     word = models.CharField(blank=True, max_length=600)
@@ -99,7 +111,7 @@ class Definition(Timestampable, Contributable, models.Model):
     )
 
     def __str__(self):
-        return self.word
+        return self.translation
 
 
 class Country(Contributable, Editable, Timestampable, models.Model):
