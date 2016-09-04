@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
 from core.behaviors import Timestampable, Contributable, Editable, Ownable
@@ -81,6 +82,10 @@ class Definition(Timestampable, Contributable, models.Model):
     archived = models.BooleanField(default=False, null=False)
 
     users = models.ManyToManyField(User)
+    ease = models.CharField(
+        blank=True,
+        max_length=20,
+    )
 
     def __str__(self):
         return self.word

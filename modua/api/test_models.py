@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 from .models import Definition, User, Language
 
 
@@ -6,7 +7,8 @@ class DefinitionTestCase(TestCase):
 
     def test_definition_users(self):
         '''Test that the Definition model's `users` ManyToMany field is operating correctly.'''
-        user = User.objects.create_user(username='johndoe', email='john@site.com', password='password')
+        john = User.objects.create_user(username='john', email='john@site.com', password='password')
+        sally = User.objects.create_user(username='sally', email='sally@site.com', password='password')
         english = Language.objects.create(language='en')
         spanish = Language.objects.create(language='es')
         pairs = [('hey','hola'), ('lets go', 'vaminos'), ('school', 'escuela')]
@@ -17,13 +19,47 @@ class DefinitionTestCase(TestCase):
                 word=word,
                 translation=translation
             )
+
+
         instance = Definition.objects.filter(language=english, target=spanish, word='hey')[0]
-        instance.users.add(user)
+        same, created = Definition.objects.get_or_create(
+            language=instance.language,
+            target=instance.target,
+            word=instance.word,
+            ease='hard'
+        )
+        same.users.add(john)
 
-        self.assertEqual(len(user.definition_set.all()), 1)
+        same, created = Definition.objects.get_or_create(
+            language=instance.language,
+            target=instance.target,
+            word=instance.word,
+            ease='hard'
+        )
+
+        same.users.add(sally)
 
 
+        different_ease1, created = Definition.objects.get_or_create(
+            language=english,
+            target=spanish,
+            word='go',
+            translation='va',
+            ease='hard'
+        )
+        different_ease1.users.add(john)
 
+        different_ease2, created = Definition.objects.get_or_create(
+            language=english,
+            target=spanish,
+            word='go',
+            translation='va',
+            ease='easy'
+        )
+        different_ease2.users.add(sally)
+
+        self.assertTrue(len(same.users.all()) == 2)
+        self.assertTrue(len(different_ease1.users.all()) == 1)
 
 
 
