@@ -61,6 +61,7 @@ class Article(Ownable, models.Model):
     url = models.CharField(max_length=2000, blank=True)
     text = models.TextField(blank=False)
     language = models.ForeignKey(Language, related_name='api_article_language')
+    slug = models.SlugField(max_length=40)
 
     @property
     def preview(self):
