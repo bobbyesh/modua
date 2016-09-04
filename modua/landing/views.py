@@ -29,7 +29,7 @@ class SigninView(FormView):
         username = self.request.POST['username']
         password = self.request.POST['password']
         user = authenticate(username=username, password=password)
-        if user.is_authenticated():
+        if user is not None:
             login(self.request, user)
             return redirect('home')
         else:
@@ -38,7 +38,7 @@ class SigninView(FormView):
             .. TODO: Create reasonable invalid user redirection.
 
             '''
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return redirect('signup')
 
 
 class SignupView(FormView):
@@ -53,6 +53,11 @@ class SignupView(FormView):
         password = self.request.POST['password']
         user = User.objects.create_user(username=username, email=email, password=password)
         Token.objects.create(user=user)
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(self.request, user)
+        else:
+            raise Exception("login or authentication error in SignupView")
         return super(FormView, self).form_valid(form)
 
 

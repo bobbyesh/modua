@@ -7,9 +7,9 @@ from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from api.models import Article, Language
 
-
 from core.utils import klassified
 from core.services import fetch_article, tokenize_text
+from core.mixins import UserMixin
 
 from .forms import URLForm
 
@@ -55,25 +55,7 @@ class ArticleView(TemplateView, UserMixin):
         slug = kwargs['slug']
         article = Article.objects.get(slug=slug)
         text = article.text
-
-        tokens = []
-        for token in tokenize_text(text):
-            if is_punctuation(token):
-                tokens.append(token)
-            else:
-                word = Word.objects.filter(word=token, language=self.language, users__user=user)
-                if word:
-                    assert len(word) == 1
-                    word = word[0]
-                else:
-                    try:
-                        word = Word.objects.get(word=token, language.self.language)
-                    except ObjectDoesNotExist:
-                        word = token
-
-            tokens.append(word)
-
-
-
-        context['tokens'] = tokens
+        context['tokens'] = self.get_tokens(text)
+        context['counts'] = self.get_counts(text)
+        import pdb;pdb.set_trace()
         return context
