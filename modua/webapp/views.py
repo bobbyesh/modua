@@ -8,8 +8,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from api.models import Article, Language
 
 from core.utils import klassified
-from core.services import fetch_article, tokenize_text
-from core.mixins import UserMixin
+from core.services import fetch_article
+from core.mixins import ArticleMixin
 
 from .forms import URLForm
 
@@ -45,7 +45,7 @@ class HomeView(FormView, LoginRequiredMixin):
 
 
 @method_decorator(login_required, name='dispatch')
-class ArticleView(TemplateView, UserMixin):
+class ArticleView(TemplateView, ArticleMixin):
 
     template_name = 'webapp/sample.html'
 
@@ -54,8 +54,9 @@ class ArticleView(TemplateView, UserMixin):
         user = self.request.user
         slug = kwargs['slug']
         article = Article.objects.get(slug=slug)
+        language = article.language
         text = article.text
-        context['tokens'] = self.get_tokens(text)
-        context['counts'] = self.get_counts(text)
+        context['tokens'] = self.get_tokens(text, language)
+        context['counts'] = self.get_counts(text, language)
         import pdb;pdb.set_trace()
         return context

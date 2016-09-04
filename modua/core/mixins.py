@@ -2,7 +2,7 @@
 
 from api.models import Word
 from api.mixins import LanguageFilterMixin
-from core.utils import is_punctuation
+from core.utils import is_punctuation, tokenize_text
 from collections import defaultdict
 
 class UserMixin(LanguageFilterMixin):
@@ -34,7 +34,6 @@ class UserMixin(LanguageFilterMixin):
                     except ObjectDoesNotExist:
                         word = token
 
-            tokens.append(word)
+            self.tokens.append(word)
 
         return self.tokens
-

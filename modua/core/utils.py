@@ -5,6 +5,7 @@ import configparser
 import os
 import requests
 import unicodedata
+from wordfencer.parser import ChineseParser
 
 
 class Token(object):
@@ -134,3 +135,11 @@ def is_punctuation(char):
         return False
     return unicodedata.category(char).startswith('P')
 
+
+def tokenize_text(text):
+    p = ChineseParser()
+    tokens = []
+    for string in text.split():
+        tokens += p.parse(string)
+
+    return tokens

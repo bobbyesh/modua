@@ -18,11 +18,3 @@ def fetch_article(url, language):
         title = a.title
 
     return title, a.text
-
-def tokenize_text(text):
-    p = ChineseParser()
-    tokens = []
-    for string in text.split():
-        tokens += p.parse(string)
-
-    return tokens
