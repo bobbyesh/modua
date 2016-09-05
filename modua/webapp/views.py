@@ -3,6 +3,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from api.models import Article, Language
@@ -51,12 +53,8 @@ class ArticleView(TemplateView, ArticleMixin):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
-        user = self.request.user
-        slug = kwargs['slug']
-        article = Article.objects.get(slug=slug)
-        language = article.language
-        text = article.text
-        context['tokens'] = self.get_tokens(text, language)
-        context['counts'] = self.get_counts(text, language)
+        user = User.objects.get(username=self.request.user.username)
+        if user is not None:
+            context['tokens'], context['counts'] = self.get_article_context(user)
         import pdb;pdb.set_trace()
         return context
