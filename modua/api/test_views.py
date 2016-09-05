@@ -133,18 +133,23 @@ class DefinitionListTestCase(APITestCase):
         Language.objects.create(language='en')
         Language.objects.create(language='es')
         Language.objects.create(language='zh')
-        john = User.objects.create_user(username='john', email='jdoe@gmail.com', password='password')
-        User.objects.create_user(username='sally', password='password')
+        john = User.objects.create_user(username='john', password='password')
+        sally = User.objects.create_user(username='sally', password='password')
 
         word = Word.create('hey', 'en')
         word.add_definition('hola', 'es')
         word.add_definition('es una blah', 'es')
         word.add_definition('ni hao', 'zh')
-        word.set_user(username='john')
-        
-        word = Word.create('hey', 'en')
-        word.add_definition('special definition', 'zh')
-        word.set_user(username='sally')
+        word.user = john
+        word.save()
+
+        sallys_word = Word.objects.create(
+            word='hey',
+            language=Language.objects.get(language='en'),
+            user=sally
+        )
+
+        sallys_word.add_definition('special definition', 'zh')
 
         self.client = APIClient()
         self.client.login(username='john', password='password')
@@ -168,13 +173,15 @@ class DefinitionListTestCase(APITestCase):
         kwargs={'language': 'en', 'word': 'hey'}
         url = reverse('definition-list', kwargs=kwargs)
         kwargs['username'] = 'john'
-        response = self.client.get(url, {'username': 'john'})
+        response = self.client.get(url, kwargs)
 
         if DEBUG:
 
+            print("kwargs = {}".format(kwargs))
             print(url)
             print(response.data)
             print()
+            import pdb;pdb.set_trace()
 
         self.assertContains(response, 'hola')
         self.assertContains(response, 'es una blah')

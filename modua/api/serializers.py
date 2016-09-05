@@ -22,10 +22,11 @@ class WordSerializer(serializers.ModelSerializer):
 class DefinitionSerializer(serializers.ModelSerializer):
 
     word = WordSerializer()
+    language = LanguageSerializer()
 
     class Meta:
         model = Definition
-        fields = ('word', 'definition', 'word_type', 'id')
+        fields = ('word', 'definition', 'language', 'word_type', 'id')
         depth = 1
 
 
