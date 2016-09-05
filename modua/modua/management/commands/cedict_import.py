@@ -24,7 +24,7 @@ def store_def_boi(word, trans, def_arr):
 
         # Do the insertion
         # If there is more than one definition insert them both as different rows
-        zh = Language.objects.get(language='zh')
+        zh, create = Language.objects.get_or_create(language='zh')
         for definition in def_arr:
             store_this_guy = Definitions(language=zh, word=word, transliteration=trans, definition=definition)
             store_this_guy.save()
