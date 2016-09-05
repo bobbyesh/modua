@@ -40,7 +40,7 @@ $(function() {
     $('span.token').click(function(e){
         var elem = get_popup_elem(this);
         elem.css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
-        elem.show().delay(2000).fadeOut();
+        elem.show();
     });
     
     $('button.ease').click(function() {
