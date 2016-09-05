@@ -32,19 +32,19 @@ var get_popup_elem = function(that) {
 };
 
 
-$(function() {
+$(document).ready(function() {
     const moveLeft = 20;
     const moveDown = 10;
 
-
     $('span.token').click(function(e){
-        var elem = get_popup_elem(this);
-        elem.css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
-        elem.show();
+	    $('div.definition').hide();
+            var elem = get_popup_elem(this);
+            elem.css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
+            elem.show();
     });
     
-    $('button.ease').click(function() {
-	    $(this).parent().hide();
+    $('button.ease').on('click', function() {
+	    $('div.definition').hide();
     });
 
 

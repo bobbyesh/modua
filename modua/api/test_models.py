@@ -21,7 +21,7 @@ class DefinitionTestCase(TestCase):
         sally = User.objects.create_user(username='sally', email='sally@site.com', password='password')
 
         hard = Word.create(word='hey', language='en', definition_language='es', definition='hola', ease='hard')
-        easy = Word.create(word='hey', language='en', definition_language='es', definition='hola', ease='hard')
+        easy = Word.create(word='hey', language='en', definition_language='es', definition='hola', ease='easy')
 
         hard.users.add(sally)
         easy.users.add(john)
