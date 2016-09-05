@@ -13,11 +13,11 @@
 }
 
 
-.unknown {
+.hard {
     background-color: rgba(255,90, 67, 0.8)
 }
 
-.learning {
+.easy {
     background-color: rgba(230,180,38, 0.8)
 }
 
