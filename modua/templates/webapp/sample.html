@@ -44,7 +44,9 @@
         <div class="definition" data-token="{{ token }}">
 		<h3>{{ token }}<p class="transliteration">{{ token.transliteration }}</p></h3>
             <p>{{ definition }}</p>
-	    <span class="btn"></span>
+	    <button type="submit" class="btn btn-primary ease">easy</button>
+	    <button type="submit" class="btn btn-primary ease">hard</button>
+	    <button type="submit" class="btn btn-primary ease">known</button>
         </div>
         {% endfor %}
     {% endif %}
