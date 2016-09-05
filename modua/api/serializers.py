@@ -8,6 +8,7 @@ class WordSerializer(serializers.ModelSerializer):
         fields = ('word', 'language', 'ease', 'id')
         depth = 1
 
+
 class DefinitionSerializer(serializers.ModelSerializer):
 
     class Meta:
