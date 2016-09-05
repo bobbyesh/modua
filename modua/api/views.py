@@ -102,5 +102,3 @@ class DefinitionListView(ListAPIView):
     serializer_class = DefinitionSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = DefinitionFilter
-    lookup_field = 'word'
-    lookup_url_kwarg = 'word'

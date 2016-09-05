@@ -9,6 +9,7 @@ from .serializers import DefinitionSerializer
 from .models import Definition, User, Language, Word
 from .views import LanguageListView, DefinitionListView, AnnotationView, URLImportView, WordDetailView
 
+DEBUG = True
 
 class WordDetailTestCase(APITestCase):
 
@@ -58,7 +59,6 @@ class WordDetailTestCase(APITestCase):
         url = reverse('word-detail', kwargs=kwargs) 
         print(url)
         response = self.client.get(url, kwargs)
-        #response = self.view(request, language='zh', word='cool')
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -126,6 +126,60 @@ class LanguageListTestCase(APITestCase):
         response = view(request)
         self.assertContains(response, 'en')
         self.assertContains(response, 'zh')
+
+class DefinitionListTestCase(APITestCase):
+
+    def setUp(self):
+        Language.objects.create(language='en')
+        Language.objects.create(language='es')
+        Language.objects.create(language='zh')
+        john = User.objects.create_user(username='john', email='jdoe@gmail.com', password='password')
+        User.objects.create_user(username='sally', password='password')
+
+        word = Word.create('hey', 'en')
+        word.add_definition('hola', 'es')
+        word.add_definition('es una blah', 'es')
+        word.add_definition('ni hao', 'zh')
+        word.set_user(username='john')
+        
+        word = Word.create('hey', 'en')
+        word.add_definition('special definition', 'zh')
+        word.set_user(username='sally')
+
+        self.client = APIClient()
+        self.client.login(username='john', password='password')
+
+    def test_definition_list(self):
+        kwargs={'language': 'en', 'word': 'hey'}
+        url = reverse('definition-list', kwargs=kwargs)
+        response = self.client.get(url, {'target': 'es'})
+
+        if DEBUG:
+            print('test_definition_list')
+            print(url)
+            print(response.data)
+            print()
+
+        self.assertContains(response, 'hola')
+        self.assertContains(response, 'es una blah')
+        self.assertNotContains(response, 'ni hao')
+
+    def test_filter_by_user(self):
+        kwargs={'language': 'en', 'word': 'hey'}
+        url = reverse('definition-list', kwargs=kwargs)
+        kwargs['username'] = 'john'
+        response = self.client.get(url, {'username': 'john'})
+
+        if DEBUG:
+
+            print(url)
+            print(response.data)
+            print()
+
+        self.assertContains(response, 'hola')
+        self.assertContains(response, 'es una blah')
+        self.assertContains(response, 'ni hao')
+        self.assertNotContains(response, 'special definition')
 
 
 '''
