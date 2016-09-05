@@ -94,25 +94,19 @@ class Word(Ownable, models.Model):
         return self.word
 
     @classmethod
-    def create(cls, word, language, definition, definition_language, ease='', transliteration=''):
-        l, created = Language.objects.get_or_create(language=language)
-        definition_l, created = Language.objects.get_or_create(language=definition_language)
-        word_instance, created =  cls.objects.get_or_create(word=word, language=l, ease=ease, transliteration=transliteration)
-        Definition.objects.get_or_create(word=word_instance, language=definition_l, definition=definition)
+    def create(cls, word, language_string, transliteration=''):
+        language = Language.objects.get(language=language_string)
+        word_instance, created =  cls.objects.get_or_create(word=word, language=language, transliteration=transliteration)
         return word_instance
 
-    def set_user(self, username):
+    def set_user(self, username, ease='new'):
         self.user = User.objects.get(username=username)
+        self.ease = ease
         self.save()
 
-    def add_definition(self, language, definition):
-        query_instance, created = Language.objects.get_or_create(language=language)
-        Definition.objects.get_or_create(word=self, language=query_instance, definition=definition)
-
-    def set_language(self, language, delimited=True):
-        language, created = Language.objects.get_or_create(language=language, delimited=delimited)
-        self.language = language
-        self.save()
+    def add_definition(self, definition, language_string):
+        language = Language.objects.get(language=language_string)
+        Definition.objects.get_or_create(word=self, language=language, definition=definition)
 
 
 class Definition(Timestampable, Contributable, models.Model):
