@@ -1,7 +1,7 @@
 #cedict_import.py
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
-from api.models import Definitions, Language
+from api.models import Definition, Language, Word
 from . import cedict_parser
 
 
@@ -24,10 +24,10 @@ def store_def_boi(word, trans, def_arr):
 
         # Do the insertion
         # If there is more than one definition insert them both as different rows
-        zh, create = Language.objects.get_or_create(language='zh')
+        zh, created = Language.objects.get_or_create(language='zh')
+        en, created = Language.objects.get_or_create(language='en')
         for definition in def_arr:
-            store_this_guy = Definitions(language=zh, word=word, transliteration=trans, definition=definition)
-            store_this_guy.save()
+            word_instance = Word.create(word=word, language=zh, definition=definition, definition_language=en, transliteration=trans)
     except Exception as e:
         error_file = open("cedict_error.txt", "a+")
         error_file.writelines("{0} | {1} | {2} | {3}\n".format(e, word, trans, def_arr))

@@ -94,8 +94,7 @@ class Word(Ownable, models.Model):
     def create(cls, word, language, definition, definition_language, ease='', transliteration=''):
         l, created = Language.objects.get_or_create(language=language)
         definition_l, created = Language.objects.get_or_create(language=definition_language)
-        word_instance =  cls(word=word, language=l, ease=ease, transliteration=transliteration)
-        word_instance.save()
+        word_instance, created =  cls.objects.get_or_create(word=word, language=l, ease=ease, transliteration=transliteration)
         Definition.objects.get_or_create(word=word_instance, language=definition_l, definition=definition)
         return word_instance
 
@@ -116,7 +115,7 @@ class Definition(Timestampable, Contributable, models.Model):
     word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
 
     def __str__(self):
-        return self.translation
+        return self.definition
 
 
 class Country(Contributable, Editable, Timestampable, models.Model):
