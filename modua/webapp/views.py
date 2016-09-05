@@ -56,5 +56,4 @@ class ArticleView(TemplateView, ArticleMixin):
         user = User.objects.get(username=self.request.user.username)
         if user is not None:
             context['tokens'], context['counts'] = self.get_article_context(user)
-        import pdb;pdb.set_trace()
         return context

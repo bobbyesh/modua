@@ -1,6 +1,11 @@
 {% extends 'webapp/base.html' %}
 {% load staticfiles %}
 
+{% block head_include %}
+   <script src="{% static 'webapp/js/hover.js' %}"></script>
+   <link rel="stylesheet" href="{% static 'webapp/css/hover.css' %}" type="text/css"/>
+{% endblock %}
+
 {% block contents %}
     <div class="row">
         <div class="col-md-2">
@@ -24,7 +29,7 @@
             <p>
                 {% for token in tokens %}
                     {% if token.ease %}
-                        <span class="{{ token.ease }}">{{ token }}</span>
+		    <span class="token {{ token.ease }}" name="{{ token }}">{{ token }}</span>
                     {% else %}
                         {{ token }}
                     {% endif %}
@@ -33,4 +38,14 @@
             </div>
         </div>
     </div>
+    {% for token in tokens %}
+    {% if token.definition_set %}
+   	{% for definition in token.definition_set.all %} 
+        <div class="definition" data-token="{{ token }}">
+		<h3>{{ token }}<p class="transliteration">{{ token.transliteration }}</p></h3>
+            <p>{{ definition }}</p>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endfor %}
 {%  endblock %}
