@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveUpdateAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -6,11 +6,15 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
+from rest_framework import filters
 from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
+from django.shortcuts import get_object_or_404
+
 
 from core.services import fetch_article
 from .models import Definition, Language, Article, Word
+from .filters import WordFilter
 from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer
 from .mixins import LanguageFilterMixin
 
@@ -106,16 +110,19 @@ class AnnotationView(APIView, LanguageFilterMixin):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class WordDetailView(RetrieveAPIView, UpdateAPIView, LanguageFilterMixin):
+class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
+    queryset = Word.objects.all()
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (AllowAny,)
+    filter_backends = (filters.DjangoFilterBackend,)
     serializer_class = WordSerializer
-
+    filter_class = WordFilter
     lookup_field = 'word'
     lookup_url_kwarg = 'word'
 
     def get_queryset(self):
         return Word.objects.filter(language=self.language)
+
 
 
 class DefinitionDetailView(RetrieveAPIView, UpdateAPIView, LanguageFilterMixin):

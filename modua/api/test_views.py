@@ -1,8 +1,9 @@
 from rest_framework.test import APITestCase, APIRequestFactory
 from rest_framework import status
-from rest_framework.test import force_authenticate
+from rest_framework.test import force_authenticate, APIClient
 from rest_framework.authtoken.models import Token
 from mock import patch
+from django.core.urlresolvers import reverse
 
 from .serializers import DefinitionSerializer
 from .models import Definition, User, Language, Word
@@ -11,42 +12,28 @@ from .views import LanguageListView, DefinitionListView, DefinitionDetailView, A
 
 class WordDetailTestCase(APITestCase):
 
+    def setUp(self):
+        john = User.objects.create_user(username='john', email='jdoe@gmail.com', password='password')
+        self.johns_token = Token.objects.create(user=john)
+        sally = User.objects.create_user(username='sally', email='sally@gmail.com', password='password')
+        word = Word.create(word='hey', language='en', definition='hola', definition_language='es', ease='hard')
+        word.set_user(username='john')
+
+        self.john = john
+        self.sally = sally
+        self.client = APIClient()
+        self.client.login(username='john', password='password')
+
     def test_update_ease(self):
-        self.password = 'password'
-        self.username = 'john'
-        self.user = User.objects.create(username=self.username, email='jdoe@gmail.com', password=self.password)
-        self.word = Word.create(word='hey', language='en', definition='hola', definition_language='es', ease='hard')
-        self.word.users.add(self.user)
-        self.token = Token.objects.create(user=self.user)
-        factory = APIRequestFactory()
-        expected_ease = 'easy'
-        request_url = '/api/0.1/language/{}/word/{}?&username={}&password={}&ease={}'.format(
-            'en',
-            self.word,
-            self.username,
-            self.password,
-            expected_ease
-        )
-        kwargs = {
-            'language': 'en',
-            'word': self.word,
-            'username': self.username,
-            'password': self.password,
-            'ease': expected_ease
-        }
-
-        request = factory.patch(
-            request_url,
-            kwargs
-        )
-        force_authenticate(request, self.user, self.token)
-        response = UpdateWordView.as_view()(request)
-
-        resulting_ease = self.user.word_set.filter(word=self.word)[0].ease
+        url = reverse('word-detail', kwargs={'language': 'en', 'word': 'hey'})
+        response = self.client.patch(url, {'username': 'john', 'ease': 'easy'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertContains(response, expected_ease)
-        self.assertEqual(expected_ease, str(resulting_ease))
+        self.assertContains(response, 'easy')
+
+        actual_ease = self.john.word_set.filter(word='hey')[0].ease
+        self.assertEqual('easy', str(actual_ease))
+
 
     def test_does_contain_word(self):
         Word.create(
@@ -72,6 +59,7 @@ class WordDetailTestCase(APITestCase):
         self.factory = APIRequestFactory()
         request = self.factory.get('/api/0.1/languages/zh/cool/')
         response = self.view(request, language='zh', word='cool')
+        import pdb;pdb.set_trace()
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_wrong_word_raises_404(self):
@@ -83,7 +71,7 @@ class WordDetailTestCase(APITestCase):
         )
         self.view = WordDetailView.as_view()
         self.factory = APIRequestFactory()
-        request = self.factory.get('/api/0.1/languages/en/basketball/3/')
+        request = self.factory.get('/api/0.1/languages/en/basketball/')
         response = self.view(request, language='en', word='basketball')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

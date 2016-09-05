@@ -4,6 +4,7 @@ cssselect==0.9.2
 Django==1.9.6
 django-crispy-forms==1.6.0
 django-filter==0.13.0
+django-guardian==1.4.5
 django-twitter-bootstrap==3.3.0
 django-twitter-bootstrap-form==0.1.0
 djangorestframework==3.3.3

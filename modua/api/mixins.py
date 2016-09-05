@@ -11,9 +11,6 @@ class LanguageFilterMixin(object):
     Provides the language and delimited properties automatically.
     '''
 
-    def get_language(self):
-        return self.language
-
     def get_target(self):
         return self.target
 
@@ -57,5 +54,6 @@ class LanguageFilterMixin(object):
     def get_language(self):
         if 'language' in self.kwargs:
             return self.kwargs['language']
+
 
         return self.request.data['language']

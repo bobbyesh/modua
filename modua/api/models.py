@@ -66,6 +66,9 @@ class Article(Ownable, models.Model):
     language = models.ForeignKey(Language, related_name='api_article_language')
     slug = models.SlugField(max_length=40, allow_unicode=True)
 
+    def __str__(self):
+       return self.slug
+
     def save(self, *args, **kwargs):
         if not self.id:
             self.slug = slugify(self.title, allow_unicode=True)
@@ -81,11 +84,11 @@ class Article(Ownable, models.Model):
 
 class Word(Ownable, models.Model):
     word = models.CharField(blank=True, max_length=600)
-    users = models.ManyToManyField(User)
+    user = models.ForeignKey(User, null=True)
     ease = models.CharField(blank=True, max_length=20)
     language = models.ForeignKey(Language)
     transliteration = models.CharField(blank=True, max_length=8000)
-    article = models.ManyToManyField(Article)
+    articles = models.ManyToManyField(Article)
 
     def __str__(self):
         return self.word
@@ -97,6 +100,10 @@ class Word(Ownable, models.Model):
         word_instance, created =  cls.objects.get_or_create(word=word, language=l, ease=ease, transliteration=transliteration)
         Definition.objects.get_or_create(word=word_instance, language=definition_l, definition=definition)
         return word_instance
+
+    def set_user(self, username):
+        self.user = User.objects.get(username=username)
+        self.save()
 
     def add_definition(self, language, definition):
         query_instance, created = Language.objects.get_or_create(language=language)
