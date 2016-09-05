@@ -6,7 +6,86 @@ from mock import patch
 
 from .serializers import DefinitionSerializer
 from .models import Definition, User, Language, Word
-from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView, URLImportView, UpdateWordView
+from .views import LanguageListView, DefinitionListView, DefinitionDetailView, AnnotationView, URLImportView, UpdateWordView, WordDetailView
+
+
+class WordDetailTestCase(APITestCase):
+
+    def test_update_ease(self):
+        self.password = 'password'
+        self.username = 'john'
+        self.user = User.objects.create(username=self.username, email='jdoe@gmail.com', password=self.password)
+        self.word = Word.create(word='hey', language='en', definition='hola', definition_language='es', ease='hard')
+        self.word.users.add(self.user)
+        self.token = Token.objects.create(user=self.user)
+        factory = APIRequestFactory()
+        expected_ease = 'easy'
+        request_url = '/api/0.1/language/{}/word/{}?&username={}&password={}&ease={}'.format(
+            'en',
+            self.word,
+            self.username,
+            self.password,
+            expected_ease
+        )
+        kwargs = {
+            'language': 'en',
+            'word': self.word,
+            'username': self.username,
+            'password': self.password,
+            'ease': expected_ease
+        }
+
+        request = factory.patch(
+            request_url,
+            kwargs
+        )
+        force_authenticate(request, self.user, self.token)
+        response = UpdateWordView.as_view()(request)
+
+        resulting_ease = self.user.word_set.filter(word=self.word)[0].ease
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, expected_ease)
+        self.assertEqual(expected_ease, str(resulting_ease))
+
+    def test_does_contain_word(self):
+        Word.create(
+            language='en',
+            word='cool',
+            definition_language='zh',
+            definition='not hot',
+        )
+        self.view = WordDetailView.as_view()
+        self.factory = APIRequestFactory()
+        request = self.factory.get('/api/0.1/languages/en/cool/')
+        self.response = self.view(request, language='en', word='cool')
+        self.assertContains(self.response, 'cool')
+
+    def test_wrong_language_raises_404(self):
+        Word.create(
+            language='en',
+            word='cool',
+            definition_language='zh',
+            definition='not hot',
+        )
+        self.view = WordDetailView.as_view()
+        self.factory = APIRequestFactory()
+        request = self.factory.get('/api/0.1/languages/zh/cool/')
+        response = self.view(request, language='zh', word='cool')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_wrong_word_raises_404(self):
+        Word.create(
+            language='en',
+            word='cool',
+            definition_language='zh',
+            definition='not hot',
+        )
+        self.view = WordDetailView.as_view()
+        self.factory = APIRequestFactory()
+        request = self.factory.get('/api/0.1/languages/en/basketball/3/')
+        response = self.view(request, language='en', word='basketball')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class URLImportTestCase(APITestCase):

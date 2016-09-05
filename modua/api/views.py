@@ -118,28 +118,6 @@ class WordDetailView(RetrieveAPIView, UpdateAPIView, LanguageFilterMixin):
         return Word.objects.filter(language=self.language)
 
 
-    def patch(self, request, *args, **kwargs):
-        username = request.query_params['username']
-        password = request.query_params['password']
-        assert username == self.request.user.username
-        assert password == self.request.user.password
-
-        words = Word.objects.filter(word=self.request.data['word'], language=self.language, users__username=self.request.user.username)
-        if len(words) > 1:
-            raise Exception("There should not be more than one word per user")
-        if len(words) == 0:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        word = words[0]
-        if 'ease' in request.query_params:
-            word.ease = request.query_params['ease']
-            word.save()
-
-        serializer = WordSerializer(word)
-        return Response(serializer.data)
-
-
-
 class DefinitionDetailView(RetrieveAPIView, UpdateAPIView, LanguageFilterMixin):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
     permission_classes = (AllowAny,)
