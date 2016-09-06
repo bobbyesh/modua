@@ -2,6 +2,11 @@ from rest_framework import serializers
 from .models import Definition, Language, Word
 
 
+class TokenSerializer(serializers.Serializer):
+    string = serializers.CharField(trim_whitespace=True)
+    position = serializers.IntegerField()
+
+
 class LanguageSerializer(serializers.ModelSerializer):
 
     class Meta:

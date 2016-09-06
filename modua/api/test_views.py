@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 
 from .serializers import DefinitionSerializer
 from .models import Definition, User, Language, Word
-from .views import LanguageListView, DefinitionListView, AnnotationView, URLImportView, WordDetailView
+from .views import LanguageListView, DefinitionListView, URLImportView, WordDetailView, ParseView
 
 DEBUG = True
 
@@ -187,6 +187,15 @@ class DefinitionListTestCase(APITestCase):
         self.assertContains(response, 'es una blah')
         self.assertContains(response, 'ni hao')
         self.assertNotContains(response, 'special definition')
+
+
+class ParseViewTestCase(APITestCase):
+    
+    def test_parse(self):
+        factory = APIRequestFactory()
+        request = factory.post(reverse('parse', kwargs={'language':'zh'}), {'language': 'zh', 'string': '我是美国人'})
+        response = ParseView.as_view()(request)
+        self.assertTrue(x['string'] in {'我','是', '美国人'} for x in response.data)
 
 
 '''

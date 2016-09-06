@@ -15,9 +15,9 @@ class Token(object):
 
     '''
 
-    def __init__(self, string, klass):
+    def __init__(self, string, position):
         self.string = string
-        self.klass = klass
+        self.position = position
 
     def __str__(self):
         return self.string
@@ -27,7 +27,7 @@ class Token(object):
 
 
 def klassified(tokens):
-    return [Token(elem, 'new') for elem in tokens]
+    raise Exception("Not implemented anymore, deprecated")
 
 
 def get_api_response(url):
