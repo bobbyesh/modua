@@ -12,11 +12,11 @@ class OwnerPermissionsTestCase(APITestCase):
     def test_not_owner_cannot_read(self):
         '''John creates a word and then Sally tries to read it even though she shouldn't
         be able to.  Luckily she can't.'''
-        john = User.objects.create(username='john', password='password')
+        john = User.objects.create_user(username='john', password='password')
         language= Language.objects.create(language='en')
         word = Word.objects.create(user=john, word='foo', language=language, ease='easy')
         definition = Definition.objects.create(word=word, language=language, definition='bar')
-        sally = User.objects.create(username='sally', password='password')
+        sally = User.objects.create_user(username='sally', password='password')
         client = APIClient()
         client.login(username='sally', password='password')
         url = reverse('word-detail', kwargs={'language': 'en', 'word': 'foo'})
@@ -28,3 +28,21 @@ class OwnerPermissionsTestCase(APITestCase):
             print('url == {}'.format(url))
 
         self.assertTrue(response.status_code == status.HTTP_403_FORBIDDEN)
+    
+    def test_owner_can_read(self):
+        '''John creates a word and then accesses it successfully'''
+        john = User.objects.create_user(username='john', password='password')
+        language= Language.objects.create(language='en')
+        word = Word.objects.create(user=john, word='foo', language=language, ease='easy')
+        definition = Definition.objects.create(word=word, language=language, definition='bar')
+        client = APIClient()
+        client.login(username='john', password='password')
+        url = reverse('word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = client.get(url, {'username': 'john'})
+
+        if DEBUG:
+            print(response)
+            print(response.data)
+            print('url == {}'.format(url))
+
+        self.assertTrue(response.status_code == status.HTTP_200_OK)
