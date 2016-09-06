@@ -30,6 +30,47 @@ def api_root(request, format=None):
         })
 
 
+class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
+    queryset = Word.objects.all()
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
+    serializer_class = WordSerializer
+    filter_class = WordFilter
+    filter_backends = (DjangoFilterBackend,)
+    lookup_field = 'word'
+    lookup_url_kwarg = 'word'
+
+
+class LanguageListView(ListAPIView):
+    queryset = Language.objects.all()
+    serializer_class = LanguageSerializer
+    permission_classes = (AllowAny,)
+
+
+class DefinitionListView(ListAPIView):
+    queryset = Definition.objects.all()
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
+    serializer_class = DefinitionSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = DefinitionFilter
+
+
+class ParseView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        if request.data['language'] == 'zh':
+            string = request.data['string']
+            parser = ChineseParser()
+            segments = parser.parse(string)
+            token_list = [Token(string=seg, position=idx) for idx, seg in enumerate(segments)]
+            serializer = TokenSerializer(token_list, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
     authentication_classes = (TokenAuthentication, )
     permission_classes = (AllowAny,)
@@ -58,44 +99,3 @@ class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-class ParseView(APIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request, *args, **kwargs):
-        if request.data['language'] == 'zh':
-            string = request.data['string']
-            parser = ChineseParser()
-            segments = parser.parse(string)
-            token_list = [Token(string=seg, position=idx) for idx, seg in enumerate(segments)]
-            serializer = TokenSerializer(token_list, many=True)
-            return Response(serializer.data)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
-    queryset = Word.objects.all()
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
-    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
-
-    serializer_class = WordSerializer
-    filter_class = WordFilter
-    filter_backends = (DjangoFilterBackend,)
-    lookup_field = 'word'
-    lookup_url_kwarg = 'word'
-
-
-class LanguageListView(ListAPIView):
-    queryset = Language.objects.all()
-    serializer_class = LanguageSerializer
-    permission_classes = (AllowAny,)
-
-
-class DefinitionListView(ListAPIView):
-    queryset = Definition.objects.all()
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
-    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
-
-    serializer_class = DefinitionSerializer
-    filter_backends = (DjangoFilterBackend,)
-    filter_class = DefinitionFilter

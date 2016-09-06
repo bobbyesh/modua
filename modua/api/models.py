@@ -95,6 +95,7 @@ class Word(Ownable, models.Model):
 
     @classmethod
     def create(cls, word, language_string, transliteration=''):
+        print("Create method needs revision or will be deprecated.")
         language = Language.objects.get(language=language_string)
         word_instance, created =  cls.objects.get_or_create(word=word, language=language, transliteration=transliteration)
         return word_instance
