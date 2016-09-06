@@ -94,7 +94,7 @@ class LanguageListView(ListAPIView):
 class DefinitionListView(ListAPIView):
     queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication, TokenAuthentication)
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
 
     serializer_class = DefinitionSerializer
     filter_backends = (DjangoFilterBackend,)
