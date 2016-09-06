@@ -181,7 +181,6 @@ class DefinitionListTestCase(APITestCase):
             print(url)
             print(response.data)
             print()
-            import pdb;pdb.set_trace()
 
         self.assertContains(response, 'hola')
         self.assertContains(response, 'es una blah')
