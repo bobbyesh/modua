@@ -13,13 +13,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
 
-
 from core.services import fetch_article
 from .models import Definition, Language, Article, Word
 from .filters import WordFilter, DefinitionFilter
 from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
+from .permissions import OnlyOwnerAllowedAny
 
 
 @api_view(['GET'])
@@ -76,7 +76,7 @@ class ParseView(APIView):
 class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
     queryset = Word.objects.all()
     authentication_classes = (SessionAuthentication, TokenAuthentication)
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
 
     serializer_class = WordSerializer
     filter_class = WordFilter
