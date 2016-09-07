@@ -31,7 +31,7 @@ URL Params
         None
 
 
-..TODO::
+.. todo::
 
         Implement optional id parameter
 
@@ -174,7 +174,7 @@ Deleting A User Created Definition
 ---------------------------------
 
 
-..TODO::
+.. todo::
 
         Implement DELETE request on user definition
 
