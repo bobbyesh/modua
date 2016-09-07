@@ -3,6 +3,15 @@ from rest_framework import status
 
 from .models import User, Language, Word
 
+
+class DefinitionDetailTestCase(APITestCase):
+
+    def setUp(self):
+        pass
+
+    def test_get_definition(self):
+        pass
+
 class TestViews(APITestCase):
 
 

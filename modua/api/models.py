@@ -14,51 +14,6 @@ class Language(Contributable, Editable, Timestampable, models.Model):
         return self.language
 
 
-class DictionaryAPI(Timestampable, models.Model):
-    """
-
-    .. TODO: Create fulltext index in DB
-
-    :Fields:
-        `description`:
-            This should be Usage, notes, and known issues.
-
-        `site`:
-            Actual site of the dictionary we want to use, not the URL
-            from connecting to it.
-
-        `base_url`:
-            URL used if it's that's how we need to connect to the API.
-
-        `api_key`:
-            The API key if you need to register an application with the site - may not
-            be necessary.
-
-        `id_key`:
-            The key needed/issued to access the API - may not be necessary.
-
-    """
-
-    name = models.CharField(blank=True, max_length=150)
-    description = models.CharField(blank=True, max_length=8000)
-    api_type = models.CharField(blank=True, max_length=150)
-    site = models.CharField(blank=True, max_length=2000)
-    base_url = models.CharField(blank=True, max_length=2000)
-    api_key = models.CharField(blank=True, max_length=500)
-    id_key = models.CharField(blank=True, max_length=500)
-    language = models.ForeignKey(Language, related_name='apis', null=True)
-
-    def __str__(self):
-        return str(self.api_name)
-
-
-class WordType(Contributable, Editable, Timestampable, models.Model):
-    word_type = models.CharField(blank=True, max_length=150)
-
-    def __str__(self):
-        return self.word_type
-
-
 class Article(Ownable, models.Model):
     title = models.CharField(max_length=2000, blank=True)
     url = models.CharField(max_length=2000, blank=True)
@@ -118,6 +73,51 @@ class Definition(Timestampable, Contributable, models.Model):
 
     def __str__(self):
         return self.definition
+
+
+class DictionaryAPI(Timestampable, models.Model):
+    """
+
+    .. TODO: Create fulltext index in DB
+
+    :Fields:
+        `description`:
+            This should be Usage, notes, and known issues.
+
+        `site`:
+            Actual site of the dictionary we want to use, not the URL
+            from connecting to it.
+
+        `base_url`:
+            URL used if it's that's how we need to connect to the API.
+
+        `api_key`:
+            The API key if you need to register an application with the site - may not
+            be necessary.
+
+        `id_key`:
+            The key needed/issued to access the API - may not be necessary.
+
+    """
+
+    name = models.CharField(blank=True, max_length=150)
+    description = models.CharField(blank=True, max_length=8000)
+    api_type = models.CharField(blank=True, max_length=150)
+    site = models.CharField(blank=True, max_length=2000)
+    base_url = models.CharField(blank=True, max_length=2000)
+    api_key = models.CharField(blank=True, max_length=500)
+    id_key = models.CharField(blank=True, max_length=500)
+    language = models.ForeignKey(Language, related_name='apis', null=True)
+
+    def __str__(self):
+        return str(self.api_name)
+
+
+class WordType(Contributable, Editable, Timestampable, models.Model):
+    word_type = models.CharField(blank=True, max_length=150)
+
+    def __str__(self):
+        return self.word_type
 
 
 class Country(Contributable, Editable, Timestampable, models.Model):
