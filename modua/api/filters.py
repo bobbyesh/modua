@@ -19,10 +19,11 @@ class WordFilter(filters.FilterSet):
 class DefinitionFilter(filters.FilterSet):
     word = django_filters.CharFilter(name='word__word')
     username = django_filters.CharFilter(name='owner__username')
+    target = django_filters.CharFilter(name='language__language')
 
     class Meta:
         model = Definition
-        fields = ['word', 'username', 'definition', 'id']
+        fields = ['word', 'username', 'definition', 'id', 'target']
 
 
 class WordByURLWordFilter(filters.BaseFilterBackend):

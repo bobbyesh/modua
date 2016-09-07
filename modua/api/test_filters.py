@@ -42,20 +42,14 @@ class DefinitionFilterTestCase(TestCase):
 
     def test_filter_match(self):
         queryset = Definition.objects.all()
-        params = {'word': 'hey', 'language': 'en', 'target': 'es'}
+        params = {'word': 'hey', 'target': 'es'}
         filtered = DefinitionFilter(params, queryset=queryset).qs
         expected = Definition.objects.filter(word__word='hey', language__language='es')
         self.assertEqual(filtered[0], expected[0])
 
     def test_filter_mismatch_target_language(self):
         queryset = Definition.objects.all()
-        params = {'word': 'hey', 'language': 'en', 'target': 'zh'}
-        filtered = DefinitionFilter(params, queryset=queryset).qs
-        self.assertQuerysetEqual(filtered, [])
-
-    def test_filter_mismatch_language(self):
-        queryset = Definition.objects.all()
-        params = {'word': 'hey', 'language': 'zh'}
+        params = {'word': 'hey', 'target': 'zh'}
         filtered = DefinitionFilter(params, queryset=queryset).qs
         self.assertQuerysetEqual(filtered, [])
 
