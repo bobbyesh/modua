@@ -5,22 +5,14 @@ Follow these directions in order if you are starting from scratch.  Some databas
 requirements.txt, so install those first, and only then move onto the database setup.
 
 
-Dependencies Installation
-=========================
-
-::
-
-$ sudo pip3 install -r modua/modua/requirements.txt
-
-
-Database Installation and Setup
-===============================
+Dependcies and Database Installation and Setup
+==============================================
 
 ::
 
 $ sudo apt-get install postgresql postgresql-contrib
 $ sudo apt-get install libpq-dev python-dev python3-dev
-$ sudo pip3 install -r modua/modua/requirements.txt
+$ sudo pip3 install -r requirements.txt
 $ python3 manage.py createdb
 $ python3 manage.py makemigrations api
 $ python3 manage.py migrate
