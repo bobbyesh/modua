@@ -29,3 +29,7 @@ class Ownable(models.Model):
 
     class Meta:
         abstract = True
+
+    def set_user(self, username):
+        self.owner = User.objects.get(username=username)
+        self.save()

@@ -39,7 +39,6 @@ class Article(Ownable, models.Model):
 
 class Word(Ownable, models.Model):
     word = models.CharField(blank=True, max_length=600)
-    user = models.ForeignKey(User, null=True)
     ease = models.CharField(blank=True, max_length=20)
     language = models.ForeignKey(Language)
     transliteration = models.CharField(blank=True, max_length=8000)
@@ -55,17 +54,20 @@ class Word(Ownable, models.Model):
         word_instance, created =  cls.objects.get_or_create(word=word, language=language, transliteration=transliteration)
         return word_instance
 
-    def set_user(self, username, ease='new'):
-        self.user = User.objects.get(username=username)
-        self.ease = ease
-        self.save()
 
     def add_definition(self, definition, language_string):
         language = Language.objects.get(language=language_string)
         Definition.objects.get_or_create(word=self, language=language, definition=definition)
 
 
-class Definition(Timestampable, Contributable, models.Model):
+class WordType(Contributable, Editable, Timestampable, models.Model):
+    word_type = models.CharField(blank=True, max_length=150)
+
+    def __str__(self):
+        return self.word_type
+
+
+class Definition(Ownable, Timestampable, models.Model):
     word = models.ForeignKey(Word)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
@@ -111,13 +113,6 @@ class DictionaryAPI(Timestampable, models.Model):
 
     def __str__(self):
         return str(self.api_name)
-
-
-class WordType(Contributable, Editable, Timestampable, models.Model):
-    word_type = models.CharField(blank=True, max_length=150)
-
-    def __str__(self):
-        return self.word_type
 
 
 class Country(Contributable, Editable, Timestampable, models.Model):
