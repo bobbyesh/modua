@@ -49,7 +49,8 @@ class Word(Ownable, models.Model):
 
     @classmethod
     def create(cls, word, language_string, transliteration=''):
-        print("Create method needs revision or will be deprecated.")
+        print("WARNING: Create method needs revision or will be deprecated.")
+        ''' This method needs testing to demonstrate non-violability. '''
         language = Language.objects.get(language=language_string)
         word_instance, created =  cls.objects.get_or_create(word=word, language=language, transliteration=transliteration)
         return word_instance
