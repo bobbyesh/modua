@@ -9,12 +9,12 @@ class DefinitionDetailTestCase(APITestCase):
 
     def setUp(self):
         english = Language.objects.create(language='en')
-        spanish = Language.objects.create(language='es')
+        self.spanish = Language.objects.create(language='es')
         john = User.objects.create_user(username='john', email='jdoe@gmail.com', password='password')
-        word = Word.objects.create(word='foo', owner=john, language=english)
+        self.word = Word.objects.create(word='foo', owner=john, language=english)
         Definition.objects.create(
-            word=word,
-            language=spanish,
+            word=self.word,
+            language=self.spanish,
             definition='bar',
             owner=john
         )
@@ -32,6 +32,17 @@ class DefinitionDetailTestCase(APITestCase):
         response = self.client.delete(self.url, kwargs)
         queryset = Definition.objects.all()
         self.assertQuerysetEqual(queryset, [])
+
+    def test_can_not_delete_public(self):
+        Definition.objects.create(
+            word=self.word,
+            language=self.language,
+            definition='public',
+        )
+        kwargs= {'definition': 'public', 'word': 'foo', 'language': 'en', 'target': 'es', 'username': 'john'}
+        response = self.client.delete(self.url, kwargs)
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class TestViews(APITestCase):
 
