@@ -36,7 +36,7 @@ class WordDetailTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, 'easy')
 
-        actual_ease = self.john.word_set.filter(word='hey')[0].ease
+        actual_ease = self.john.api_word_owner.filter(word='hey')[0].ease
         self.assertEqual('easy', str(actual_ease))
 
 
@@ -130,7 +130,7 @@ class LanguageListTestCase(APITestCase):
 class DefinitionListTestCase(APITestCase):
 
     def setUp(self):
-        Language.objects.create(language='en')
+        en = Language.objects.create(language='en')
         Language.objects.create(language='es')
         Language.objects.create(language='zh')
         john = User.objects.create_user(username='john', password='password')
@@ -140,13 +140,14 @@ class DefinitionListTestCase(APITestCase):
         word.add_definition('hola', 'es')
         word.add_definition('es una blah', 'es')
         word.add_definition('ni hao', 'zh')
-        word.user = john
+        definition = Definition.objects.create(word=word, definition='foo bar', language=en, owner=john)
+        word.owner = john
         word.save()
 
         sallys_word = Word.objects.create(
             word='hey',
             language=Language.objects.get(language='en'),
-            user=sally
+            owner=sally
         )
 
         sallys_word.add_definition('special definition', 'zh')
@@ -182,9 +183,9 @@ class DefinitionListTestCase(APITestCase):
             print(response.data)
             print()
 
-        self.assertContains(response, 'hola')
-        self.assertContains(response, 'es una blah')
-        self.assertContains(response, 'ni hao')
+        self.assertContains(response, 'foo')
+        self.assertNotContains(response, 'es una blah')
+        self.assertNotContains(response, 'ni hao')
         self.assertNotContains(response, 'special definition')
 
 
