@@ -26,7 +26,7 @@ from .filters import WordFilter, DefinitionFilter
 from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
-from .permissions import OnlyOwnerAllowedAny
+from .permissions import OnlyOwnerAllowedAny, OnlyOwnerCanDelete
 
 
 @api_view(['GET'])
@@ -40,7 +40,7 @@ def api_root(request, format=None):
 class DefinitionDetailView(RetrieveDestroyAPIView):
     queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
-    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
+    permission_classes = (AllowAny, OnlyOwnerAllowedAny, OnlyOwnerCanDelete,)
     serializer_class = DefinitionSerializer
     filter_class = DefinitionFilter
     filter_backends = (DjangoFilterBackend,)

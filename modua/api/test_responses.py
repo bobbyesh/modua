@@ -20,28 +20,38 @@ class DefinitionDetailTestCase(APITestCase):
         )
         self.client = APIClient()
         self.client.login(username='john', password='password')
-        self.url = reverse('definition-detail', kwargs={'definition': 'bar', 'word': 'foo', 'language': 'en'})
 
     def test_get_definition(self):
+        url = reverse('definition-detail', kwargs={'definition': 'bar', 'word': 'foo', 'language': 'en'})
         kwargs= {'definition': 'bar', 'word': 'foo', 'language': 'en', 'target': 'es', 'username': 'john'}
-        response = self.client.get(self.url, kwargs)
+        response = self.client.get(url, kwargs)
         self.assertContains(response, 'bar')
 
     def test_delete_definition(self):
+        url = reverse('definition-detail', kwargs={'definition': 'bar', 'word': 'foo', 'language': 'en'})
         kwargs= {'definition': 'bar', 'word': 'foo', 'language': 'en', 'target': 'es', 'username': 'john'}
-        response = self.client.delete(self.url, kwargs)
+        response = self.client.delete(url, kwargs)
         queryset = Definition.objects.all()
         self.assertQuerysetEqual(queryset, [])
 
     def test_can_not_delete_public(self):
         Definition.objects.create(
             word=self.word,
-            language=self.language,
+            language=self.spanish,
             definition='public',
         )
+
         kwargs= {'definition': 'public', 'word': 'foo', 'language': 'en', 'target': 'es', 'username': 'john'}
-        response = self.client.delete(self.url, kwargs)
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        url = reverse('definition-detail', kwargs={'definition': 'public', 'word': 'foo', 'language': 'en'})
+        response = self.client.delete(url, kwargs)
+
+        result = Definition.objects.filter(
+            word=self.word,
+            language=self.spanish,
+            definition='public',
+        )
+
+        self.assertTrue(len(result) != 0)
 
 
 class TestViews(APITestCase):
