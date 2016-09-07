@@ -28,9 +28,9 @@ class WordFilterTestCase(TestCase):
 class DefinitionFilterTestCase(TestCase):
 
     def setUp(self):
-        User.objects.create(username='john', password='password')
+        self.john = User.objects.create(username='john', password='password')
         Language.objects.create(language='en')
-        Language.objects.create(language='es')
+        self.es = Language.objects.create(language='es')
         Language.objects.create(language='zh')
         Word.create('hey', 'en').add_definition('hola', 'es')
 
@@ -60,12 +60,12 @@ class DefinitionFilterTestCase(TestCase):
         self.assertQuerysetEqual(filtered, [])
 
     def test_filter_by_user(self):
-        queryset = Definition.objects.all()
         w = Word.create('no', 'en')
-        w.add_definition('spanish no', 'es')
         w.set_user('john')
+        queryset = Definition.objects.all()
+        Definition.objects.create(definition='spanish no', owner=self.john, word=w, language=self.es)
         params = {'word': 'no', 'language': 'en', 'username': 'john'}
-        filtered = DefinitionFilter(params, queryset=queryset).qs
-        expected = Definition.objects.filter(word__word='no', word__language__language='en', word__user__username='john')
-        self.assertEqual(filtered[0], expected[0] )
+        filtered = DefinitionFilter(params, queryset=queryset).qs[0]
+        expected = Definition.objects.filter(word__word='no', word__language__language='en', owner__username='john')[0]
+        self.assertEqual(filtered, expected)
 
