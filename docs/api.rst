@@ -1,4 +1,4 @@
-User this format: https://gist.github.com/iros/3426278
+Use this format: https://gist.github.com/iros/3426278
 =========
 MODUA API
 =========
@@ -26,6 +26,48 @@ URL Params
 
         None
 
+`Optional`::
+
+        None
+
+
+..TODO::
+
+        Implement optional id parameter
+
+
+Example
+-------
+
+::
+
+        GET :8000/api/0.1/languages/
+
+
+        HTTP/1.0 200 OK
+        Allow: GET, HEAD, OPTIONS
+        Content-Type: application/json
+        Date: Wed, 07 Sep 2016 17:45:48 GMT
+        Server: WSGIServer/0.2 CPython/3.5.2
+        Vary: Accept, Cookie
+        X-Frame-Options: SAMEORIGIN
+
+        {
+            "count": 2,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": 3,
+                    "language": "zh"
+                },
+                {
+                    "id": 4,
+                    "language": "en"
+                }
+            ]
+        }
+
 
 Show User Definitions
 =====================
@@ -49,6 +91,11 @@ URL Params
 `Required`::
 
         None
+
+
+`Optional`::
+
+        id=[integer]
 
 
 Examples
@@ -123,6 +170,14 @@ Getting A User Created Definition
         }
 
 
+Deleting A User Created Definition
+---------------------------------
+
+
+..TODO::
+
+        Implement DELETE request on user definition
+
 
 Getting Public Definitions
 --------------------------
@@ -170,3 +225,35 @@ To access all public definitions (not created by users), use the same request as
                 }
             ]
         }
+
+
+Parsing A String
+----------------
+
+
+::
+
+        POST :8000/api/0.1/languages/zh/parse/ string=一套由于实现
+
+        HTTP/1.0 200 OK
+        Allow: POST, OPTIONS
+        Content-Type: application/json
+        Date: Wed, 07 Sep 2016 18:05:12 GMT
+        Server: WSGIServer/0.2 CPython/3.5.2
+        Vary: Accept, Cookie
+        X-Frame-Options: SAMEORIGIN
+
+        [
+            {
+                "position": 0,
+                "string": "一套"
+            },
+            {
+                "position": 1,
+                "string": "由于"
+            },
+            {
+                "position": 2,
+                "string": "实现"
+            }
+        ]

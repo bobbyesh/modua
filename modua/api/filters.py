@@ -27,7 +27,6 @@ class DefinitionFilter(filters.FilterSet):
         fields = ['word', 'username', 'definition', 'id', 'target']
 
 
-
 class URLKwargFilter(filters.BaseFilterBackend):
     """
 

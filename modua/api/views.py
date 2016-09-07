@@ -4,6 +4,7 @@ from rest_framework.generics import (
     RetrieveUpdateAPIView,
     RetrieveAPIView,
     RetrieveDestroyAPIView,
+    CreateAPIView,
 )
 
 from rest_framework.views import APIView
@@ -48,6 +49,11 @@ class DefinitionDetailView(RetrieveDestroyAPIView):
 
 
 class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
+    '''
+
+    ..TODO:  Only allow authorized, and don't allow multiple identical words per user.
+
+    '''
     queryset = Word.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerCanAccess)
@@ -73,11 +79,11 @@ class DefinitionListView(ListAPIView):
     filter_class = DefinitionFilter
 
 
-class ParseView(APIView):
+class ParseView(CreateAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        if request.data['language'] == 'zh':
+        if self.kwargs['language'] == 'zh':
             string = request.data['string']
             parser = ChineseParser()
             segments = parser.parse(string)
