@@ -12,7 +12,7 @@ class OwnerPermissionsTestCase(APITestCase):
     def setUp(self):
         john = User.objects.create_user(username='john', password='password')
         language= Language.objects.create(language='en')
-        word = Word.objects.create(user=john, word='foo', language=language, ease='easy')
+        word = Word.objects.create(owner=john, word='foo', language=language, ease='easy')
         definition = Definition.objects.create(word=word, language=language, definition='bar')
         sally = User.objects.create_user(username='sally', password='password')
 

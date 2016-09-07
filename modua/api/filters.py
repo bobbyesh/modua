@@ -4,8 +4,9 @@ from rest_framework import filters
 import django_filters
 from .models import Word, Definition
 
+
 class WordFilter(filters.FilterSet):
-    username = django_filters.CharFilter(name='owner')
+    username = django_filters.CharFilter(name='owner__username')
     language = django_filters.CharFilter(name='language', lookup_expr='language')
     article = django_filters.NumberFilter(name='articles__id')
 
