@@ -18,12 +18,10 @@ class WordFilter(filters.FilterSet):
 class DefinitionFilter(filters.FilterSet):
     word = django_filters.CharFilter(name='word__word')
     username = django_filters.CharFilter(name='owner__username')
-    language = django_filters.CharFilter(name='word__language__language')
-    target = django_filters.CharFilter(name='language__language')
 
     class Meta:
         model = Definition
-        fields = ['word', 'language', 'username', 'definition', 'target', 'id']
+        fields = ['word', 'username', 'definition', 'id']
 
 
 class WordByURLWordFilter(filters.BaseFilterBackend):
@@ -61,5 +59,16 @@ class URLLanguageFilter(filters.BaseFilterBackend):
     """
 
     def filter_queryset(self, request, queryset, view):
-        language = view.kwargs['language']
-        return queryset.filter(language__language=language)
+        print("""here!!\n
+              \nview: {}\n kwargs: {}\n query params: {}
+        """.format(view, view.kwargs, request.query_params)
+        )
+        if queryset.model == Word:
+            language = view.kwargs['language']
+            return queryset.filter(language__language=language)
+
+        elif queryset.model == Definition:
+            language = view.kwargs['language']
+            return queryset.filter(word__language__language=language)
+
+        return queryset
