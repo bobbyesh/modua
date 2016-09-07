@@ -3,7 +3,7 @@ from rest_framework.generics import (
     UpdateAPIView,
     RetrieveUpdateAPIView,
     RetrieveAPIView,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveDestroyAPIView,
 )
 
 from rest_framework.views import APIView
@@ -37,7 +37,7 @@ def api_root(request, format=None):
         })
 
 
-class DefinitionDetailView(RetrieveUpdateDestroyAPIView):
+class DefinitionDetailView(RetrieveDestroyAPIView):
     queryset = Definition.objects.all()
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerAllowedAny)

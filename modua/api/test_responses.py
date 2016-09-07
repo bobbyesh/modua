@@ -27,6 +27,12 @@ class DefinitionDetailTestCase(APITestCase):
         response = self.client.get(self.url, kwargs)
         self.assertContains(response, 'bar')
 
+    def test_delete_definition(self):
+        kwargs= {'definition': 'bar', 'word': 'foo', 'language': 'en', 'target': 'es', 'username': 'john'}
+        response = self.client.delete(self.url, kwargs)
+        queryset = Definition.objects.all()
+        self.assertQuerysetEqual(queryset, [])
+
 class TestViews(APITestCase):
 
 
