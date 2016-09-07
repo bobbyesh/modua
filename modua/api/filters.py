@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 class WordFilter(filters.FilterSet):
     username = django_filters.CharFilter(name='owner__username')
-    language = django_filters.CharFilter(name='language', lookup_expr='language')
+    language = django_filters.CharFilter(name='language__language')
     article = django_filters.NumberFilter(name='articles__id')
 
     class Meta:
