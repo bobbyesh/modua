@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from . import views
-from rest_framework import authtoken
+from rest_framework.authtoken import views as authtoken_views
 
 
 urlpatterns = [
@@ -11,5 +11,5 @@ urlpatterns = [
     url(r'^languages/(?P<language>[\w-]+)/parse/$', views.ParseView.as_view(), name='parse'),
     url(r'^import/$', views.URLImportView.as_view(), name='url-import'),
     url(r'^languages/(?P<language>[\w-]+)/word/(?P<word>[\w-]+)/definitions/(?P<definition>[\w-]+)/$', views.DefinitionDetailView.as_view(), name='definition-detail'),
-    url(r'^api-token-auth/', authtoken.views.obtain_auth_token)
+    url(r'^api-token-auth/', authtoken_views.obtain_auth_token)
 ]
