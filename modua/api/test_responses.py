@@ -1,16 +1,31 @@
-from rest_framework.test import APITestCase, APIRequestFactory
+from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 from rest_framework import status
+from django.core.urlresolvers import reverse
 
-from .models import User, Language, Word
+from .models import User, Language, Word, Definition
 
 
 class DefinitionDetailTestCase(APITestCase):
 
     def setUp(self):
-        pass
+        english = Language.objects.create(language='en')
+        spanish = Language.objects.create(language='es')
+        john = User.objects.create_user(username='john', email='jdoe@gmail.com', password='password')
+        word = Word.objects.create(word='foo', owner=john, language=english)
+        Definition.objects.create(
+            word=word,
+            language=spanish,
+            definition='bar',
+            owner=john
+        )
+        self.client = APIClient()
+        self.client.login(username='john', password='password')
+        self.url = reverse('definition-detail', kwargs={'definition': 'bar', 'word': 'foo', 'language': 'en'})
 
     def test_get_definition(self):
-        pass
+        kwargs= {'definition': 'bar', 'word': 'foo', 'language': 'en', 'target': 'es', 'username': 'john'}
+        response = self.client.get(self.url, kwargs)
+        self.assertContains(response, 'bar')
 
 class TestViews(APITestCase):
 

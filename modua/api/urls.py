@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^languages/(?P<language>[\w-]+)/word/(?P<word>[\w-]+)/definitions/$', views.DefinitionListView.as_view(), name='definition-list'),
     url(r'^languages/(?P<language>[\w-]+)/parse/$', views.ParseView.as_view(), name='parse'),
     url(r'^import/$', views.URLImportView.as_view(), name='url-import'),
+    url(r'^languages/(?P<language>[\w-]+)/word/(?P<word>[\w-]+)/definitions/(?P<definition>[\w-]+)/$', views.DefinitionDetailView.as_view(), name='definition-detail'),
 ]

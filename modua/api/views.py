@@ -1,4 +1,11 @@
-from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveUpdateAPIView, RetrieveAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    UpdateAPIView,
+    RetrieveUpdateAPIView,
+    RetrieveAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -28,6 +35,16 @@ def api_root(request, format=None):
     return Response({
         'languages': reverse('language-list', request=request, format=format),
         })
+
+
+class DefinitionDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Definition.objects.all()
+    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    permission_classes = (AllowAny, OnlyOwnerAllowedAny)
+    serializer_class = DefinitionSerializer
+    filter_class = DefinitionFilter
+    filter_backends = (DjangoFilterBackend,)
+    lookup_field = 'definition'
 
 
 class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
