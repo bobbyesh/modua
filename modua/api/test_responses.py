@@ -54,36 +54,36 @@ class DefinitionDetailTestCase(APITestCase):
         self.assertTrue(len(result) != 0)
 
 
-class TestViews(APITestCase):
+class TestPublicRequests(APITestCase):
 
 
     def setUp(self):
-        for chinese, english in [("我", "I"), ("爱", "love"), ("中国", "China")]:
-            Word.create(word=chinese, language='zh', definition=english, definition_language='en')
-        User.objects.create_user('john', 'john@gmail.com', 'password')
+        self.zh = Language.objects.create(language='zh')
+        self.en = Language.objects.create(language='en')
+        for chinese_word, english_word in [("我", "I"), ("爱", "love"), ("中国", "China")]:
+            word = Word.objects.create(word=chinese_word, language=self.zh)
+            definition = Definition.objects.create(language=self.en, definition=english_word, word=word)
 
 
     def test_search_status_code_200(self):
         '''
         Passes if a valid search returns a status code of 200.
         '''
-        Word.create(word='hello', language='en', definition='a greeating', definition_language='zh')
-        response = self.client.get("/api/0.1/languages/en/hello/")
+        response = self.client.get("/api/0.1/languages/zh/word/我/")
         self.assertEqual(response.status_code, 200)
 
     def test_term_search(self):
         '''
         Passes if the json returned from a valid request is the correct json.
         '''
-        Word.create(word='hello', language='en', definition='a greeating', definition_language='zh')
-        response = self.client.get("/api/0.1/languages/en/hello/")
-        self.assertContains(response, 'hello')
+        response = self.client.get("/api/0.1/languages/zh/word/我/")
+        self.assertContains(response, '我')
 
     def test_bad_term_search(self):
         '''
         Passes if a request for a word not in the dictionary returns a status code 404.
         '''
-        response = self.client.get("/api/0.1/languages/en/term_not_in_DB/", format='json')
+        response = self.client.get("/api/0.1/languages/en/word/term_not_in_DB/", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_bad_url(self):
