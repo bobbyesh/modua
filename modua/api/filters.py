@@ -24,3 +24,42 @@ class DefinitionFilter(filters.FilterSet):
     class Meta:
         model = Definition
         fields = ['word', 'language', 'username', 'definition', 'target', 'id']
+
+
+class WordByURLWordFilter(filters.BaseFilterBackend):
+    """
+    Filter :model:`Word` by the url kwarg `word`.
+
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        if 'word' not in view.kwargs:
+            return queryset
+        else:
+            word = view.kwargs['word']
+            return queryset.filter(word=word)
+
+
+class DefinitionByURLWordFilter(filters.BaseFilterBackend):
+    """
+    Filter :model:`Definition` by the url kwarg `word`.
+
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        if 'word' not in view.kwargs:
+            return queryset
+        else:
+            word = view.kwargs['word']
+            return queryset.filter(word__word=word)
+
+
+class URLLanguageFilter(filters.BaseFilterBackend):
+    """
+    Filter :model:`Word` or :model:`Definition` by the url kwarg `language`.
+
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        language = view.kwargs['language']
+        return queryset.filter(language__language=language)

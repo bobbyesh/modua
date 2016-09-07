@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 
 from core.services import fetch_article
 from .models import Definition, Language, Article, Word
-from .filters import WordFilter, DefinitionFilter
+from .filters import WordFilter, DefinitionFilter, WordByURLWordFilter, DefinitionByURLWordFilter, URLLanguageFilter
 from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
@@ -69,7 +69,7 @@ class DefinitionListView(ListAPIView):
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerCanAccess)
     serializer_class = DefinitionSerializer
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, URLLanguageFilter, DefinitionByURLWordFilter,)
     filter_class = DefinitionFilter
 
 
