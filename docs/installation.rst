@@ -47,6 +47,10 @@ $ python3 manage.py migrate
 Populate Database With Sample Data
 ----------------------------------
 
+.. DANGER::
+
+    (DEPRECATED)
+
 ::
 
 $ python3 manage.py load_examples
@@ -55,6 +59,10 @@ $ python3 manage.py load_examples
 Removing Language and Definition Model Instances from Database
 --------------------------------------------------------------
 
+.. DANGER::
+
+    (DEPRECATED)
+    
 ::
 
 $ python3 manage.py delete_entries
