@@ -14,6 +14,8 @@ $ sudo pip3 install -r modua/modua/requirements.txt
 Database Installation and Setup
 ===============================
 
+::
+
 $ sudo apt-get install postgresql postgresql-contrib
 $ sudo apt-get install libpq-dev python-dev python3-dev
 $ sudo pip3 install -r modua/modua/requirements.txt
@@ -40,7 +42,7 @@ Many database tasks have been scripted.  Below are the scripts and their usages.
 Resetting the Database
 ----------------------
 
-Sometimes you might want to delete your current database.  To do so, type these commands:
+Sometimes you might want to delete your current database.  To do so, type these commands::
 
 $ python3 manage.py dropdb
 $ python3 manage.py createdb
