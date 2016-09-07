@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 
 from core.services import fetch_article
 from .models import Definition, Language, Article, Word
-from .filters import WordFilter, DefinitionFilter, WordByURLWordFilter, DefinitionByURLWordFilter, URLLanguageFilter, OwnerOnlyFilter
+from .filters import WordFilter, DefinitionFilter, OwnerOnlyFilter, URLKwargFilter
 from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
@@ -49,11 +49,11 @@ class DefinitionDetailView(RetrieveDestroyAPIView):
 
 class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
     queryset = Word.objects.all()
-    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerCanAccess)
     serializer_class = WordSerializer
     filter_class = WordFilter
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, URLKwargFilter)
     lookup_field = 'word'
     lookup_url_kwarg = 'word'
 
@@ -66,10 +66,10 @@ class LanguageListView(ListAPIView):
 
 class DefinitionListView(ListAPIView):
     queryset = Definition.objects.all()
-    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
     serializer_class = DefinitionSerializer
-    filter_backends = (DjangoFilterBackend, URLLanguageFilter, DefinitionByURLWordFilter, OwnerOnlyFilter,)
+    filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
     filter_class = DefinitionFilter
 
 

@@ -151,9 +151,8 @@ class DefinitionListTestCase(APITestCase):
         )
 
         sallys_word.add_definition('special definition', 'zh')
-
+        self.john = john
         self.client = APIClient()
-        self.client.login(username='john', password='password')
 
     def test_definition_list(self):
         kwargs={'language': 'en', 'word': 'hey'}
@@ -171,10 +170,11 @@ class DefinitionListTestCase(APITestCase):
         self.assertNotContains(response, 'ni hao')
 
     def test_filter_by_user(self):
+        token = Token.objects.create(user=self.john)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         kwargs={'language': 'en', 'word': 'hey'}
         url = reverse('definition-list', kwargs=kwargs)
-        kwargs['username'] = 'john'
-        response = self.client.get(url, kwargs)
+        response = self.client.get(url)
 
         if DEBUG:
 

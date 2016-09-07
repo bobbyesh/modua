@@ -4,6 +4,7 @@ from rest_framework import filters
 import django_filters
 from .models import Word, Definition
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 
 class WordFilter(filters.FilterSet):
@@ -26,54 +27,32 @@ class DefinitionFilter(filters.FilterSet):
         fields = ['word', 'username', 'definition', 'id', 'target']
 
 
-class WordByURLWordFilter(filters.BaseFilterBackend):
+
+class URLKwargFilter(filters.BaseFilterBackend):
     """
-    Filter :model:`Word` by the url kwarg `word`.
-
-    """
-
-    def filter_queryset(self, request, queryset, view):
-        if 'word' not in view.kwargs:
-            return queryset
-        else:
-            word = view.kwargs['word']
-            return queryset.filter(word=word)
-
-
-class DefinitionByURLWordFilter(filters.BaseFilterBackend):
-    """
-    Filter :model:`Definition` by the url kwarg `word`.
 
     """
 
     def filter_queryset(self, request, queryset, view):
-        if 'word' not in view.kwargs:
-            return queryset
-        else:
-            word = view.kwargs['word']
-            return queryset.filter(word__word=word)
+        query_kwargs = self.get_kwargs(request, queryset, view)
+        return queryset.filter(**query_kwargs)
 
-
-class URLLanguageFilter(filters.BaseFilterBackend):
-    """
-    Filter :model:`Word` or :model:`Definition` by the url kwarg `language`.
-
-    """
-
-    def filter_queryset(self, request, queryset, view):
-        print("""here!!\n
-              \nview: {}\n kwargs: {}\n query params: {}
-        """.format(view, view.kwargs, request.query_params)
-        )
+    def get_kwargs(self, request, queryset, view):
+        query_kwargs = dict()
         if queryset.model == Word:
-            language = view.kwargs['language']
-            return queryset.filter(language__language=language)
+            if 'language' in view.kwargs:
+                query_kwargs['language__language'] = view.kwargs['language']
+            if 'word' in view.kwargs:
+                query_kwargs['word'] = view.kwargs['word']
 
         elif queryset.model == Definition:
-            language = view.kwargs['language']
-            return queryset.filter(word__language__language=language)
+            if 'language' in view.kwargs:
+                query_kwargs['word__language__language'] = view.kwargs['language']
+            if 'word' in view.kwargs:
+                query_kwargs['word__word'] = view.kwargs['word']
 
-        return queryset
+        return query_kwargs
+
 
 class OwnerOnlyFilter(filters.BaseFilterBackend):
     """
@@ -83,7 +62,7 @@ class OwnerOnlyFilter(filters.BaseFilterBackend):
     """
     def filter_queryset(self, request, queryset, view):
         if type(request.user) is User:
-            queryset.filter(owner__in=[None, request.user])
+            return queryset.filter(owner__in=[None, request.user])
         else:
             return queryset.filter(owner=None)
 
