@@ -8,6 +8,7 @@ class OnlyOwnerCanAccess(permissions.BasePermission):
 
         return True
 
+
 class OnlyOwnerCanDelete(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
