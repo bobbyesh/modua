@@ -59,10 +59,6 @@ $ python3 manage.py load_examples
 Removing Language and Definition Model Instances from Database
 --------------------------------------------------------------
 
-.. DANGER::
-
-    (DEPRECATED)
-    
 ::
 
 $ python3 manage.py delete_entries
