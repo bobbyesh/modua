@@ -27,9 +27,10 @@ class WordDetailTestCase(APITestCase):
         self.john = john
         self.sally = sally
         self.client = APIClient()
-        self.client.login(username='john', password='password')
 
     def test_update_ease(self):
+        token = Token.objects.get(user__username='john')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         url = reverse('word-detail', kwargs={'language': 'en', 'word': 'hey'})
         response = self.client.patch(url, {'username': 'john', 'ease': 'easy'})
 
