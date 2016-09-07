@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'twitter_bootstrap',
     'crispy_forms',
+    'guardian',
     'core',
     'api',
     'modua',
@@ -99,6 +100,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'modua.wsgi.application'
+
+
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend', # default
+        'guardian.backends.ObjectPermissionBackend',
+)
 
 
 # Database

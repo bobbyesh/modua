@@ -3,6 +3,7 @@
 from rest_framework import filters
 import django_filters
 from .models import Word, Definition
+from django.contrib.auth.models import User
 
 
 class WordFilter(filters.FilterSet):
@@ -72,3 +73,17 @@ class URLLanguageFilter(filters.BaseFilterBackend):
             return queryset.filter(word__language__language=language)
 
         return queryset
+
+class OwnerOnlyFilter(filters.BaseFilterBackend):
+    """
+    If request has a user, then give them all Public definitions and their own.
+    Otherwise just give all public.
+
+    """
+    def filter_queryset(self, request, queryset, view):
+        if type(request.user) is User:
+            queryset.filter(owner__in=[None, request.user])
+        else:
+            return queryset.filter(owner=None)
+
+
