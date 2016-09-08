@@ -62,6 +62,12 @@ class UserWordDetailTestCase(APITestCase):
         queryset = Word.objects.filter(word='foo', language=self.en, owner=self.john)
         self.assertTrue(len(queryset) == 0)
 
+    """
+
+    .. todo:  Test that this view doesn't fetch public definitions.
+
+    """
+
 
 class WordDetailTestCase(APITestCase):
 

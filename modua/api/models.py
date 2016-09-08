@@ -83,11 +83,21 @@ class WordType(Contributable, Editable, Timestampable, models.Model):
         return self.word_type
 
 
-class Definition(Ownable, Timestampable, models.Model):
+class Definition(Timestampable, models.Model):
     word = models.ForeignKey(Word)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
-    word_type = models.ForeignKey(WordType, related_name='word_type_id', null=True)
+    word_type = models.ForeignKey(WordType, null=True)
+
+    def __str__(self):
+        return self.definition
+
+
+class UserDefinition(Ownable, Timestampable, models.Model):
+    word = models.ForeignKey(Word)
+    definition = models.CharField(max_length=8000)
+    language = models.ForeignKey(Language)
+    word_type = models.ForeignKey(WordType, null=True)
 
     def __str__(self):
         return self.definition
