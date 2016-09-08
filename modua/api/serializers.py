@@ -14,8 +14,23 @@ class LanguageSerializer(serializers.ModelSerializer):
         fields = ('language', 'id')
 
 
-class WordSerializer(serializers.ModelSerializer):
+class WordOnlySerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = Word
+        fields = ('word', 'ease', 'id')
+
+
+class WordSerializer(serializers.ModelSerializer):
+    language = LanguageSerializer()
+
+    class Meta:
+        model = Word
+        fields = ('word', 'language', 'ease', 'id')
+        depth = 1
+
+
+class UserWordSerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
 
     class Meta:
@@ -26,7 +41,7 @@ class WordSerializer(serializers.ModelSerializer):
 
 class DefinitionSerializer(serializers.ModelSerializer):
 
-    word = WordSerializer()
+    word = WordOnlySerializer()
     language = LanguageSerializer()
 
     class Meta:

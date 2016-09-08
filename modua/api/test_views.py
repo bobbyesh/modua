@@ -11,6 +11,58 @@ from .views import LanguageListView, DefinitionListView, URLImportView, WordDeta
 
 DEBUG = True
 
+
+class UserWordDetailTestCase(APITestCase):
+    """
+    An authenticated user can read a word, create a word, delete a word,
+    or modify a word's ease.
+
+    """
+
+    def setUp(self):
+        self.john = User.objects.create(username='john', password='password')
+        self.en = Language.objects.create(language='en')
+        self.client = APIClient()
+        token = Token.objects.get(user__username='john')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_create(self):
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.post(url, {'ease': 'easy'})
+        queryset = Word.objects.filter(owner__username='john')
+        self.assertTrue(len(queryset) == 1)
+
+    def test_read(self):
+        Word.objects.create(word='foo', language=self.en, owner=self.john)
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.get(url)
+        self.assertContains(response, 'foo')
+
+    def test_modify(self):
+        Word.objects.create(word='foo', language=self.en, owner=self.john, ease='easy')
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.patch(url, {'ease': 'hard'})
+
+        queryset = Word.objects.filter(word='foo', owner=self.john)
+        instance = Word.objects.filter(word='foo', owner=self.john)[0]
+        dummy = Word.objects.create(word='dummy', ease='hard', language=self.en)
+        self.assertEqual(len(queryset), 1)
+        self.assertEqual(instance.ease, dummy.ease)
+
+    def test_put(self):
+        Word.objects.create(word='foo', language=self.en, owner=self.john, ease='easy')
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.put(url, {'language': 'en', 'word': 'foo', 'ease': 'hard'})
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete(self):
+        Word.objects.create(word='foo', language=self.en, owner=self.john)
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.delete(url)
+        queryset = Word.objects.filter(word='foo', language=self.en, owner=self.john)
+        self.assertTrue(len(queryset) == 0)
+
+
 class WordDetailTestCase(APITestCase):
 
     def setUp(self):

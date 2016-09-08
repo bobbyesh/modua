@@ -26,6 +26,21 @@ class DefinitionFilter(filters.FilterSet):
         model = Definition
         fields = ['word', 'username', 'definition', 'id', 'target']
 
+class LanguageFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        query_kwargs = self.get_kwargs(request, queryset, view)
+        return queryset.filter(**query_kwargs)
+
+    def get_kwargs(self, request, queryset, view):
+        query_kwargs = dict()
+        if queryset.model == Word:
+            if 'language' in view.kwargs:
+                query_kwargs['language__language'] = view.kwargs['language']
+
+        elif queryset.model == Definition:
+            if 'language' in view.kwargs:
+                query_kwargs['word__language__language'] = view.kwargs['language']
+
 
 class URLKwargFilter(filters.BaseFilterBackend):
     """
@@ -51,6 +66,14 @@ class URLKwargFilter(filters.BaseFilterBackend):
                 query_kwargs['word__word'] = view.kwargs['word']
 
         return query_kwargs
+
+
+class OwnerWordOnlyFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if type(request.user) is User:
+            return queryset.filter(owner=request.user)
+        else:
+            return queryset.none()
 
 
 class OwnerOnlyFilter(filters.BaseFilterBackend):
