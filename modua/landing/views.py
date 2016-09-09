@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from wordfencer.parser import ChineseParser
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from api.models import Definition, Language
+from api.models import PublicDefinition, Language
 from core.utils import build_popup_html, build_word_html
 
 
@@ -103,7 +103,7 @@ class AnnotationView(FormView):
         s = ''
         try:
             language = Language.objects.get(language='zh')
-            definitions = Definition.objects.filter(word=word, language=language)
+            definitions = PublicDefinition.objects.filter(word=word, language=language)
             unique_definitions = list(set([x.definition for x in definitions]))
             for definition in unique_definitions:
                 s += definition + ' / '

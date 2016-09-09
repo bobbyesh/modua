@@ -1,6 +1,6 @@
 # mixins.py
 
-from api.models import Word, Article
+from api.models import PublicWord, Article
 from core.utils import is_punctuation, tokenize_text
 from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 class ArticleMixin(object):
 
     def get_article_context(self, user):
-        '''Returns a tuple of (tokens, counts).  `tokens` is the Word model instances with ratings, and `counts` is a dictionary containing counts of words
+        '''Returns a tuple of (tokens, counts).  `tokens` is the PublicWord model instances with ratings, and `counts` is a dictionary containing counts of words
         in each easiness rating.
 
 
@@ -42,11 +42,11 @@ class ArticleMixin(object):
 
 
     def get_tokens(self, user):
-        '''Returns a list of elements that are either `api.models.Word` instances or just strings.
+        '''Returns a list of elements that are either `api.models.PublicWord` instances or just strings.
 
         If the user has not saved a particular token as a word before, then that word is
         get or created with an `ease` of `new`, but it is not associated with that user via the 
-        ManyToMany `users` field in the :model:`Word`.
+        ManyToMany `users` field in the :model:`PublicWord`.
 
         '''
         if hasattr(self, 'tokens'):
@@ -59,12 +59,12 @@ class ArticleMixin(object):
             if is_punctuation(token):
                 word = token
             else:
-                word = Word.objects.filter(word=token, language=self.language, users__username=user.username)
+                word = PublicWord.objects.filter(word=token, language=self.language, users__username=user.username)
                 if word:
                     assert len(word) == 1
                     word = word[0]
                 else:
-                    word, created = Word.objects.get_or_create(word=token, language=self.language, ease='new')
+                    word, created = PublicWord.objects.get_or_create(word=token, language=self.language, ease='new')
 
             self.tokens.append(word)
 

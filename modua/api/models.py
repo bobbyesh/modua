@@ -66,17 +66,15 @@ class UserWord(Ownable, models.Model):
 
 class PublicWord(models.Model):
     word = models.CharField(blank=True, max_length=600)
-    ease = models.CharField(blank=True, max_length=20)
     language = models.ForeignKey(Language)
     transliteration = models.CharField(blank=True, max_length=8000)
-    articles = models.ManyToManyField(Article)
 
     def __str__(self):
         return self.word
 
 
 class PublicDefinition(Timestampable, models.Model):
-    word = models.ForeignKey(Word)
+    word = models.ForeignKey(PublicWord)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
 
@@ -85,7 +83,7 @@ class PublicDefinition(Timestampable, models.Model):
 
 
 class UserDefinition(Ownable, Timestampable, models.Model):
-    word = models.ForeignKey(Word)
+    word = models.ForeignKey(UserWord)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
 

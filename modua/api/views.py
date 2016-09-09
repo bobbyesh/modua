@@ -24,9 +24,9 @@ from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
 
 from core.services import fetch_article
-from .models import PublicDefinition, Language, Article, Word
-from .filters import WordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, LanguageFilter
-from .serializers import PublicDefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
+from .models import PublicDefinition, UserDefinition, Language, Article, PublicWord, UserWord
+from .filters import PublicWordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, UserWordFilter, LanguageFilter
+from .serializers import PublicDefinitionSerializer, LanguageSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
 from .permissions import OnlyOwnerCanAccess, OnlyOwnerCanDelete, NoPutAllowed, OnlyEaseCanChange
@@ -72,9 +72,9 @@ class UserDefinitionListView(ListAPIView):
     queryset = UserDefinition.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
-    serializer_class = DefinitionSerializer
+    serializer_class = PublicDefinitionSerializer
     filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
-    filter_class = DefinitionFilter
+    filter_class = PublicDefinitionFilter
 
 
 class UserDefinitionDetailView(APIView):
@@ -93,11 +93,11 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
         GET, POST, PATCH, DELETE
 
     """
-    queryset = Word.objects.all()
+    queryset = UserWord.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
-    serializer_class = WordSerializer
-    filter_class = WordFilter
+    serializer_class = UserWordSerializer
+    filter_class = UserWordFilter
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, URLKwargFilter)
     lookup_field = 'word'
     lookup_url_kwarg = 'word'
@@ -106,8 +106,8 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
         language = self.kwargs['language']
         word = self.kwargs['word']
         language = Language.objects.get(language=language)
-        word_instance = Word.objects.create(language=language, word=word, owner=request.user, **request.data)
-        serializer = WordSerializer(word_instance)
+        word_instance = UserWord.objects.create(language=language, word=word, owner=request.user, **request.data)
+        serializer = PublicWordSerializer(word_instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, *args, **kwargs):
@@ -181,43 +181,43 @@ class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
 ############################################################################
 
 
-class DefinitionDetailView(RetrieveDestroyAPIView):
-    queryset = Definition.objects.all()
+class PublicDefinitionDetailView(RetrieveDestroyAPIView):
+    queryset = PublicDefinition.objects.all()
     authentication_classes = (SessionAuthentication, TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerCanAccess, OnlyOwnerCanDelete,)
-    serializer_class = DefinitionSerializer
-    filter_class = DefinitionFilter
+    serializer_class = PublicDefinitionSerializer
+    filter_class = PublicDefinitionFilter
     filter_backends = (DjangoFilterBackend,)
     lookup_field = 'definition'
 
 
-class WordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
+class PublicWordDetailView(RetrieveUpdateAPIView, LanguageFilterMixin):
     """
 
     ..TODO:  Only allow authorized, and don't allow multiple identical words per user.
 
     """
-    queryset = Word.objects.all()
+    queryset = PublicWord.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerCanAccess)
-    serializer_class = WordSerializer
-    filter_class = WordFilter
+    serializer_class = PublicWordSerializer
+    filter_class = PublicWordFilter
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, URLKwargFilter)
     lookup_field = 'word'
     lookup_url_kwarg = 'word'
 
 
-class WordCreateView(CreateAPIView):
+class PublicWordCreateView(CreateAPIView):
     """
 
     .. TODO:  Hand roll this view.
 
     """
-    queryset = Word.objects.all()
+    queryset = PublicWord.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny, OnlyOwnerCanAccess)
-    serializer_class = WordSerializer
-    filter_class = WordFilter
+    serializer_class = PublicWordSerializer
+    filter_class = PublicWordFilter
     filter_backends = (DjangoFilterBackend, LanguageFilter,)
     lookup_field = 'word'
     lookup_url_kwarg = 'word'

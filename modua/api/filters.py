@@ -2,29 +2,47 @@
 
 from rest_framework import filters
 import django_filters
-from .models import Word, Definition
+from .models import PublicWord, PublicDefinition, UserWord, UserDefinition
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
 
-class WordFilter(filters.FilterSet):
+class PublicWordFilter(filters.FilterSet):
+    language = django_filters.CharFilter(name='language__language')
+
+    class Meta:
+        model = PublicWord
+        fields = ['word', 'language', 'id']
+
+
+class UserWordFilter(filters.FilterSet):
     username = django_filters.CharFilter(name='owner__username')
     language = django_filters.CharFilter(name='language__language')
     article = django_filters.NumberFilter(name='articles__id')
 
     class Meta:
-        model = Word
-        fields = ['word', 'language', 'username', 'ease', 'article', 'id']
+        model = UserWord
+        fields = ['word', 'language', 'id', 'username', 'ease']
 
 
-class DefinitionFilter(filters.FilterSet):
+class PublicDefinitionFilter(filters.FilterSet):
     word = django_filters.CharFilter(name='word__word')
-    username = django_filters.CharFilter(name='owner__username')
     target = django_filters.CharFilter(name='language__language')
 
     class Meta:
-        model = Definition
-        fields = ['word', 'username', 'definition', 'id', 'target']
+        model = PublicDefinition
+        fields = ['word', 'definition', 'id', 'target']
+
+
+class UserDefinitionFilter(filters.FilterSet):
+    word = django_filters.CharFilter(name='word__word')
+    target = django_filters.CharFilter(name='language__language')
+    username = django_filters.CharFilter(name='owner__username')
+
+    class Meta:
+        model = UserDefinition
+        fields = ['word', 'definition', 'id', 'target', 'username']
+
 
 class LanguageFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -33,11 +51,11 @@ class LanguageFilter(filters.BaseFilterBackend):
 
     def get_kwargs(self, request, queryset, view):
         query_kwargs = dict()
-        if queryset.model == Word:
+        if queryset.model == PublicWord:
             if 'language' in view.kwargs:
                 query_kwargs['language__language'] = view.kwargs['language']
 
-        elif queryset.model == Definition:
+        elif queryset.model == PublicDefinition:
             if 'language' in view.kwargs:
                 query_kwargs['word__language__language'] = view.kwargs['language']
 
@@ -53,7 +71,7 @@ class URLKwargFilter(filters.BaseFilterBackend):
 
     def get_kwargs(self, request, queryset, view):
         query_kwargs = dict()
-        if queryset.model == Word:
+        if queryset.model == PublicWord:
             if 'language' in view.kwargs:
                 query_kwargs['language__language'] = view.kwargs['language']
             if 'word' in view.kwargs:
