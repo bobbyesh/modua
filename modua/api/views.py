@@ -24,9 +24,9 @@ from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
 
 from core.services import fetch_article
-from .models import Definition, Language, Article, Word
-from .filters import WordFilter, DefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, LanguageFilter
-from .serializers import DefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
+from .models import PublicDefinition, Language, Article, Word
+from .filters import WordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, LanguageFilter
+from .serializers import PublicDefinitionSerializer, LanguageSerializer, WordSerializer, TokenSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
 from .permissions import OnlyOwnerCanAccess, OnlyOwnerCanDelete, NoPutAllowed, OnlyEaseCanChange
@@ -40,8 +40,8 @@ def api_root(request, format=None):
         })
 
 
-class DefinitionListView(ListAPIView):
-    """Defines a list view for the `Definition` model that is publically accessible.
+class PublicDefinitionListView(ListAPIView):
+    """Defines a list view for the `PublicDefinition` model that is publically accessible.
 
     This view should be read-only, as public information should be protected from deletion.
     This means that only the GET method need be supported.
@@ -50,12 +50,12 @@ class DefinitionListView(ListAPIView):
     .. todo: Change OwnerOnlyFilter to PublicFilter for clarity
 
     """
-    queryset = Definition.objects.all()
+    queryset = PublicDefinition.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
-    serializer_class = DefinitionSerializer
+    serializer_class = PublicDefinitionSerializer
     filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
-    filter_class = DefinitionFilter
+    filter_class = PublicDefinitionFilter
 
 
 class UserDefinitionListView(ListAPIView):
@@ -69,7 +69,12 @@ class UserDefinitionListView(ListAPIView):
         GET, POST
 
     """
-    pass
+    queryset = UserDefinition.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (OnlyOwnerCanAccess,)
+    serializer_class = DefinitionSerializer
+    filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
+    filter_class = DefinitionFilter
 
 
 class UserDefinitionDetailView(APIView):

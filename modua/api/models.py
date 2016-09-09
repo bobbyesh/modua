@@ -14,6 +14,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
@@ -52,7 +53,7 @@ class Article(Ownable, models.Model):
         return str(self.text)[:50] + ' ...'
 
 
-class Word(Ownable, models.Model):
+class UserWord(Ownable, models.Model):
     word = models.CharField(blank=True, max_length=600)
     ease = models.CharField(blank=True, max_length=20)
     language = models.ForeignKey(Language)
@@ -62,32 +63,22 @@ class Word(Ownable, models.Model):
     def __str__(self):
         return self.word
 
-    @classmethod
-    def create(cls, word, language_string, transliteration=''):
-        print("WARNING: Create method needs revision or will be deprecated.")
-        ''' This method needs testing to demonstrate non-violability. '''
-        language = Language.objects.get(language=language_string)
-        word_instance, created =  cls.objects.get_or_create(word=word, language=language, transliteration=transliteration)
-        return word_instance
 
-
-    def add_definition(self, definition, language_string):
-        language = Language.objects.get(language=language_string)
-        Definition.objects.get_or_create(word=self, language=language, definition=definition)
-
-
-class WordType(Contributable, Editable, Timestampable, models.Model):
-    word_type = models.CharField(blank=True, max_length=150)
+class PublicWord(models.Model):
+    word = models.CharField(blank=True, max_length=600)
+    ease = models.CharField(blank=True, max_length=20)
+    language = models.ForeignKey(Language)
+    transliteration = models.CharField(blank=True, max_length=8000)
+    articles = models.ManyToManyField(Article)
 
     def __str__(self):
-        return self.word_type
+        return self.word
 
 
-class Definition(Timestampable, models.Model):
+class PublicDefinition(Timestampable, models.Model):
     word = models.ForeignKey(Word)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
-    word_type = models.ForeignKey(WordType, null=True)
 
     def __str__(self):
         return self.definition
@@ -97,7 +88,6 @@ class UserDefinition(Ownable, Timestampable, models.Model):
     word = models.ForeignKey(Word)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
-    word_type = models.ForeignKey(WordType, null=True)
 
     def __str__(self):
         return self.definition
@@ -138,7 +128,7 @@ class DictionaryAPI(Timestampable, models.Model):
     language = models.ForeignKey(Language, related_name='apis', null=True)
 
     def __str__(self):
-        return str(self.api_name)
+        return self.name
 
 
 class Country(Contributable, Editable, Timestampable, models.Model):
