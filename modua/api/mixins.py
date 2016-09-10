@@ -3,6 +3,7 @@ from core.utils import is_delimited
 from .models import Language
 
 
+
 class LanguageFilterMixin(object):
     '''
     Use for views that require identifying a single language from the

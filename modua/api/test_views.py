@@ -58,31 +58,41 @@ class UserDefinitionCreateDestroyViewTestCase(UserTestMixin, APITestCase):
 
     def setUp(self):
         super().setUp()
+
+    def test_no_duplicate(self):
         en = Language.objects.create(language='en')
         word = UserWord.objects.create(word='foo', language=en, owner=self.user)
         definition = UserDefinition.objects.create(owner=self.user, word=word, language=en, definition='bar')
-
-    def test_read(self):
         url = reverse('user-definition-create-destroy', kwargs={'language': 'en', 'word': 'foo'})
-        response = self.client.get(url)
-        self.assertContains(response, 'foo')
+        response = self.client.post(url, {'definition': 'bar', 'target': 'en'})
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create(self):
+        en = Language.objects.create(language='en')
+        UserWord.objects.create(word='foo', language=en, owner=self.user)
+        url = reverse('user-definition-create-destroy', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.post(url, {'definition': 'bar', 'target': 'en'})
+
+        queryset = UserDefinition.objects.filter(owner=self.user, definition='bar')
+        self.assertTrue(len(queryset) == 1)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
 
-'''
-class UserWordCreateDestroyViewTestCase(UserTestMixin, APITestCase):
+class UserWordDetailTestCase(UserTestMixin, APITestCase):
 
     def setUp(self):
         super().setUp()
-        en = Language.objects.create(language='en')
-        word = UserWord.objects.create(word='foo', language=en, owner=self.user)
-        definition = UserDefinition.objects.create(owner=self.user, word=word, language=en, definition='bar')
+        self.en = Language.objects.create(language='en')
 
-    def test_create(self):
-        url = reverse('user-word-create-destroy', kwargs={'language': 'en', 'word': 'foo'})
-        response = self.client.post(url)
-        result = UserWord.objects.filter(owner=self.user)
-        self.assertTrue(len(result) == 1)
-        self.assertEquals(result[0].word, 'foo')
+    def test_create_status(self):
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.post(url, {'ease': 'easy', 'target': str(self.en.language)})
+        self.assertEquals(result.status_code, status.HTTP_201_CREATED)
+
+'''
+    def test_delete(self):
+        word = UserWord.objects.create(word='foo', language=self.en, owner=self.user)
+        definition = UserDefinition.objects.create(owner=self.user, word=word, language=self.en, definition='bar')
 '''
 
 

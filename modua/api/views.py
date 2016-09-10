@@ -20,12 +20,16 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework.exceptions import NotFound
 from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db.utils import IntegrityError
 
 from core.services import fetch_article
+from core.decorators import find_language_or_404, required_request_data
+from core.exceptions import Raise403
 from .models import PublicDefinition, UserDefinition, Language, Article, PublicWord, UserWord
 from .filters import PublicWordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, UserWordFilter, LanguageFilter, UserDefinitionFilter
 from .serializers import PublicDefinitionSerializer, LanguageSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
@@ -77,9 +81,6 @@ class UserDefinitionListView(ListAPIView):
     serializer_class = UserDefinitionSerializer
     filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
     filter_class = UserDefinitionFilter
-    
-    def get(self, request, *args, **kwargs):
-        return self.list(self, request, *args, **kwargs)
 
 
 class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
@@ -90,37 +91,52 @@ class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
     filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
     filter_class = UserDefinitionFilter
 
+    @find_language_or_404
+    @required_request_data(['target', 'definition'])
     def create(self, request, *args, **kwargs):
-        '''
-        if not self.request.auth:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        '''
-
-        word = UserWord.objects.filter(**self.word_fields)
-        if not word:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND, data=
-                {'message': 'The definition could not be created because word {} in language {} does not exist'.format(self.kwargs['word'], self.word_fields['language'])}
-            )
-
-        try:
-            target = Language.objects.get(language=self.query_params['target'])
-        except ObjectDoesNotExist:
-            return Response(
-                status=status.HTTP_401_UNAUTHORIZED, data={'message': 'Language {} is not currently supported or does not exist.'.format(self.kwargs['word'], target)}
-            )
-
-
-        definition = UserDefinition.objects.create(word=word, definition=request.query_params['definition'], language=target, owner=request.user)
+        definition = self.get_definition()
         serializer = UserDefinitionSerializer(definition)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    def get_definition(self):
+        try:
+            definition = UserDefinition.objects.create(
+                word=self.get_word(),
+                definition=self.request.data['definition'],
+                language=self.get_target(),
+                owner=self.request.user
+            )
+        except IntegrityError:
+            raise Raise403(detail={'message': 'User already has this definition saved for this word'})
 
-    def word_fields(self, data):
+        return definition
+
+    def get_word(self):
+        try:
+            word = UserWord.objects.get(**self.get_word_fields())
+        except ObjectDoesNotExist:
+            message = (
+                'The definition could not be created because word {} in language {} does'
+                'not exist for user {}'
+            ).format(self.kwargs['word'], self.get_word_fields()['language'], self.request.user)
+
+            raise NotFound(detail={'message': message})
+
+        return word
+
+    def get_target(self):
+        try:
+            target = Language.objects.get(language=self.request.data['target'])
+        except ObjectDoesNotExist:
+            raise NotFound(detail={'message': 'Target language {} is not currently supported or does not exist.'.format(self.request.data['target'])})
+
+        return target
+
+    def get_word_fields(self):
         return {
             'language': Language.objects.get(language=self.kwargs['language']),
             'word': self.kwargs['word'],
-            'owner': request.user,
+            'owner': self.request.user,
         }
 
 
@@ -144,9 +160,12 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
     lookup_url_kwarg = 'word'
 
     def create(self, request, *args, **kwargs):
-        word_instance = UserWord.objects.create(**self.build_fields)
-        serializer = UserWordSerializer(word_instance)
-        serializer.save()
+        try:
+            word = UserWord.objects.create(**self.build_fields())
+        except ValidationError:
+            return Response(status=status.HTTP_403_FORBIDDEN, data={'message': 'User already has this word saved, either delete and then post the word, or just update it.'})
+
+        serializer = UserWordSerializer(word)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def build_fields(self, data):
