@@ -5,7 +5,19 @@ import configparser
 import os
 import requests
 import unicodedata
+
+from django.core.exceptions import ValidationError
+from core.exceptions import Raise403
 from wordfencer.parser import ChineseParser
+
+
+def get_object_or_403(model, message='HTTP 403: Forbidden', **kwargs):
+    try:
+        obj = model.objects.create(**kwargs)
+    except ValidationError:
+        raise Raise403(detail=message)
+
+    return obj
 
 
 class Token(object):

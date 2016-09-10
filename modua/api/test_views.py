@@ -84,16 +84,16 @@ class UserWordDetailTestCase(UserTestMixin, APITestCase):
         super().setUp()
         self.en = Language.objects.create(language='en')
 
-    def test_create_status(self):
+    def test_create(self):
         url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
-        response = self.client.post(url, {'ease': 'easy', 'target': str(self.en.language)})
-        self.assertEquals(result.status_code, status.HTTP_201_CREATED)
+        response = self.client.post(url)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
-'''
     def test_delete(self):
         word = UserWord.objects.create(word='foo', language=self.en, owner=self.user)
-        definition = UserDefinition.objects.create(owner=self.user, word=word, language=self.en, definition='bar')
-'''
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.delete(url)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
 
 

@@ -34,7 +34,7 @@ from .models import PublicDefinition, UserDefinition, Language, Article, PublicW
 from .filters import PublicWordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, UserWordFilter, LanguageFilter, UserDefinitionFilter
 from .serializers import PublicDefinitionSerializer, LanguageSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
 from .mixins import LanguageFilterMixin
-from core.utils import Token
+from core.utils import Token, get_object_or_403
 from .permissions import OnlyOwnerCanAccess, OnlyOwnerCanDelete, NoPutAllowed, OnlyEaseCanChange
 
 
@@ -160,21 +160,19 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
     lookup_url_kwarg = 'word'
 
     def create(self, request, *args, **kwargs):
-        try:
-            word = UserWord.objects.create(**self.build_fields())
-        except ValidationError:
-            return Response(status=status.HTTP_403_FORBIDDEN, data={'message': 'User already has this word saved, either delete and then post the word, or just update it.'})
-
+        message = ('User already has this word saved, either delete and then post the'
+                   'word, or just update it.')
+        word = get_object_or_403(UserWord, message=message, **self.build_fields())
         serializer = UserWordSerializer(word)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def build_fields(self, data):
+    def build_fields(self):
         return {
             'language': Language.objects.get(language=self.kwargs['language']),
             'word': self.kwargs['word'],
-            'owner': request.user,
-            'ease': request.data.pop('ease', None),
-            'transliteration': request.data.pop('transliteration', None)
+            'owner': self.request.user,
+            'ease': self.request.data.pop('ease', None),
+            'transliteration': self.request.data.pop('transliteration', '')
         }
 
     def put(self, request, *args, **kwargs):
