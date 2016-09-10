@@ -106,7 +106,7 @@ class OwnerOnlyFilter(filters.BaseFilterBackend):
     """
     def filter_queryset(self, request, queryset, view):
         if type(request.user) is User:
-            return queryset.filter(owner__in=request.user)
+            return queryset.filter(owner=request.user)
         else:
             return queryset.filter(owner=None)
 
