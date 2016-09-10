@@ -5,12 +5,101 @@ from rest_framework.authtoken.models import Token
 from mock import patch
 from django.core.urlresolvers import reverse
 
-from .serializers import DefinitionSerializer
-from .models import Definition, User, Language, Word
-from .views import LanguageListView, DefinitionListView, URLImportView, WordDetailView, ParseView
+from .serializers import PublicDefinitionSerializer
+from .models import PublicDefinition, User, Language, PublicWord, UserDefinition, UserWord
+from .views import ParseView
 
 DEBUG = True
 
+class UserTestMixin(object):
+
+    def setUp(self):
+        self.user = User.objects.create(username='john', password='password')
+        token = Token.objects.get(user__username='john')
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+
+class PublicDefinitionListViewTestCase(APITestCase):
+
+    def setUp(self):
+        en = Language.objects.create(language='en')
+        word = PublicWord.objects.create(word='foo', language=en)
+        definition = PublicDefinition.objects.create(word=word, language=en, definition='bar')
+        self.client = APIClient()
+
+    def test_read(self):
+        url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.get(url)
+        self.assertContains(response, 'foo')
+
+
+class UserDefinitionListViewTestCase(UserTestMixin, APITestCase):
+    """Tests that the UserDefinitionListView and 'user-definition-list' URL route are
+    working correctly.
+
+    The view only supports the GET method.
+
+    """
+
+    def setUp(self):
+        super().setUp()
+        en = Language.objects.create(language='en')
+        word = UserWord.objects.create(word='foo', language=en, owner=self.user)
+        definition = UserDefinition.objects.create(owner=self.user, word=word, language=en, definition='bar')
+
+    def test_read(self):
+        url = reverse('user-definition-list', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.get(url)
+        self.assertContains(response, 'foo')
+
+
+class UserDefinitionCreateDestroyViewTestCase(UserTestMixin, APITestCase):
+
+    def setUp(self):
+        super().setUp()
+        en = Language.objects.create(language='en')
+        word = UserWord.objects.create(word='foo', language=en, owner=self.user)
+        definition = UserDefinition.objects.create(owner=self.user, word=word, language=en, definition='bar')
+
+    def test_read(self):
+        url = reverse('user-definition-create-destroy', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.get(url)
+        self.assertContains(response, 'foo')
+
+
+'''
+class UserWordCreateDestroyViewTestCase(UserTestMixin, APITestCase):
+
+    def setUp(self):
+        super().setUp()
+        en = Language.objects.create(language='en')
+        word = UserWord.objects.create(word='foo', language=en, owner=self.user)
+        definition = UserDefinition.objects.create(owner=self.user, word=word, language=en, definition='bar')
+
+    def test_create(self):
+        url = reverse('user-word-create-destroy', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.post(url)
+        result = UserWord.objects.filter(owner=self.user)
+        self.assertTrue(len(result) == 1)
+        self.assertEquals(result[0].word, 'foo')
+'''
+
+
+
+
+'''
+class ParseViewTestCase(APITestCase):
+
+    def test_parse(self):
+        factory = APIRequestFactory()
+        url = reverse('parse', kwargs={'language':'zh'})
+        request = factory.post(url, {'string': '我是美国人'})
+        response = ParseView.as_view()(request)
+        self.assertTrue(x['string'] in {'我','是', '美国人'} for x in response.data)
+'''
+
+'''
 
 class UserWordDetailTestCase(APITestCase):
     """
@@ -248,16 +337,8 @@ class DefinitionListTestCase(APITestCase):
         self.assertNotContains(response, 'special definition')
 
 
-class ParseViewTestCase(APITestCase):
-    
-    def test_parse(self):
-        factory = APIRequestFactory()
-        request = factory.post(reverse('parse', kwargs={'language':'zh'}), {'language': 'zh', 'string': '我是美国人'})
-        response = ParseView.as_view()(request)
-        self.assertTrue(x['string'] in {'我','是', '美国人'} for x in response.data)
 
 
-'''
 class AnnotateTestCase(APITestCase):
     def setUp(self):
         english = Language.objects.create(language='en')

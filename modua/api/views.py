@@ -6,6 +6,7 @@ from rest_framework.generics import (
     RetrieveDestroyAPIView,
     RetrieveUpdateDestroyAPIView,
     CreateAPIView,
+    DestroyAPIView,
 )
 
 from rest_framework.views import APIView
@@ -22,10 +23,11 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateMo
 from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 
 from core.services import fetch_article
 from .models import PublicDefinition, UserDefinition, Language, Article, PublicWord, UserWord
-from .filters import PublicWordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, UserWordFilter, LanguageFilter
+from .filters import PublicWordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, UserWordFilter, LanguageFilter, UserDefinitionFilter
 from .serializers import PublicDefinitionSerializer, LanguageSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
 from .mixins import LanguageFilterMixin
 from core.utils import Token
@@ -52,9 +54,9 @@ class PublicDefinitionListView(ListAPIView):
     """
     queryset = PublicDefinition.objects.all()
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (OnlyOwnerCanAccess,)
+    permission_classes = (AllowAny,)
     serializer_class = PublicDefinitionSerializer
-    filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
+    filter_backends = (URLKwargFilter, DjangoFilterBackend,)
     filter_class = PublicDefinitionFilter
 
 
@@ -72,19 +74,58 @@ class UserDefinitionListView(ListAPIView):
     queryset = UserDefinition.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
-    serializer_class = PublicDefinitionSerializer
+    serializer_class = UserDefinitionSerializer
     filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
-    filter_class = PublicDefinitionFilter
+    filter_class = UserDefinitionFilter
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(self, request, *args, **kwargs)
 
 
-class UserDefinitionDetailView(APIView):
-    pass
+class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
+    queryset = UserDefinition.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (OnlyOwnerCanAccess,)
+    serializer_class = UserDefinitionSerializer
+    filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
+    filter_class = UserDefinitionFilter
+
+    def create(self, request, *args, **kwargs):
+        '''
+        if not self.request.auth:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        '''
+
+        word = UserWord.objects.filter(**self.word_fields)
+        if not word:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND, data=
+                {'message': 'The definition could not be created because word {} in language {} does not exist'.format(self.kwargs['word'], self.word_fields['language'])}
+            )
+
+        try:
+            target = Language.objects.get(language=self.query_params['target'])
+        except ObjectDoesNotExist:
+            return Response(
+                status=status.HTTP_401_UNAUTHORIZED, data={'message': 'Language {} is not currently supported or does not exist.'.format(self.kwargs['word'], target)}
+            )
+
+
+        definition = UserDefinition.objects.create(word=word, definition=request.query_params['definition'], language=target, owner=request.user)
+        serializer = UserDefinitionSerializer(definition)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def word_fields(self, data):
+        return {
+            'language': Language.objects.get(language=self.kwargs['language']),
+            'word': self.kwargs['word'],
+            'owner': request.user,
+        }
 
 
 class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
-    """Defines a view for users to create, modify, or delete a single word in their account.  Initially, as out of the box parsing won't
-    support user-definied strings, this view will be used to simply add words to the user's own account.  Later, 
-    they should be able to add words of their own choosing and length.
+    """Defines a view for users to create, modify, or delete a single word in their account.
 
     The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as 
     time passes.
@@ -103,15 +144,24 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
     lookup_url_kwarg = 'word'
 
     def create(self, request, *args, **kwargs):
-        language = self.kwargs['language']
-        word = self.kwargs['word']
-        language = Language.objects.get(language=language)
-        word_instance = UserWord.objects.create(language=language, word=word, owner=request.user, **request.data)
-        serializer = PublicWordSerializer(word_instance)
+        word_instance = UserWord.objects.create(**self.build_fields)
+        serializer = UserWordSerializer(word_instance)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def build_fields(self, data):
+        return {
+            'language': Language.objects.get(language=self.kwargs['language']),
+            'word': self.kwargs['word'],
+            'owner': request.user,
+            'ease': request.data.pop('ease', None),
+            'transliteration': request.data.pop('transliteration', None)
+        }
 
     def put(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
 
 
 class PublicWordListView(ListAPIView):

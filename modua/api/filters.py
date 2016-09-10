@@ -51,11 +51,13 @@ class LanguageFilter(filters.BaseFilterBackend):
 
     def get_kwargs(self, request, queryset, view):
         query_kwargs = dict()
-        if queryset.model == PublicWord:
+        if (queryset.model == PublicWord or
+            queryset.model == UserWord):
             if 'language' in view.kwargs:
                 query_kwargs['language__language'] = view.kwargs['language']
 
-        elif queryset.model == PublicDefinition:
+        elif (queryset.model == PublicDefinition or
+              queryset.model == UserDefinition):
             if 'language' in view.kwargs:
                 query_kwargs['word__language__language'] = view.kwargs['language']
 
@@ -71,13 +73,15 @@ class URLKwargFilter(filters.BaseFilterBackend):
 
     def get_kwargs(self, request, queryset, view):
         query_kwargs = dict()
-        if queryset.model == PublicWord:
+        if (queryset.model == PublicWord or
+            queryset.model == UserWord):
             if 'language' in view.kwargs:
                 query_kwargs['language__language'] = view.kwargs['language']
             if 'word' in view.kwargs:
                 query_kwargs['word'] = view.kwargs['word']
 
-        elif queryset.model == Definition:
+        elif (queryset.model == UserDefinition or
+              queryset.model == PublicDefinition):
             if 'language' in view.kwargs:
                 query_kwargs['word__language__language'] = view.kwargs['language']
             if 'word' in view.kwargs:
@@ -102,7 +106,7 @@ class OwnerOnlyFilter(filters.BaseFilterBackend):
     """
     def filter_queryset(self, request, queryset, view):
         if type(request.user) is User:
-            return queryset.filter(owner__in=[None, request.user])
+            return queryset.filter(owner__in=request.user)
         else:
             return queryset.filter(owner=None)
 

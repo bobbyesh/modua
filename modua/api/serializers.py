@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PublicDefinition, Language, PublicWord
+from .models import PublicDefinition, Language, PublicWord, UserDefinition, UserWord
 
 
 class TokenSerializer(serializers.Serializer):
@@ -19,7 +19,7 @@ class PublicWordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PublicWord
-        fields = ('word', 'language', 'ease', 'id')
+        fields = ('word', 'language', 'id')
         depth = 1
 
 
@@ -27,7 +27,7 @@ class UserWordSerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
 
     class Meta:
-        model = PublicWord
+        model = UserWord
         fields = ('word', 'language', 'ease', 'id')
         depth = 1
 
@@ -49,7 +49,7 @@ class UserDefinitionSerializer(serializers.ModelSerializer):
     language = LanguageSerializer()
 
     class Meta:
-        model = PublicDefinition
+        model = UserDefinition
         fields = ('word', 'definition', 'language', 'id')
         depth = 1
 

@@ -60,6 +60,9 @@ class UserWord(Ownable, models.Model):
     transliteration = models.CharField(blank=True, max_length=8000)
     articles = models.ManyToManyField(Article)
 
+    class Meta:
+        unique_together = ('owner', 'word')
+
     def __str__(self):
         return self.word
 
@@ -86,6 +89,9 @@ class UserDefinition(Ownable, Timestampable, models.Model):
     word = models.ForeignKey(UserWord)
     definition = models.CharField(max_length=8000)
     language = models.ForeignKey(Language)
+
+    class Meta:
+        unique_together = ("owner", "word", "definition", "language")
 
     def __str__(self):
         return self.definition
