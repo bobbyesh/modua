@@ -9,7 +9,9 @@ from .serializers import PublicDefinitionSerializer
 from .models import PublicDefinition, User, Language, PublicWord, UserDefinition, UserWord
 from .views import ParseView
 
+
 DEBUG = True
+
 
 class UserTestMixin(object):
 
@@ -32,6 +34,18 @@ class PublicDefinitionListViewTestCase(APITestCase):
         url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'foo'})
         response = self.client.get(url)
         self.assertContains(response, 'foo')
+    
+    def test_bad_language_returns_empty(self):
+        url = reverse('public-definition-list', kwargs={'language': 'zh', 'word': 'foo'})
+        response = self.client.get(url)
+        results = response.data['results']
+        self.assertEqual(results, [])
+
+    def test_word_language_returns_empty(self):
+        url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'not in db'})
+        response = self.client.get(url)
+        results = response.data['results']
+        self.assertEqual(results, [])
 
 
 class UserDefinitionListViewTestCase(UserTestMixin, APITestCase):
@@ -52,6 +66,18 @@ class UserDefinitionListViewTestCase(UserTestMixin, APITestCase):
         url = reverse('user-definition-list', kwargs={'language': 'en', 'word': 'foo'})
         response = self.client.get(url)
         self.assertContains(response, 'foo')
+
+    def test_bad_language_returns_empty(self):
+        url = reverse('user-definition-list', kwargs={'language': 'zh', 'word': 'foo'})
+        response = self.client.get(url)
+        results = response.data['results']
+        self.assertEqual(results, [])
+
+    def test_invalid_language_returns_empty(self):
+        url = reverse('user-definition-list', kwargs={'language': 'en', 'word': 'notindb'})
+        response = self.client.get(url)
+        results = response.data['results']
+        self.assertEqual(results, [])
 
 
 class UserDefinitionCreateDestroyViewTestCase(UserTestMixin, APITestCase):
@@ -76,6 +102,13 @@ class UserDefinitionCreateDestroyViewTestCase(UserTestMixin, APITestCase):
         queryset = UserDefinition.objects.filter(owner=self.user, definition='bar')
         self.assertTrue(len(queryset) == 1)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+    
+    def test_bad_language_should_return_404(self):
+        url = reverse('user-definition-create-destroy', kwargs={'language': 'zh', 'word': 'foo'})
+        response = self.client.post(url, {'ease': 'hard'})
+        self.assertEquals(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
 
 
 class UserWordDetailTestCase(UserTestMixin, APITestCase):
@@ -89,13 +122,51 @@ class UserWordDetailTestCase(UserTestMixin, APITestCase):
         response = self.client.post(url)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
+        queryset = UserWord.objects.filter(owner=self.user, word='foo')
+        self.assertTrue(len(queryset) == 1)
+        self.assertTrue(str(queryset[0].word) == 'foo')
+
+
     def test_delete(self):
         word = UserWord.objects.create(word='foo', language=self.en, owner=self.user)
         url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
         response = self.client.delete(url)
-        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEquals(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_no_duplicate(self):
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.post(url)
+        response = self.client.post(url)
+        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update(self):
+        word = UserWord.objects.create(word='foo', language=self.en, owner=self.user)
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.patch(url, {'ease': 'hard'})
+        queryset = UserWord.objects.filter(owner=self.user, word='foo')
+        self.assertTrue(str(queryset[0].ease) == 'hard')
+
+    def test_put_not_allowed(self):
+        url = reverse('user-word-detail', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.put(url, {'ease': 'hard'})
+        self.assertTrue(response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_bad_language_should_return_404(self):
+        url = reverse('user-word-detail', kwargs={'language': 'zh', 'word': 'foo'})
+        response = self.client.post(url, {'ease': 'hard'})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class PublicWordListTestCase(APITestCase):
+    def setUp(self):
+        self.en = Language.objects.create(language='en')
+        word = PublicWord.objects.create(word='foo', language=self.en)
+
+    def test_read(self):
+        self.client = APIClient()
+        url = reverse('public-word-list', kwargs={'language': 'en'})
+        response = self.client.get(url)
+        self.assertContains(response, 'foo')
 
 
 '''

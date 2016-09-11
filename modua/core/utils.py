@@ -7,6 +7,7 @@ import requests
 import unicodedata
 
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from core.exceptions import Raise403
 from wordfencer.parser import ChineseParser
 
@@ -14,7 +15,7 @@ from wordfencer.parser import ChineseParser
 def get_object_or_403(model, message='HTTP 403: Forbidden', **kwargs):
     try:
         obj = model.objects.create(**kwargs)
-    except ValidationError:
+    except IntegrityError:
         raise Raise403(detail=message)
 
     return obj

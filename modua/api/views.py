@@ -140,16 +140,17 @@ class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
         }
 
 
-class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
+class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
     """Defines a view for users to create, modify, or delete a single word in their account.
 
     The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as 
     time passes.
 
     :Supported Methods:
-        GET, POST, PATCH, DELETE
+        GET, POST, PATCH
 
     """
+    http_method_names = ['get', 'post', 'patch']
     queryset = UserWord.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
@@ -159,7 +160,8 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
     lookup_field = 'word'
     lookup_url_kwarg = 'word'
 
-    def create(self, request, *args, **kwargs):
+    @find_language_or_404
+    def post(self, request, *args, **kwargs):
         message = ('User already has this word saved, either delete and then post the'
                    'word, or just update it.')
         word = get_object_or_403(UserWord, message=message, **self.build_fields())
@@ -167,18 +169,15 @@ class UserWordDetailView(RetrieveUpdateDestroyAPIView, CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def build_fields(self):
+        ease = self.request.data['ease'] if 'ease' in self.request.data else ''
+        transliteration = self.request.data['translation'] if 'translation' in self.request.data else ''
         return {
             'language': Language.objects.get(language=self.kwargs['language']),
             'word': self.kwargs['word'],
             'owner': self.request.user,
-            'ease': self.request.data.pop('ease', None),
-            'transliteration': self.request.data.pop('transliteration', '')
+            'ease': ease,
+            'transliteration': transliteration
         }
-
-    def put(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
 
 
 class PublicWordListView(ListAPIView):
@@ -188,7 +187,11 @@ class PublicWordListView(ListAPIView):
     words, this only the GET method is supported.
 
     """
-    pass
+    queryset = PublicWord.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = PublicWordSerializer
+    filter_backends = (URLKwargFilter, DjangoFilterBackend,)
+    filter_class = PublicWordFilter
 
 
 class LanguageListView(ListAPIView):
