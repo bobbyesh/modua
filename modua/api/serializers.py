@@ -4,7 +4,6 @@ from .models import PublicDefinition, Language, PublicWord, UserDefinition, User
 
 class TokenSerializer(serializers.Serializer):
     string = serializers.CharField(trim_whitespace=True)
-    position = serializers.IntegerField()
 
 
 class LanguageSerializer(serializers.ModelSerializer):

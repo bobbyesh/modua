@@ -12,8 +12,8 @@ urlpatterns = [
     url(r'^auth/', include('djoser.urls.authtoken')),
 
     # Public views
+    url(r'^parse/$', views.ParseView.as_view(), name='parse'),
     url(r'^languages/$', views.LanguageListView.as_view(), name='language-list'),
-    url(r'^languages/(?P<language>[\w-]+)/parse/$', views.ParseView.as_view(), name='parse'),
     url(r'^languages/(?P<language>[\w-]+)/words/$', views.PublicWordListView.as_view(), name='public-word-list'),
     url(r'^languages/(?P<language>[\w-]+)/definitions/(?P<word>[\w-]+)/$', views.PublicDefinitionListView.as_view(), name='public-definition-list'),
 
