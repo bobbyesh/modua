@@ -8,6 +8,7 @@ django-guardian==1.4.5
 django-twitter-bootstrap==3.3.0
 django-twitter-bootstrap-form==0.1.0
 djangorestframework==3.3.3
+djoser==0.5.1
 feedfinder2==0.0.4
 feedparser==5.2.1
 idna==2.1

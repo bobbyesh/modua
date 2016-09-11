@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from . import views
 from rest_framework.authtoken import views as authtoken_views
 
@@ -8,7 +8,8 @@ urlpatterns = [
     url(r'^$', views.api_root, name='api-root'),
 
     # Authentication views
-    url(r'^api-token-auth/', authtoken_views.obtain_auth_token),
+    url(r'^auth/', include('djoser.urls')),
+    url(r'^auth/', include('djoser.urls.authtoken')),
 
     # Public views
     url(r'^languages/$', views.LanguageListView.as_view(), name='language-list'),

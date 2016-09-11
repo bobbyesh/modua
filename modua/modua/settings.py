@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'twitter_bootstrap',
     'crispy_forms',
     'guardian',
+    'djoser',
     'core',
     'api',
     'modua',
@@ -158,7 +159,6 @@ REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.BasicAuthentication',
-            'rest_framework.authentication.SessionAuthentication',
             ),
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.IsAuthenticated',
