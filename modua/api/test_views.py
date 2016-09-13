@@ -25,24 +25,31 @@ class UserTestMixin(object):
 class PublicDefinitionListViewTestCase(APITestCase):
 
     def setUp(self):
-        en = Language.objects.create(language='en')
-        word = PublicWord.objects.create(word='foo', language=en)
-        definition = PublicDefinition.objects.create(word=word, language=en, definition='bar')
+        self.en = Language.objects.create(language='en')
+        self.word = PublicWord.objects.create(word='foo', language=self.en)
+        definition = PublicDefinition.objects.create(word=self.word, language=self.en, definition='bar')
         self.client = APIClient()
 
     def test_read(self):
         url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'foo'})
         response = self.client.get(url)
         self.assertContains(response, 'foo')
-    
+
+    def test_returns_two_definitions(self):
+        definition = PublicDefinition.objects.create(word=self.word, language=self.en, definition='meso')
+        url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'foo'})
+        response = self.client.get(url)
+        self.assertContains(response, str(definition.definition))
+        self.assertContains(response, 'bar')
+
     def test_bad_language_returns_empty(self):
         url = reverse('public-definition-list', kwargs={'language': 'zh', 'word': 'foo'})
         response = self.client.get(url)
         results = response.data['results']
         self.assertEqual(results, [])
 
-    def test_word_language_returns_empty(self):
-        url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'not in db'})
+    def test_bad_word_returns_empty(self):
+        url = reverse('public-definition-list', kwargs={'language': 'en', 'word': 'not_in_db'})
         response = self.client.get(url)
         results = response.data['results']
         self.assertEqual(results, [])
@@ -73,7 +80,7 @@ class UserDefinitionListViewTestCase(UserTestMixin, APITestCase):
         results = response.data['results']
         self.assertEqual(results, [])
 
-    def test_invalid_language_returns_empty(self):
+    def test_invalid_word_returns_empty(self):
         url = reverse('user-definition-list', kwargs={'language': 'en', 'word': 'notindb'})
         response = self.client.get(url)
         results = response.data['results']
