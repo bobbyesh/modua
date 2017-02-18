@@ -1,2 +1,2 @@
-modua/static/* linguist-vendored
-modua/templates/* linguist-vendored
+*.css linguist-vendored
+*.html linguist-vendored
