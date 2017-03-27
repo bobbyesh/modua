@@ -1,5 +1,15 @@
 {% extends 'landing/base.html' %}
 {% load staticfiles %}
+
+
+{% block navlinks %}
+<li><a href="{% url 'index' %}#">Home</a></li>
+<li><a href="{% url 'about' %}">About</a></li>
+<li><a href="{% url 'contact' %}">Contact</a></li>
+<li class="active"><a class="btn" href="{% url 'signin' %}">SIGN IN / SIGN UP</a></li>
+{% endblock %}
+
+
 {% block content %}
 	<header id="head" class="secondary"></header>
 	<!-- container -->
@@ -11,27 +21,27 @@
 		</ol>
 
 		<div class="row">
-			
+
 			<!-- Article main content -->
 			<article class="col-xs-12 maincontent">
 				<header class="page-header">
 					<h1 class="page-title">Sign in</h1>
 				</header>
-				
+
 				<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
 					<div class="panel panel-default">
 						<div class="panel-body">
 							<h3 class="thin text-center">Sign in to your account</h3>
 							<p class="text-center text-muted">Lorem ipsum dolor sit amet, <a href="{% url 'signup' %}">Register</a> adipisicing elit. Quo nulla quibusdam cum doloremque incidunt nemo sunt a tenetur omnis odio. </p>
 							<hr>
-							
+
               {% load crispy_forms_tags %}
 
                 {% crispy form %}
 
 
 				</div>
-				
+
 			</article>
 			<!-- /Article -->
 

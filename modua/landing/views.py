@@ -20,6 +20,14 @@ class IndexView(TemplateView):
     template_name = 'landing/index.html'
 
 
+class ContactView(TemplateView):
+    template_name = 'landing/contact.html'
+
+
+class AboutView(TemplateView):
+    template_name = 'landing/about.html'
+
+
 class SigninView(FormView):
     model = User
     template_name = 'landing/signin.html'

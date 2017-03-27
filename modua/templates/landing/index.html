@@ -6,12 +6,20 @@
 <body class="home">
 {% endblock %}
 
+{% block navlinks %}
+<li class="active"><a href="{% url 'index' %}#">Home</a></li>
+<li><a href="{% url 'about' %}">About</a></li>
+<li><a href="{% url 'contact' %}">Contact</a></li>
+<li><a class="btn" href="{% url 'signin' %}">SIGN IN / SIGN UP</a></li>
+{% endblock %}
+
+
 {% block content %}
 	<!-- Header -->
 	<header id="head">
 		<div class="container">
 			<div class="row">
-				<h1 class="lead">An Easy Way To Learn</h1>
+				<h1 class="lead">An Easy Way to Learn a New Language</h1>
 				<p class="tagline">Readable Language: An assisted reader so you can learn a language with content you're actually interested in.</a></p>
 			</div>
 		</div>
