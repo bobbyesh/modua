@@ -41,7 +41,7 @@ class SigninView(FormView):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(self.request, user)
-            return redirect('home')
+            return redirect('webapp:home')
         else:
             '''
 

@@ -41,17 +41,16 @@
 
         <div class="col-md-8">
             {% for article in articles %}
-					<h2>
-						{{ article.title }}
-					</h2>
-					<p>
-                        <!-- should be about 230 characters -->
-						{{ article.preview }}
-					</p>
-					<p>
-						<a class="btn" href="{{ article.get_absolute_url }}">View details »</a>
-					</p>
-                {% endfor %}
+        					<h2>
+        						{{ article.title }}
+        					</h2>
+        					<p>
+        						{{ article.preview }}
+        					</p>
+        					<p>
+        						<a class="btn" href="{{ article.get_absolute_url }}">View details »</a>
+        					</p>
+          {% endfor %}
 			</div>
     </div> <!-- row -->
     </div> <!-- container -->

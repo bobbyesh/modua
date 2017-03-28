@@ -5,16 +5,14 @@ import requests
 
 
 def fetch_article(url, language):
-    if url == '' or language == '':
-        raise Exception("fetch_article requires a url and a language")
     a = Article(url, language=language)
     a.download()
     a.parse()
-    if not a.title:
+    title = a.title
+    text = a.text
+    if not title:
         r = requests.get(url)
-        html = bs4.BeautifulSoup(r.text)
-        title = str(html.text.title)
-    else:
-        title = a.title
+        html = bs4.BeautifulSoup(r.content)
+        title = html.find('h1').text
 
-    return title, a.text
+    return title, text

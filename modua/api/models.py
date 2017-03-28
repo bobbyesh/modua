@@ -38,7 +38,7 @@ class Article(Ownable, models.Model):
     slug = models.SlugField(max_length=200, allow_unicode=True)
 
     def __str__(self):
-       return self.slug
+       return self.title
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -46,7 +46,7 @@ class Article(Ownable, models.Model):
         super(Article, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('article', kwargs={'slug': str(self.slug)})
+        return reverse('webapp:article', kwargs={'slug': str(self.slug)})
 
     @property
     def preview(self):
