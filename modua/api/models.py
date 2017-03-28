@@ -31,11 +31,11 @@ class Language(Contributable, Editable, Timestampable, models.Model):
 
 
 class Article(Ownable, models.Model):
-    title = models.CharField(max_length=2000, blank=True)
-    url = models.CharField(max_length=2000, blank=True)
-    text = models.TextField(blank=False)
+    title = models.CharField(max_length=512, blank=True)
+    url = models.CharField(max_length=512, blank=True)
+    text = models.TextField()
     language = models.ForeignKey(Language, related_name='api_article_language')
-    slug = models.SlugField(max_length=40, allow_unicode=True)
+    slug = models.SlugField(max_length=200, allow_unicode=True)
 
     def __str__(self):
        return self.slug
@@ -54,10 +54,10 @@ class Article(Ownable, models.Model):
 
 
 class UserWord(Ownable, models.Model):
-    word = models.CharField(blank=True, max_length=600)
+    word = models.CharField(blank=True, max_length=512)
     ease = models.CharField(blank=True, max_length=20)
     language = models.ForeignKey(Language)
-    transliteration = models.CharField(blank=True, max_length=8000)
+    transliteration = models.CharField(blank=True, max_length=512)
     articles = models.ManyToManyField(Article)
 
     class Meta:
@@ -68,9 +68,9 @@ class UserWord(Ownable, models.Model):
 
 
 class PublicWord(models.Model):
-    word = models.CharField(blank=True, max_length=600)
+    word = models.CharField(blank=True, max_length=512)
     language = models.ForeignKey(Language)
-    transliteration = models.CharField(blank=True, max_length=8000)
+    transliteration = models.CharField(blank=True, max_length=512)
 
     def __str__(self):
         return self.word
@@ -78,7 +78,7 @@ class PublicWord(models.Model):
 
 class PublicDefinition(Timestampable, models.Model):
     word = models.ForeignKey(PublicWord)
-    definition = models.CharField(max_length=8000)
+    definition = models.CharField(max_length=512)
     language = models.ForeignKey(Language)
 
     def __str__(self):
@@ -87,7 +87,7 @@ class PublicDefinition(Timestampable, models.Model):
 
 class UserDefinition(Ownable, Timestampable, models.Model):
     word = models.ForeignKey(UserWord)
-    definition = models.CharField(max_length=8000)
+    definition = models.CharField(max_length=512)
     language = models.ForeignKey(Language)
 
     class Meta:
@@ -123,12 +123,12 @@ class DictionaryAPI(Timestampable, models.Model):
     """
 
     name = models.CharField(blank=True, max_length=150)
-    description = models.CharField(blank=True, max_length=8000)
+    description = models.CharField(blank=True, max_length=512)
     api_type = models.CharField(blank=True, max_length=150)
     site = models.CharField(blank=True, max_length=2000)
-    base_url = models.CharField(blank=True, max_length=2000)
-    api_key = models.CharField(blank=True, max_length=500)
-    id_key = models.CharField(blank=True, max_length=500)
+    base_url = models.CharField(blank=True, max_length=512)
+    api_key = models.CharField(blank=True, max_length=512)
+    id_key = models.CharField(blank=True, max_length=512)
     language = models.ForeignKey(Language, related_name='apis', null=True)
 
     def __str__(self):

@@ -3,10 +3,11 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import redirect
 from api.models import Article, Language
 
 from core.utils import klassified
@@ -16,9 +17,17 @@ from core.mixins import ArticleMixin
 from .forms import URLForm
 
 
+def logout_view(request):
+    logout(request)
+    return redirect('logout_success')
+
+
+class LogoutSuccessView(TemplateView):
+    template_name = 'landing/logout_success.html'
+
+
 @method_decorator(login_required, name='dispatch')
 class HomeView(FormView, LoginRequiredMixin):
-
     template_name = 'webapp/home.html'
     login_url = 'landing/signin'
     form_class = URLForm
@@ -48,7 +57,6 @@ class HomeView(FormView, LoginRequiredMixin):
 
 @method_decorator(login_required, name='dispatch')
 class ArticleView(TemplateView, ArticleMixin):
-
     template_name = 'webapp/sample.html'
 
     def get_context_data(self, **kwargs):

@@ -6,10 +6,12 @@ from django.contrib.auth import login, authenticate
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import redirect
+from django.views.generic.edit import CreateView
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.response import Response
 from wordfencer.parser import ChineseParser
+
 
 from .forms import SignupForm, AnnotationForm, SigninForm
 from api.models import PublicDefinition, Language
@@ -46,28 +48,21 @@ class SigninView(FormView):
             .. TODO: Create reasonable invalid user redirection.
 
             '''
-            return redirect('signup')
+            return redirect('signin')
 
 
-class SignupView(FormView):
+class SignupView(CreateView):
     model = User
     template_name = 'landing/signup.html'
     form_class = SignupForm
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('webapp:home')
 
     def form_valid(self, form):
-        username = self.request.POST['username']
-        email = self.request.POST['email']
-        password = self.request.POST['password']
-        user = User.objects.create_user(username=username, email=email, password=password)
-        Token.objects.create(user=user)
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(self.request, user)
-        else:
-            raise Exception("login or authentication error in SignupView")
-        return super(FormView, self).form_valid(form)
-
+        valid = super(SignupView, self).form_valid(form)
+        username, password = form.cleaned_data.get('username'), form.cleaned_data.get('password1')
+        new_user = authenticate(username=username, password=password)
+        login(self.request, new_user)
+        return valid
 
 class SignupSuccessView(TemplateView):
     template_name = 'landing/success.html'

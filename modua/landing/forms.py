@@ -1,17 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Div, Field, Layout
 
 
-class SigninForm(forms.Form):
+class SigninForm(AuthenticationForm):
     password = forms.CharField(widget=forms.PasswordInput)
     username = forms.CharField()
-    '''
-    class Meta:
-        model = User
-        fields = ['username']
-    '''
 
     def __init__(self, *args, **kwargs):
         super(SigninForm, self).__init__(*args, **kwargs)
@@ -26,24 +22,19 @@ class SigninForm(forms.Form):
         )
 
 
-
-class SignupForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    class Meta:
-        model = User
-        fields = ['username','email']
-
+class SignupForm(UserCreationForm):
+    email = forms.EmailField()
     def __init__(self, *args, **kwargs):
         super(SignupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        # form_action associates a view name
-        self.helper.form_action = 'signup'
+        self.helper.form_action = 'signup' # form_action associates a view name
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Submit'))
         self.helper.layout = Layout(
-            Div('username', css_class='top-margin'),
-            Div('email', css_class='top-margin'),
-            Div('password', css_class='top-margin'),
+            'username',
+            Div('email'),
+            'password1',
+            'password2',
         )
 
 
