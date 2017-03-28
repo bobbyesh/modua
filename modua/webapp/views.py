@@ -9,10 +9,12 @@ from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from api.models import Article, Language
+from api.models import PublicWord, Article
+from core.utils import is_punctuation, tokenize_text
+from collections import defaultdict, Counter
 
 from core.utils import klassified
 from core.services import fetch_article
-from core.mixins import ArticleMixin
 
 from .forms import URLForm
 
@@ -57,12 +59,40 @@ class HomeView(FormView, LoginRequiredMixin):
 
 
 @method_decorator(login_required, name='dispatch')
-class ArticleView(TemplateView, ArticleMixin):
+class ArticleView(TemplateView):
     template_name = 'webapp/sample.html'
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
         user = User.objects.get(username=self.request.user.username)
         if user is not None:
-            context['tokens'], context['counts'] = self.get_article_context(user)
+            tokens = self.get_tokens()
+            context['tokens'] = tokens
+            context['counts'] = Counter(t.ease for t in tokens if hasattr(t, 'ease'))
         return context
+
+    def get_tokens(self):
+        '''Returns a list of elements that are either `api.models.PublicWord` instances or just strings.
+
+        If the user has not saved a particular token as a word before, then that word is
+        get or created with an `ease` of `new`, but it is not associated with that user via the
+        ManyToMany `users` field in the :model:`PublicWord`.
+
+        '''
+
+        tokens = []
+        article = self.get_article()
+        for token in tokenize_text(article.text):
+            try:
+                word = PublicWord.objects.get(word=token, language=article.language)
+            except ObjectDoesNotExist:
+                word = token
+
+            tokens.append(word)
+
+        return tokens
+
+    def get_article(self):
+        slug = self.kwargs['slug']
+        article = Article.objects.get(slug=slug)
+        return article
