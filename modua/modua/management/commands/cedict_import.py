@@ -11,34 +11,32 @@ def clean_entry(def_boi):
      return_string = return_string.replace("'", "\'")
      return return_string
 
+
 def store_def_boi(word, trans, def_arr):
-    try:
-        # Escape the apostrophe going into the DB
-        word = clean_entry(word)
-        trans = clean_entry(trans)
+    # Escape the apostrophe going into the DB
+    word = clean_entry(word)
+    trans = clean_entry(trans)
 
-        def_idx = 0
-        while def_idx < len(def_arr):
-            def_arr[def_idx] = clean_entry(def_arr[def_idx])
-            def_idx += 1
+    def_idx = 0
+    while def_idx < len(def_arr):
+        def_arr[def_idx] = clean_entry(def_arr[def_idx])
+        def_idx += 1
 
-        # Do the insertion
-        # If there is more than one definition insert them both as different rows
-        zh, created = Language.objects.get_or_create(language='zh')
-        en, created = Language.objects.get_or_create(language='en')
-        for definition in def_arr:
-            word_instance = PublicWord.create(word=word, language=zh, transliteration=trans)
-            definition_instance = PublicDefinition.create(word=word_instance, definition=definition, language=en)
-    except Exception as e:
-        error_file = open("cedict_error.txt", "a+")
-        error_file.writelines("{0} | {1} | {2} | {3}\n".format(e, word, trans, def_arr))
+    # Do the insertion
+    # If there is more than one definition insert them both as different rows
+    zh, created = Language.objects.get_or_create(language='zh')
+    en, created = Language.objects.get_or_create(language='en')
+    for definition in def_arr:
+        word_instance = PublicWord.objects.create(word=word, language=zh, transliteration=trans)
+        definition_instance = PublicDefinition.objects.create(word=word_instance, definition=definition, language=en)
 
 
 def import_dictionary(file_name):
     cnt = 0
+    lines = []
     with open(file_name) as f:
-        for idx, line in enumerate(f):
-            cnt = idx
+        for cnt, line in enumerate(f):
+            lines.append(line)
 
     # tqdm is the progress bar
     with tqdm(total=cnt) as pbar:
