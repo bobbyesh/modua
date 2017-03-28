@@ -15,7 +15,7 @@ class SigninForm(AuthenticationForm):
         # form_action associates a view name
         self.helper.form_action = 'signin'
         self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.add_input(Submit('submit', 'Login'))
         self.helper.layout = Layout(
             Div('username', css_class='top-margin'),
             Div('password', css_class='top-margin'),

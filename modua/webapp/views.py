@@ -17,7 +17,7 @@ from webapp.forms import URLForm
 
 def logout_view(request):
     logout(request)
-    return redirect('logout_success')
+    return redirect('webapp:logout_success')
 
 
 class LogoutSuccessView(TemplateView):

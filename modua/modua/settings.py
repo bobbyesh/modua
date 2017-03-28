@@ -183,10 +183,8 @@ USE_L10N = True
 USE_TZ = True
 
 
-# The settings_local.py will overwrite only the settings specified therein.
-# Add settings_local.py to .gitignore to avoid messy version control. 
 try:
-    from .settings_local import *
+    from .local_settings import *
 except ImportError:
     pass
 
