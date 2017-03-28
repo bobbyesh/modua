@@ -39,10 +39,6 @@ class Token(object):
         self.string = string
 
 
-def klassified(tokens):
-    raise Exception("Not implemented anymore, deprecated")
-
-
 def get_api_response(url):
     path = os.path.abspath(os.path.dirname(__file__)) + '/data/config.ini'
     config = configparser.ConfigParser()
@@ -63,7 +59,7 @@ def build_html(**kwargs):
 
         >>> build_html(tag='div', content='hello world!')
         '<div>hello world!</div>'
-        
+
         >>> build_html(tag='div', content='hello world!', id='new', href='#')
         '<div id="new" href="#">'hello world!"</div>
 

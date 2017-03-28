@@ -1,22 +1,18 @@
-from django.contrib.auth.decorators import login_required
+from collections import Counter
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import authenticate, logout
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse_lazy
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import redirect
-from api.models import Article, Language
-from api.models import PublicWord, Article
-from core.utils import is_punctuation, tokenize_text
-from collections import defaultdict, Counter
 
-from core.utils import klassified
+from api.models import Article, Language, PublicWord
 from core.services import fetch_article
-
-from .forms import URLForm
+from webapp.forms import URLForm
 
 
 def logout_view(request):
@@ -66,12 +62,13 @@ class ArticleView(TemplateView):
         context = super(ArticleView, self).get_context_data(**kwargs)
         user = User.objects.get(username=self.request.user.username)
         if user is not None:
-            tokens = self.get_tokens()
-            context['tokens'] = tokens
-            context['counts'] = Counter(t.ease for t in tokens if hasattr(t, 'ease'))
+            entries = self.get_entries()
+            context['entries'] = entries
+            context['counts'] = Counter(e.ease for e in entries if hasattr(e, 'ease'))
+            print(context)
         return context
 
-    def get_tokens(self):
+    def get_entries(self):
         '''Returns a list of elements that are either `api.models.PublicWord` instances or just strings.
 
         If the user has not saved a particular token as a word before, then that word is
@@ -80,17 +77,17 @@ class ArticleView(TemplateView):
 
         '''
 
-        tokens = []
+        entries = []
         article = self.get_article()
-        for token in tokenize_text(article.text):
+        for token in article.as_tokens():
             try:
-                word = PublicWord.objects.get(word=token, language=article.language)
+                entry = PublicWord.objects.get(word=token, language=article.language)
             except ObjectDoesNotExist:
-                word = token
+                entry = token
 
-            tokens.append(word)
+            entries.append(entry)
 
-        return tokens
+        return entries
 
     def get_article(self):
         slug = self.kwargs['slug']

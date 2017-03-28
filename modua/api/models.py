@@ -3,12 +3,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from core.behaviors import Timestampable, Contributable, Editable, Ownable
+from core.utils import tokenize_text
 
-
-''' The following set of imports and the create_auth_token are placed in this models.py because
-it is guaranted that it will be imported by Django at startup, as suggest by the Django REST Framework
-docs.
-'''
+# The following set of imports and the create_auth_token are placed in this models.py because
+# it is guaranteed that it will be imported by Django at startup, as suggested by the Django REST Framework
+# docs.
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -35,7 +34,7 @@ class Article(Ownable, models.Model):
     url = models.CharField(max_length=512, blank=True)
     text = models.TextField()
     language = models.ForeignKey(Language, related_name='api_article_language')
-    slug = models.SlugField(max_length=200, allow_unicode=True)
+    slug = models.SlugField(max_length=200, allow_unicode=True, unique=True)
 
     def __str__(self):
        return self.title
@@ -51,6 +50,9 @@ class Article(Ownable, models.Model):
     @property
     def preview(self):
         return str(self.text)[:50] + ' ...'
+
+    def as_tokens(self):
+        return tokenize_text(self.text)
 
 
 class UserWord(Ownable, models.Model):
@@ -95,65 +97,3 @@ class UserDefinition(Ownable, Timestampable, models.Model):
 
     def __str__(self):
         return self.definition
-
-
-class DictionaryAPI(Timestampable, models.Model):
-    """
-
-    .. TODO: Create fulltext index in DB
-
-    :Fields:
-        `description`:
-            This should be Usage, notes, and known issues.
-
-        `site`:
-            Actual site of the dictionary we want to use, not the URL
-            from connecting to it.
-
-        `base_url`:
-            URL used if it's that's how we need to connect to the API.
-
-        `api_key`:
-            The API key if you need to register an application with the site - may not
-            be necessary.
-
-        `id_key`:
-            The key needed/issued to access the API - may not be necessary.
-
-    """
-
-    name = models.CharField(blank=True, max_length=150)
-    description = models.CharField(blank=True, max_length=512)
-    api_type = models.CharField(blank=True, max_length=150)
-    site = models.CharField(blank=True, max_length=2000)
-    base_url = models.CharField(blank=True, max_length=512)
-    api_key = models.CharField(blank=True, max_length=512)
-    id_key = models.CharField(blank=True, max_length=512)
-    language = models.ForeignKey(Language, related_name='apis', null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Country(Contributable, Editable, Timestampable, models.Model):
-    country = models.CharField(blank=True, max_length=250)
-
-    def __str__(self):
-        return self.country_name
-
-
-class Region(Contributable, Editable, Timestampable, models.Model):
-    country = models.ForeignKey(Country, related_name='country_region', null=True)
-    region = models.CharField(blank=True, max_length=300)
-
-    def __str__(self):
-        return self.region
-
-
-class City(Contributable, Editable, Timestampable, models.Model):
-    country_city = models.ForeignKey(Country, related_name='country_city', null=True)
-    region_city = models.ForeignKey(Region, related_name='region_city', null=True)
-    city_name = models.CharField(blank=True, max_length=150)
-
-    def __str__(self):
-        return self.city_name

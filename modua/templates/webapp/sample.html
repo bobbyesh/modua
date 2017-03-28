@@ -11,10 +11,10 @@
         <div class="col-md-2">
             <div class="article-info">
                 <h5>Word Counts</h5>
-		<div>New: <strong><span class="new">{{ counts.new }}</span></strong></div>
-		<div>Easy: <strong><span class="easy">{{ counts.easy }}</span></strong></div>
-		<div>Hard: <strong><span class="hard">{{ counts.hard }}</span></strong></div>
-		<div>Known: <strong><span class="known">{{ counts.known }}</span></strong></div>
+            		<div>New: <strong><span class="new">{{ counts.new }}</span></strong></div>
+            		<div>Easy: <strong><span class="easy">{{ counts.easy }}</span></strong></div>
+            		<div>Hard: <strong><span class="hard">{{ counts.hard }}</span></strong></div>
+            		<div>Known: <strong><span class="known">{{ counts.known }}</span></strong></div>
             </div>
         </div>
 
@@ -27,22 +27,22 @@
                     <p>by {{ author }}</p>
                 {%  endif  %}
             <p>
-                {% for token in tokens %}
-                    {% if token.ease %}
-		    <span class="token {{ token.ease }}" name="{{ token }}">{{ token }}</span>
+                {% for entry in entries %}
+                    {% if entry.ease %}
+		                    <span class="entry {{ entry.ease }}" name="{{ entry }}">{{ entry }}</span>
                     {% else %}
-                        {{ token }}
+                        {{ entry }}
                     {% endif %}
                 {% endfor %}
             </p>
             </div>
         </div>
     </div>
-    {% for token in tokens %}
-    {% if token.definition_set %}
-   	{% for definition in token.definition_set.all %} 
-        <div class="definition" data-token="{{ token }}">
-		<h3>{{ token }}<p class="transliteration">{{ token.transliteration }}</p></h3>
+    {% for entry in entries %}
+    {% if entry.definition_set %}
+   	{% for definition in entry.definition_set.all %}
+        <div class="definition" data-token="{{ entry }}">
+		<h3>{{ entry }}<p class="transliteration">{{ entry.transliteration }}</p></h3>
             <p>{{ definition }}</p>
 	    <button type="submit" class="btn btn-primary ease">easy</button>
 	    <button type="submit" class="btn btn-primary ease">hard</button>
