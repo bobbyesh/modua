@@ -1,7 +1,7 @@
 #cedict_import.py
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
-from api.models import Definition, Language, Word
+from api.models import PublicDefinition, Language, PublicWord
 from . import cedict_parser
 
 
@@ -27,7 +27,8 @@ def store_def_boi(word, trans, def_arr):
         zh, created = Language.objects.get_or_create(language='zh')
         en, created = Language.objects.get_or_create(language='en')
         for definition in def_arr:
-            word_instance = Word.create(word=word, language=zh, definition=definition, definition_language=en, transliteration=trans)
+            word_instance = PublicWord.create(word=word, language=zh, transliteration=trans)
+            definition_instance = PublicDefinition.create(word=word_instance, definition=definition, language=en)
     except Exception as e:
         error_file = open("cedict_error.txt", "a+")
         error_file.writelines("{0} | {1} | {2} | {3}\n".format(e, word, trans, def_arr))
