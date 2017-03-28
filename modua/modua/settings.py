@@ -40,7 +40,7 @@ ALLOWED_HOSTS = []
 LOGIN_URL = 'signin'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = ''
+STATIC_ROOT = '/home/ubuntu/www/readable/static/'
 STATICFILES_DIRS = [
     os.path.join('static'),
 ]
@@ -118,8 +118,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'modua',
         'USER': 'root_webbuild',
-        # TODO: Remove above webbuild user and password once the django build is done.
-        # 'USER': 'website',
         'PASSWORD': 'happytime3.14',
         'HOST': 'localhost',
         'PORT': '5432',
