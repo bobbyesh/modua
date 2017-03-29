@@ -67,14 +67,15 @@ class TestPublicRequests(APITestCase):
         '''
         Passes if a valid search returns a status code of 200.
         '''
-        response = self.client.get("/api/0.1/word/我/")
+        response = self.client.get("/api/0.1/words/我/")
         self.assertEqual(response.status_code, 200)
 
     def test_term_search(self):
         '''
         Passes if the json returned from a valid request is the correct json.
         '''
-        response = self.client.get("/api/0.1/word/我/")
+        url = reverse('public-word-list')
+        response = self.client.get("/api/0.1/words/我/")
         self.assertContains(response, '我')
 
     def test_bad_term_search(self):

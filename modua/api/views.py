@@ -94,15 +94,6 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
     filter_class = UserDefinitionFilter
 
 
-class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
-    queryset = UserDefinition.objects.all()
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (OnlyOwnerCanAccess,)
-    serializer_class = UserDefinitionSerializer
-    filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
-    filter_class = UserDefinitionFilter
-
-
 class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
     """Defines a view for users to create, modify, or delete a single word in their account.
 
@@ -141,7 +132,7 @@ class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
         }
 
 
-class PublicWordListView(ListAPIView):
+class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
     """Defines a view for the `Word` model that is public accessible.
 
     This view should be read-only because the public should not be allowed to delete publically available
@@ -153,6 +144,7 @@ class PublicWordListView(ListAPIView):
     serializer_class = PublicWordSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = PublicWordFilter
+    lookup_field = 'word'
 
 
 class ParseView(CreateAPIView):

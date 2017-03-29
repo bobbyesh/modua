@@ -5,6 +5,7 @@ from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r'user/definitions', views.UserDefinitionViewSet, base_name='user-definition')
+router.register(r'words', views.PublicWordViewSet, base_name='public-word')
 
 urlpatterns = [
     # API Root
@@ -16,7 +17,6 @@ urlpatterns = [
 
     # Public views
     url(r'^parse/$', views.ParseView.as_view(), name='parse'),
-    url(r'^words/$', views.PublicWordListView.as_view(), name='public-word-list'),
     url(r'^definitions/(?P<word>[\w-]+)/$', views.PublicDefinitionListView.as_view(), name='public-definition-list'),
     url(r'^article/$', views.PublicArticleView.as_view(), name='public-article'), # POST
 
