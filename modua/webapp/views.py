@@ -10,7 +10,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from api.models import Article, Language, PublicWord
+from api.models import Article, PublicWord
 from core.services import fetch_article
 from webapp.forms import URLForm
 
@@ -49,8 +49,7 @@ class HomeView(FormView, LoginRequiredMixin):
             title, text = fetch_article(url, language='zh')
 
         user = self.request.user
-        language = Language.objects.get(language='zh')
-        Article.objects.get_or_create(title=title, text=text, url=url, language=language, owner=user)
+        Article.objects.get_or_create(title=title, text=text, url=url, owner=user)
         return super(HomeView, self).form_valid(form)
 
 
@@ -81,7 +80,7 @@ class ArticleView(TemplateView):
         article = self.get_article()
         for token in article.as_tokens():
             try:
-                entry = PublicWord.objects.get(word=token, language=article.language)
+                entry = PublicWord.objects.get(word=token)
             except ObjectDoesNotExist:
                 entry = token
 

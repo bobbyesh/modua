@@ -15,7 +15,7 @@ from wordfencer.parser import ChineseParser
 
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from api.models import PublicDefinition, Language
+from api.models import PublicDefinition
 from core.utils import build_popup_html, build_word_html
 
 
@@ -112,8 +112,7 @@ class AnnotationView(FormView):
     def get_definitions_or_empty(self, word):
         s = ''
         try:
-            language = Language.objects.get(language='zh')
-            definitions = PublicDefinition.objects.filter(word=word, language=language)
+            definitions = PublicDefinition.objects.filter(word=word)
             unique_definitions = list(set([x.definition for x in definitions]))
             for definition in unique_definitions:
                 s += definition + ' / '

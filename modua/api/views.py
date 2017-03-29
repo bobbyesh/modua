@@ -28,21 +28,31 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.utils import IntegrityError
 
 from core.services import fetch_article
-from core.decorators import find_language_or_404, required_request_data
+from core.decorators import required_request_data
 from core.exceptions import Raise403
-from .models import PublicDefinition, UserDefinition, Language, Article, PublicWord, UserWord
-from .filters import PublicWordFilter, PublicDefinitionFilter, OwnerOnlyFilter, URLKwargFilter, OwnerWordOnlyFilter, UserWordFilter, LanguageFilter, UserDefinitionFilter
-from .serializers import PublicDefinitionSerializer, LanguageSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
-from .mixins import LanguageFilterMixin
-from core.utils import Token, get_object_or_403
+from .models import PublicDefinition, UserDefinition, Article, PublicWord, UserWord
+from .filters import (
+    PublicWordFilter,
+    PublicDefinitionFilter,
+    OwnerOnlyFilter,
+    OwnerWordOnlyFilter,
+    WordFilter,
+    UserWordFilter,
+    UserDefinitionFilter
+)
+from .serializers import PublicDefinitionSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
+from core.utils import Token, get_object_or_403, is_punctuation
 from .permissions import OnlyOwnerCanAccess, OnlyOwnerCanDelete, NoPutAllowed, OnlyEaseCanChange
+
+
+parser = ChineseParser()
 
 
 @api_view(['GET'])
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'languages': reverse('language-list', request=request, format=format),
+        'words': reverse('public-word-list', request=request, format=format),
         })
 
 
@@ -60,7 +70,7 @@ class PublicDefinitionListView(ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny,)
     serializer_class = PublicDefinitionSerializer
-    filter_backends = (URLKwargFilter, DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_class = PublicDefinitionFilter
 
 
@@ -79,7 +89,7 @@ class UserDefinitionListView(ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
     serializer_class = UserDefinitionSerializer
-    filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
+    filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, WordFilter,)
     filter_class = UserDefinitionFilter
 
 
@@ -88,11 +98,10 @@ class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
     serializer_class = UserDefinitionSerializer
-    filter_backends = (URLKwargFilter, DjangoFilterBackend, OwnerOnlyFilter,)
+    filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     filter_class = UserDefinitionFilter
 
-    @find_language_or_404
-    @required_request_data(['target', 'definition'])
+    @required_request_data(['definition'])
     def create(self, request, *args, **kwargs):
         definition = self.get_definition()
         serializer = UserDefinitionSerializer(definition)
@@ -103,7 +112,6 @@ class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
             definition = UserDefinition.objects.create(
                 word=self.get_word(),
                 definition=self.request.data['definition'],
-                language=self.get_target(),
                 owner=self.request.user
             )
         except IntegrityError:
@@ -113,37 +121,22 @@ class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
 
     def get_word(self):
         try:
-            word = UserWord.objects.get(**self.get_word_fields())
+            word = UserWord.objects.get(word=self.kwargs['word'])
         except ObjectDoesNotExist:
             message = (
-                'The definition could not be created because word {} in language {} does'
+                'The definition could not be created because word {} does '
                 'not exist for user {}'
-            ).format(self.kwargs['word'], self.get_word_fields()['language'], self.request.user)
+            ).format(self.kwargs['word'], self.request.user)
 
             raise NotFound(detail={'message': message})
 
         return word
 
-    def get_target(self):
-        try:
-            target = Language.objects.get(language=self.request.data['target'])
-        except ObjectDoesNotExist:
-            raise NotFound(detail={'message': 'Target language {} is not currently supported or does not exist.'.format(self.request.data['target'])})
-
-        return target
-
-    def get_word_fields(self):
-        return {
-            'language': Language.objects.get(language=self.kwargs['language']),
-            'word': self.kwargs['word'],
-            'owner': self.request.user,
-        }
-
 
 class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
     """Defines a view for users to create, modify, or delete a single word in their account.
 
-    The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as 
+    The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as
     time passes.
 
     :Supported Methods:
@@ -156,11 +149,10 @@ class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
     serializer_class = UserWordSerializer
     filter_class = UserWordFilter
-    filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, URLKwargFilter)
+    filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     lookup_field = 'word'
     lookup_url_kwarg = 'word'
 
-    @find_language_or_404
     def post(self, request, *args, **kwargs):
         message = ('User already has this word saved, either delete and then post the'
                    'word, or just update it.')
@@ -170,13 +162,12 @@ class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
 
     def build_fields(self):
         ease = self.request.data['ease'] if 'ease' in self.request.data else ''
-        transliteration = self.request.data['translation'] if 'translation' in self.request.data else ''
+        pinyin = self.request.data['translation'] if 'translation' in self.request.data else ''
         return {
-            'language': Language.objects.get(language=self.kwargs['language']),
             'word': self.kwargs['word'],
             'owner': self.request.user,
             'ease': ease,
-            'transliteration': transliteration
+            'pinyin': pinyin
         }
 
 
@@ -190,53 +181,77 @@ class PublicWordListView(ListAPIView):
     queryset = PublicWord.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = PublicWordSerializer
-    filter_backends = (URLKwargFilter, DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend,)
     filter_class = PublicWordFilter
-
-
-class LanguageListView(ListAPIView):
-    queryset = Language.objects.all()
-    serializer_class = LanguageSerializer
-    permission_classes = (AllowAny,)
-
 
 
 class ParseView(CreateAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        if self.request.data['language'] == 'zh':
-            string = request.data['string']
-            parser = ChineseParser()
-            segments = parser.parse(string)
-            return Response(data=segments)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        string = request.data['string']
+        parser = ChineseParser()
+        segments = parser.parse(string)
+        return Response(data=segments)
 
 
-class URLImportView(APIView, LanguageFilterMixin, LoginRequiredMixin):
+class URLImportView(APIView, LoginRequiredMixin):
     authentication_classes = (TokenAuthentication, )
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        if not self.language:
-            return Response(
-                {
-                    'message': 'Language "{}" not found'.format(request.data['language']),
-                },
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        if request.data['language'] == 'zh':
-            language = request.data['language']
-            url = request.data['url']
-            article = Article.objects.filter(url=url)
-            if not article:
-                title, text = fetch_article(url, language)
-                Article.objects.create(title=title, text=text, url=url, language=self.language, owner=user)
-
+        url = request.data['url']
+        article = Article.objects.filter(url=url)
+        if not article:
+            title, text = fetch_article(url)
+            Article.objects.create(title=title, text=text, url=url, owner=user)
             return Response(status=status.HTTP_200_OK)
 
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+class PublicArticleView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        title = request.data['title']
+        title = self.parse_into_json(title)
+        text = request.data['text']
+        paragraphs = []
+        for splitted in text.split('\n'):
+            paragraph = self.parse_into_json(splitted)
+            paragraphs.append(paragraph)
+
+        data = {
+            'title': title,
+            'paragraphs': paragraphs,
+        }
+
+        return Response(data)
+
+
+    def parse_into_json(self, text):
+        title_words = []
+        parser_results = (p for p in parser.parse(text) if not p.isspace())
+        for i, segment in enumerate(parser_results):
+            try:
+                word = PublicWord.objects.get(word=segment)
+                definitions = PublicDefinition.objects.filter(word=word)
+                word = {
+                    'word': word.word,
+                    'index': i,
+                    'pinyin': word.pinyin,
+                    'definition': [d.definition for d in definitions]
+                }
+            except:
+                word = {
+                    'word': segment,
+                    'index': i,
+                    'pinyin': '',
+                    'definition': '',
+                }
+
+            title_words.append(word)
+
+        return title_words

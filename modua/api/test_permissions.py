@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from api.models import User, Language, Word, Definition
+from api.models import User, UserWord, Definition
 from django.core.urlresolvers import reverse
 
 
@@ -11,14 +11,12 @@ class OwnerPermissionsTestCase(APITestCase):
 
     def setUp(self):
         john = User.objects.create_user(username='john', password='password')
-        language= Language.objects.create(language='en')
-        word = Word.objects.create(owner=john, word='foo', language=language, ease='easy')
-        definition = Definition.objects.create(word=word, language=language, definition='bar')
+        word = UserWord.objects.create(owner=john, word='foo', ease='easy')
+        definition = Definition.objects.create(word=word, definition='bar')
         sally = User.objects.create_user(username='sally', password='password')
 
-        language= Language.objects.create(language='en')
-        word = Word.objects.create(word='public', language=language, ease='easy')
-        definition = Definition.objects.create(word=word, language=language, definition='should be okay')
+        word = UserWord.objects.create(word='public', ease='easy')
+        definition = Definition.objects.create(word=word, definition='should be okay')
 
 
     def test_not_owner_cannot_read(self):
@@ -26,8 +24,8 @@ class OwnerPermissionsTestCase(APITestCase):
         be able to.  Luckily she can't.'''
         client = APIClient()
         client.login(username='sally', password='password')
-        url = reverse('word-detail', kwargs={'language': 'en', 'word': 'foo'})
-        response = client.get(url, {'language': 'en', 'word': 'foo', 'username': 'john'})
+        url = reverse('word-detail', kwargs={'word': 'foo'})
+        response = client.get(url, {'word': 'foo', 'username': 'john'})
 
         if DEBUG:
             self.debug_print(response, url)
@@ -38,8 +36,8 @@ class OwnerPermissionsTestCase(APITestCase):
         '''John creates a word and then accesses it successfully'''
         client = APIClient()
         client.login(username='john', password='password')
-        url = reverse('word-detail', kwargs={'language': 'en', 'word': 'foo'})
-        response = client.get(url, {'language': 'en', 'word': 'foo', 'username': 'john'})
+        url = reverse('word-detail', kwargs={'word': 'foo'})
+        response = client.get(url, {'word': 'foo', 'username': 'john'})
 
         if DEBUG:
             self.debug_print(response, url)
@@ -48,8 +46,8 @@ class OwnerPermissionsTestCase(APITestCase):
 
     def test_non_owner_can_read_public_words(self):
         client = APIClient()
-        url = reverse('word-detail', kwargs={'language': 'en', 'word': 'public'})
-        response = client.get(url, {'language': 'en', 'word': 'public'})
+        url = reverse('word-detail', kwargs={'word': 'public'})
+        response = client.get(url, {'word': 'public'})
 
         if DEBUG:
             self.debug_print(response, url)

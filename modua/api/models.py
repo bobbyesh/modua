@@ -20,20 +20,10 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 
-class Language(Contributable, Editable, Timestampable, models.Model):
-    language = models.CharField(blank=True, max_length=150)
-    script = models.CharField(blank=True, max_length=300)
-    delimited = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.language
-
-
 class Article(Ownable, models.Model):
     title = models.CharField(max_length=512, blank=True)
     url = models.CharField(max_length=512, blank=True)
     text = models.TextField()
-    language = models.ForeignKey(Language, related_name='api_article_language')
     slug = models.SlugField(max_length=200, allow_unicode=True, unique=True)
 
     def __str__(self):
@@ -58,8 +48,7 @@ class Article(Ownable, models.Model):
 class UserWord(Ownable, models.Model):
     word = models.CharField(blank=True, max_length=512)
     ease = models.CharField(blank=True, max_length=20)
-    language = models.ForeignKey(Language)
-    transliteration = models.CharField(blank=True, max_length=512)
+    pinyin = models.CharField(blank=True, max_length=512)
     articles = models.ManyToManyField(Article)
 
     class Meta:
@@ -71,8 +60,7 @@ class UserWord(Ownable, models.Model):
 
 class PublicWord(models.Model):
     word = models.CharField(blank=True, max_length=512)
-    language = models.ForeignKey(Language)
-    transliteration = models.CharField(blank=True, max_length=512)
+    pinyin = models.CharField(blank=True, max_length=512)
 
     def __str__(self):
         return self.word
@@ -81,7 +69,6 @@ class PublicWord(models.Model):
 class PublicDefinition(Timestampable, models.Model):
     word = models.ForeignKey(PublicWord)
     definition = models.CharField(max_length=512)
-    language = models.ForeignKey(Language)
 
     def __str__(self):
         return self.definition
@@ -90,10 +77,9 @@ class PublicDefinition(Timestampable, models.Model):
 class UserDefinition(Ownable, Timestampable, models.Model):
     word = models.ForeignKey(UserWord)
     definition = models.CharField(max_length=512)
-    language = models.ForeignKey(Language)
 
     class Meta:
-        unique_together = ("owner", "word", "definition", "language")
+        unique_together = ("owner", "word", "definition")
 
     def __str__(self):
         return self.definition
