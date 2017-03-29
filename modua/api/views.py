@@ -57,7 +57,7 @@ def api_root(request, format=None):
         })
 
 
-class PublicDefinitionListView(ListAPIView):
+class PublicDefinitionViewSet(viewsets.ReadOnlyModelViewSet):
     """Defines a list view for the `PublicDefinition` model that is publically accessible.
 
     This view should be read-only, as public information should be protected from deletion.
@@ -94,17 +94,12 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
     filter_class = UserDefinitionFilter
 
 
-class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
+class UserWordViewSet(viewsets.ModelViewSet):
     """Defines a view for users to create, modify, or delete a single word in their account.
 
     The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as
     time passes.
-
-    :Supported Methods:
-        GET, POST, PATCH
-
     """
-    http_method_names = ['get', 'post', 'patch']
     queryset = UserWord.objects.all()
     authentication_classes = (TokenAuthentication,)
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
@@ -112,24 +107,8 @@ class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):
     filter_class = UserWordFilter
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     lookup_field = 'word'
-    lookup_url_kwarg = 'word'
 
-    def post(self, request, *args, **kwargs):
-        message = ('User already has this word saved, either delete and then post the'
-                   'word, or just update it.')
-        word = get_object_or_403(UserWord, message=message, **self.build_fields())
-        serializer = UserWordSerializer(word)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def build_fields(self):
-        ease = self.request.data['ease'] if 'ease' in self.request.data else ''
-        pinyin = self.request.data['translation'] if 'translation' in self.request.data else ''
-        return {
-            'word': self.kwargs['word'],
-            'owner': self.request.user,
-            'ease': ease,
-            'pinyin': pinyin
-        }
+    
 
 
 class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):

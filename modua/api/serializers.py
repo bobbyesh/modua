@@ -14,9 +14,13 @@ class PublicWordSerializer(serializers.ModelSerializer):
 
 
 class UserWordSerializer(serializers.ModelSerializer):
+    owner = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         model = UserWord
-        fields = ('word', 'ease', 'id')
+        fields = ('word', 'ease', 'id', 'owner')
         depth = 1
 
 

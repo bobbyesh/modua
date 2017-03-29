@@ -13,16 +13,6 @@ from .views import ParseView, PublicArticleView
 DEBUG = True
 
 
-class UserTestMixin(object):
-
-    def setUp(self):
-        self.user = User.objects.create(username='john', password='password')
-        token = Token.objects.get(user__username='john')
-        self.client = APIClient()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
-
-
 class PublicDefinitionListViewTestCase(APITestCase):
 
     def setUp(self):
@@ -31,27 +21,28 @@ class PublicDefinitionListViewTestCase(APITestCase):
         self.client = APIClient()
 
     def test_read(self):
-        url = reverse('public-definition-list', kwargs={'word': 'foo'})
-        response = self.client.get(url)
+        kwargs={'word': 'foo'}
+        url = reverse('public-definition-list')
+        response = self.client.get(url, kwargs)
         self.assertContains(response, 'foo')
 
     def test_returns_two_definitions(self):
         definition = PublicDefinition.objects.create(word=self.word, definition='meso')
         data = {'word': 'foo'}
-        url = reverse('public-definition-list', kwargs=data)
-        response = self.client.get(url, data={'word': 'foo'})
+        url = reverse('public-definition-list')
+        response = self.client.get(url, data=data)
         self.assertContains(response, str(definition.definition))
         self.assertContains(response, 'bar')
 
     def test_bad_word_returns_empty(self):
         data = {'word': 'not_in_db'}
-        url = reverse('public-definition-list', kwargs=data)
+        url = reverse('public-definition-list')
         response = self.client.get(url, data)
         results = response.data['results']
         self.assertEqual(results, [])
 
 
-class UserDefinitionListViewTestCase(UserTestMixin, APITestCase):
+class UserDefinitionListViewTestCase(APITestCase):
     """Tests that the UserDefinitionListView and 'user-definition-list' URL route are
     working correctly.
 
@@ -60,55 +51,41 @@ class UserDefinitionListViewTestCase(UserTestMixin, APITestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        self.user = User.objects.create(username='john', password='password')
+        token = Token.objects.get(user__username='john')
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         word = UserWord.objects.create(word='foo', owner=self.user)
-        definition = UserDefinition.objects.create(owner=self.user, word=word, definition='bar')
+        self.definition = UserDefinition.objects.create(owner=self.user, word=word, definition='bar')
 
     def test_read(self):
-        url = reverse('user-definition-list', kwargs={'word': 'foo'})
-        response = self.client.get(url)
+        kwargs={'pk': self.definition.pk}
+        url = reverse('user-definition-detail', kwargs=kwargs)
+        response = self.client.get(url, kwargs)
         self.assertContains(response, 'foo')
 
     def test_invalid_word_returns_empty(self):
         data = {'word': 'notindb'}
-        url = reverse('user-definition-list', kwargs=data)
+        url = reverse('user-definition-list')
         response = self.client.get(url, data)
-        results = response.data['results']
-        self.assertEqual(results, [])
+        self.assertEqual(response.data['results'], [])
 
 
-class UserDefinitionCreateDestroyViewTestCase(UserTestMixin, APITestCase):
-
-    def setUp(self):
-        super().setUp()
-
-    def test_no_duplicate(self):
-        word = UserWord.objects.create(word='foo', owner=self.user)
-        definition = UserDefinition.objects.create(owner=self.user, word=word, definition='bar')
-        url = reverse('user-definition-create-destroy', kwargs={'word': 'foo'})
-        response = self.client.post(url, {'definition': 'bar'})
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_create(self):
-        UserWord.objects.create(word='foo', owner=self.user)
-        url = reverse('user-definition-create-destroy', kwargs={'word': 'foo'})
-        response = self.client.post(url, {'definition': 'bar'})
-
-        queryset = UserDefinition.objects.filter(owner=self.user, definition='bar')
-        self.assertTrue(len(queryset) == 1)
-        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-
-
-class UserWordDetailTestCase(UserTestMixin, APITestCase):
+class UserWordTestCase(APITestCase):
 
     def setUp(self):
-        super().setUp()
+        self.user = User.objects.create(username='john', password='password')
+        token = Token.objects.get(user__username='john')
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        self.client.login()
 
     def test_create(self):
-        url = reverse('user-word-detail', kwargs={'word': 'foo'})
-        response = self.client.post(url)
+        kwargs={'word': 'foo'}
+        url = reverse('user-word-list')
+        response = self.client.post(url, kwargs)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-
+        words = UserWord.objects.all()
         queryset = UserWord.objects.filter(owner=self.user, word='foo')
         self.assertTrue(len(queryset) == 1)
         self.assertTrue(str(queryset[0].word) == 'foo')
@@ -118,13 +95,11 @@ class UserWordDetailTestCase(UserTestMixin, APITestCase):
         word = UserWord.objects.create(word='foo', owner=self.user)
         url = reverse('user-word-detail', kwargs={'word': 'foo'})
         response = self.client.delete(url)
-        self.assertEquals(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_no_duplicate(self):
-        url = reverse('user-word-detail', kwargs={'word': 'foo'})
-        response = self.client.post(url)
-        response = self.client.post(url)
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        words = UserWord.objects.filter(word='foo', owner=self.user)
+        self.assertEqual(len(words), 0)
+
 
     def test_update(self):
         word = UserWord.objects.create(word='foo', owner=self.user)
@@ -132,11 +107,6 @@ class UserWordDetailTestCase(UserTestMixin, APITestCase):
         response = self.client.patch(url, {'ease': 'hard'})
         queryset = UserWord.objects.filter(owner=self.user, word='foo')
         self.assertTrue(str(queryset[0].ease) == 'hard')
-
-    def test_put_not_allowed(self):
-        url = reverse('user-word-detail', kwargs={'word': 'foo'})
-        response = self.client.put(url, {'ease': 'hard'})
-        self.assertTrue(response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class PublicWordListTestCase(APITestCase):

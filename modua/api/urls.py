@@ -5,6 +5,8 @@ from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r'user/definitions', views.UserDefinitionViewSet, base_name='user-definition')
+router.register(r'user/words', views.UserWordViewSet, base_name='user-word')
+router.register(r'definitions', views.PublicDefinitionViewSet, base_name='public-definition')
 router.register(r'words', views.PublicWordViewSet, base_name='public-word')
 
 urlpatterns = [
@@ -17,9 +19,9 @@ urlpatterns = [
 
     # Public views
     url(r'^parse/$', views.ParseView.as_view(), name='parse'),
-    url(r'^definitions/(?P<word>[\w-]+)/$', views.PublicDefinitionListView.as_view(), name='public-definition-list'),
+#    url(r'^definitions/(?P<word>[\w-]+)/$', views.PublicDefinitionListView.as_view(), name='public-definition-list'),
     url(r'^article/$', views.PublicArticleView.as_view(), name='public-article'), # POST
 
     # User-specific views
-    url(r'^user/(?P<word>[\w-]+)/$', views.UserWordDetailView.as_view(), name='user-word-detail'), # GET, POST, PATCH
+#    url(r'^user/(?P<word>[\w-]+)/$', views.UserWordDetailView.as_view(), name='user-word-detail'), # GET, POST, PATCH
 ] + router.urls
