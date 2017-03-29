@@ -70,7 +70,7 @@ class PublicDefinitionListView(ListAPIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny,)
     serializer_class = PublicDefinitionSerializer
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, WordFilter)
     filter_class = PublicDefinitionFilter
 
 

@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from api.models import User, UserWord, Definition
+from api.models import User, UserWord, PublicDefinition
 from django.core.urlresolvers import reverse
 
 
@@ -12,11 +12,11 @@ class OwnerPermissionsTestCase(APITestCase):
     def setUp(self):
         john = User.objects.create_user(username='john', password='password')
         word = UserWord.objects.create(owner=john, word='foo', ease='easy')
-        definition = Definition.objects.create(word=word, definition='bar')
+        definition = PublicDefinition.objects.create(word=word, definition='bar')
         sally = User.objects.create_user(username='sally', password='password')
 
         word = UserWord.objects.create(word='public', ease='easy')
-        definition = Definition.objects.create(word=word, definition='should be okay')
+        definition = PublicDefinition.objects.create(word=word, definition='should be okay')
 
 
     def test_not_owner_cannot_read(self):

@@ -37,14 +37,16 @@ class PublicDefinitionListViewTestCase(APITestCase):
 
     def test_returns_two_definitions(self):
         definition = PublicDefinition.objects.create(word=self.word, definition='meso')
-        url = reverse('public-definition-list', kwargs={'word': 'foo'})
-        response = self.client.get(url)
+        data = {'word': 'foo'}
+        url = reverse('public-definition-list', kwargs=data)
+        response = self.client.get(url, data={'word': 'foo'})
         self.assertContains(response, str(definition.definition))
         self.assertContains(response, 'bar')
 
     def test_bad_word_returns_empty(self):
-        url = reverse('public-definition-list', kwargs={'word': 'not_in_db'})
-        response = self.client.get(url)
+        data = {'word': 'not_in_db'}
+        url = reverse('public-definition-list', kwargs=data)
+        response = self.client.get(url, data)
         results = response.data['results']
         self.assertEqual(results, [])
 

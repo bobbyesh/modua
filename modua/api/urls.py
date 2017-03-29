@@ -14,6 +14,7 @@ urlpatterns = [
     # Public views
     url(r'^parse/$', views.ParseView.as_view(), name='parse'),
     url(r'^words/$', views.PublicWordListView.as_view(), name='public-word-list'),
+    url(r'^definitions/(?P<word>[\w-]+)/$', views.PublicDefinitionListView.as_view(), name='public-definition-list'),
     url(r'^article/$', views.PublicArticleView.as_view(), name='public-article'), # POST
 
     # User-specific views
