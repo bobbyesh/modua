@@ -1,50 +1,55 @@
 from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from django.core.urlresolvers import reverse
+from .models import User, PublicWord, UserWord, UserDefinition, PublicDefinition
 
-from .models import User, PublicWord, PublicDefinition
 
 
-class PublicDefinitionDetailTestCase(APITestCase):
+class UserDefinitionDetailTestCase(APITestCase):
 
     def setUp(self):
-        john = User.objects.create_user(username='john', email='jdoe@gmail.com', password='password')
-        word = PublicWord.objects.create(word='foo')
-        PublicDefinition.objects.create(
-            word=word,
-            definition='bar',
-            owner=john
-        )
+        username = 'john'
+        password = 'password'
+        john = User.objects.create_user(username=username, email='jdoe@gmail.com', password=password)
+        word = UserWord.objects.create(word='foo', owner=john)
+        definition = UserDefinition.objects.create(word=word, definition='bar', owner=john)
+
+        token = Token.objects.get(user__username=username)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        client.login(username=username, password=password)
         self.word = word
-        self.client = APIClient()
-        self.client.login(username='john', password='password')
+        self.client = client
+        self.definition = definition
 
     def test_get_definition(self):
-        url = reverse('definition-detail', kwargs={'definition': 'bar', 'word': 'foo'})
-        kwargs= {'definition': 'bar', 'word': 'foo', 'username': 'john'}
+        kwargs= {'pk': self.definition.pk }
+        url = reverse('user-definition-detail', kwargs=kwargs)
         response = self.client.get(url, kwargs)
         self.assertContains(response, 'bar')
 
     def test_delete_definition(self):
-        url = reverse('definition-detail', kwargs={'definition': 'bar', 'word': 'foo'})
+        kwargs= {'word': 'foo'}
+        url = reverse('user-definition-list')
         kwargs= {'definition': 'bar', 'word': 'foo', 'username': 'john'}
         response = self.client.delete(url, kwargs)
         queryset = PublicDefinition.objects.all()
         self.assertQuerysetEqual(queryset, [])
 
     def test_can_not_delete_public(self):
+        word = PublicWord.objects.create(word='notfoo')
         PublicDefinition.objects.create(
-            word=self.word,
+            word=word,
             definition='public',
         )
 
-        kwargs= {'definition': 'public', 'word': 'foo', 'username': 'john'}
-        url = reverse('definition-detail', kwargs={'definition': 'public', 'word': 'foo'})
+        kwargs= {'word': 'notfoo'}
+        url = reverse('user-definition-list')
         response = self.client.delete(url, kwargs)
 
         result = PublicDefinition.objects.filter(
-            word=self.word,
-            definition='public',
+            word=word,
         )
 
         self.assertTrue(len(result) != 0)

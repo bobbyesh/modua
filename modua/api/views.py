@@ -9,6 +9,7 @@ from rest_framework.generics import (
     DestroyAPIView,
 )
 
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -74,7 +75,7 @@ class PublicDefinitionListView(ListAPIView):
     filter_class = PublicDefinitionFilter
 
 
-class UserDefinitionListView(ListAPIView):
+class UserDefinitionViewSet(viewsets.ModelViewSet):
     """Defines a list view for the `Definition` model that is only accessible by an authenticated user.
 
     This view should allow the creation and reading of definitions because user's can create and read definitions
@@ -100,37 +101,6 @@ class UserDefinitionCreateDestroyView(CreateAPIView, DestroyAPIView):
     serializer_class = UserDefinitionSerializer
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     filter_class = UserDefinitionFilter
-
-    @required_request_data(['definition'])
-    def create(self, request, *args, **kwargs):
-        definition = self.get_definition()
-        serializer = UserDefinitionSerializer(definition)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def get_definition(self):
-        try:
-            definition = UserDefinition.objects.create(
-                word=self.get_word(),
-                definition=self.request.data['definition'],
-                owner=self.request.user
-            )
-        except IntegrityError:
-            raise Raise403(detail={'message': 'User already has this definition saved for this word'})
-
-        return definition
-
-    def get_word(self):
-        try:
-            word = UserWord.objects.get(word=self.kwargs['word'])
-        except ObjectDoesNotExist:
-            message = (
-                'The definition could not be created because word {} does '
-                'not exist for user {}'
-            ).format(self.kwargs['word'], self.request.user)
-
-            raise NotFound(detail={'message': message})
-
-        return word
 
 
 class UserWordDetailView(CreateModelMixin, RetrieveUpdateAPIView):

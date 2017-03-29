@@ -1,7 +1,10 @@
 from django.conf.urls import url, include
 from . import views
 from rest_framework.authtoken import views as authtoken_views
+from rest_framework import routers
 
+router = routers.SimpleRouter()
+router.register(r'user/definitions', views.UserDefinitionViewSet, base_name='user-definition')
 
 urlpatterns = [
     # API Root
@@ -19,6 +22,4 @@ urlpatterns = [
 
     # User-specific views
     url(r'^user/(?P<word>[\w-]+)/$', views.UserWordDetailView.as_view(), name='user-word-detail'), # GET, POST, PATCH
-    url(r'^user/definitions/(?P<word>[\w-]+)/$', views.UserDefinitionListView.as_view(), name='user-definition-list'), # GET
-    url(r'^user/(?P<word>[\w-]+)/definitions/$', views.UserDefinitionCreateDestroyView.as_view(), name='user-definition-create-destroy'), # GET, POST, DELETE
-]
+] + router.urls
