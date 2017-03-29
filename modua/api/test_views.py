@@ -109,7 +109,7 @@ class UserDefinitionCreateDestroyViewTestCase(UserTestMixin, APITestCase):
         queryset = UserDefinition.objects.filter(owner=self.user, definition='bar')
         self.assertTrue(len(queryset) == 1)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-    
+
     def test_bad_language_should_return_404(self):
         url = reverse('user-definition-create-destroy', kwargs={'language': 'zh', 'word': 'foo'})
         response = self.client.post(url, {'ease': 'hard'})
@@ -185,72 +185,66 @@ class ParseViewTestCase(APITestCase):
         response = ParseView.as_view()(request)
         self.assertTrue(x['string'] in {'我','是', '美国人'} for x in response.data)
 
-"""
-class AnnotateTestCase(APITestCase):
+class ArticleView(APITestCAse):
     def setUp(self):
-        english = Language.objects.create(language='en')
-        chinese = Language.objects.create(language='zh')
-        Definition.objects.create(
-            language=chinese,
-            target=english,
-            word='我',
-            translation='I',
-        )
-        Definition.objects.create(
-            language=chinese,
-            target=english,
-            word='是',
-            translation='am',
-        )
-        Definition.objects.create(
-            language=chinese,
-            target=english,
-            word='美国',
-            translation='America',
-        )
-        Definition.objects.create(
-            language=chinese,
-            target=english,
-            word='人',
-            translation='person',
-        )
-        self.view = AnnotationView.as_view()
-        self.factory = APIRequestFactory()
+        PublicWord.objects.create(word='你好', pinyin='‘nǐ hǎo’', definition='hello')
+        factory = APIRequestFactory()
+        url = reverse('article')
+        data = {
+            'text': '    你好！\n   你好！',
+            'title': '你好',
+        }
+        request = factory.post(url, data=data)
+        self.response = ArticleView.as_view()(request)
+        self.expected = {
+            'title': [
+                    {
+                        'headword': '你好'
+                        'id': 0,
+                        'pinyin': ‘nǐ hǎo’,
+                        'definition': 'hello'
+                    },
+            ],
+            'paragraphs':
+                [
+                    {
+                        'headword': '你好'
+                        'id': 0,
+                        'pinyin': ‘nǐ hǎo’,
+                        'definition': 'hello'
+                    },
+                    {
+                        'headword': '!',
+                        'id': 1,
+                        'pinyin': ‘’,
+                        'definition': ''
+                ],
+                [
+                    {
+                        'headword': '你好'
+                        'id': 0,
+                        'pinyin': ‘nǐ hǎo’,
+                        'definition': 'hello'
+                    },
+                    {
+                        'headword': '!',
+                        'id': 1,
+                        'pinyin': ‘’,
+                        'definition': ''
+                ],
+        }
 
-    @patch('wordfencer.parser.ChineseParser.parse')
-    def test_correct_query_status_200(self, parse):
-        parse.return_value = ['我','是','美国','人']
-        url = '/api/0.1/annotate/?string=我是美国人&language=zh&target=en'
-        request = self.factory.post(url, {'string': '我是美国人', 'language': 'zh', 'target': 'en'})
-        response = self.view(request)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_article_returns_with_paragraphs(self):
+        paragraphs = self.response.data['paragraphs']
+        self.assertEqual(len(paragraphs), 2)
 
-    @patch('wordfencer.parser.ChineseParser.parse')
-    def test_correct_query_result(self, parse):
-        tokens = ['我','是','美国','人']
-        parse.return_value = tokens
-        url = '/api/0.1/annotate/?string=我是美国人&language=zh&target=en'
-        request = self.factory.post(url, {'string': '我是美国人', 'language': 'zh', 'target': 'en'})
-        response = self.view(request)
-        expected = self.expected_result(tokens)
-        self.assertEqual(response.data, expected)
+    def test_headwords(self):
+        paragraphs = self.response.data['paragraphs']
+        result = set(p['headword'] for p in paragraphs)
+        expected = set(p['headword'] for p in self.expected['paragraphs'])
+        self.assertEqual(result, expected)
 
-    def expected_result(self, tokens):
-        language = Language.objects.get(language='zh')
-        target = Language.objects.get(language='en')
-        serialized = []
-        for t in tokens:
-            qset = Definition.objects.filter(word=t, language=language, target=target)
-            serializer = DefinitionSerializer(qset, many=True)
-            serialized.append(serializer.data)
-
-        return serialized
-
-
-    def test_empty_query_returns_404(self):
-        url = '/api/0.1/annotate/?string&language=zh&target=en'
-        request = self.factory.post(url, {'string': '', 'language': 'zh', 'target': 'en'})
-        response = self.view(request)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-"""
+    def test_title_headword(self):
+        result = self.response.data['title'][0]['headword']
+        expected = self.response.data['expected'][0]['headword']
+        self.assertEqual(result, expected)
