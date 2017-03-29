@@ -4,6 +4,7 @@ from api.models import User, UserWord, UserDefinition, PublicWord, PublicDefinit
 from django.core.urlresolvers import reverse
 from rest_framework.authtoken.models import Token
 
+
 DEBUG = True
 
 

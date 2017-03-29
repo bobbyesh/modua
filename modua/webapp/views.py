@@ -27,7 +27,7 @@ class LogoutSuccessView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class HomeView(FormView, LoginRequiredMixin):
     template_name = 'webapp/home.html'
-    login_url = 'landing/signin'
+    login_url = 'landing/login'
     form_class = URLForm
     success_url = reverse_lazy('webapp:home')
 

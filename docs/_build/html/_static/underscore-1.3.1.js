@@ -472,7 +472,7 @@
   // Reusable constructor function for prototype setting.
   var ctor = function(){};
 
-  // Create a function bound to a given object (assigning `this`, and arguments,
+  // Create a function bound to a given object (asloging `this`, and arguments,
   // optionally). Binding with arguments is also known as `curry`.
   // Delegates to **ECMAScript 5**'s native `Function.bind` if available.
   // We check for `func.bind` first, to fail fast when `func` is undefined.

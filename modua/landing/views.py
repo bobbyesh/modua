@@ -33,7 +33,7 @@ class AboutView(TemplateView):
 
 class SigninView(FormView):
     model = User
-    template_name = 'landing/signin.html'
+    template_name = 'landing/login.html'
     form_class = SigninForm
 
     def form_valid(self, form):
@@ -49,7 +49,7 @@ class SigninView(FormView):
             .. TODO: Create reasonable invalid user redirection.
 
             '''
-            return redirect('signin')
+            return redirect('login')
 
 
 class SignupView(CreateView):
@@ -66,7 +66,7 @@ class SignupView(CreateView):
         login(self.request, new_user)
         email = form.cleaned_data.get('email')
         title = 'Sign Up Confirmation at Readable!'
-        body = 'Thanks for signing up at Readable!'
+        body = 'Thanks for loging up at Readable!'
         email = EmailMessage(title, body, to=[email])
         email.send()
         return valid

@@ -37,7 +37,7 @@ ALLOWED_HOSTS = []
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 # Extra places for collectstatic to find static files.
 
-LOGIN_URL = 'signin'
+LOGIN_URL = 'login'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = ''
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
     'twitter_bootstrap',
     'crispy_forms',
     'guardian',

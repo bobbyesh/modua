@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 
 from .serializers import PublicDefinitionSerializer
 from .models import PublicDefinition, User, PublicWord, UserDefinition, UserWord
-from .views import ParseView, PublicArticleView
+from .views import PublicArticleView
 
 
 DEBUG = True
@@ -119,15 +119,6 @@ class PublicWordListTestCase(APITestCase):
         response = self.client.get(url)
         self.assertContains(response, 'foo')
 
-
-class ParseViewTestCase(APITestCase):
-
-    def test_parse(self):
-        factory = APIRequestFactory()
-        url = reverse('parse')
-        request = factory.post(url, data={'string': '我是美国人'})
-        response = ParseView.as_view()(request)
-        self.assertTrue(x['string'] in {'我','是', '美国人'} for x in response.data)
 
 class PublicArticleViewTestCase(APITestCase):
     def setUp(self):

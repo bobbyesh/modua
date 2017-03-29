@@ -21,7 +21,7 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
@@ -53,7 +53,7 @@ parser = ChineseParser()
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'words': reverse('public-word-list', request=request, format=format),
+        'words': reverse('api:public-word-list'),
         })
 
 
@@ -108,7 +108,7 @@ class UserWordViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     lookup_field = 'word'
 
-    
+
 
 
 class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
@@ -124,16 +124,6 @@ class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_class = PublicWordFilter
     lookup_field = 'word'
-
-
-class ParseView(CreateAPIView):
-    permission_classes = (AllowAny,)
-
-    def post(self, request, *args, **kwargs):
-        string = request.data['string']
-        parser = ChineseParser()
-        segments = parser.parse(string)
-        return Response(data=segments)
 
 
 class URLImportView(APIView, LoginRequiredMixin):
@@ -153,9 +143,16 @@ class URLImportView(APIView, LoginRequiredMixin):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 class PublicArticleView(APIView):
+    """Requires 'title' and 'text' query parameters"""
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
+        if 'title' not in request.data:
+            raise ValidationError('missing the title parameter')
+
+        if 'text' not in request.data:
+            raise ValidationError('missing the text parameter')
+
         title = request.data['title']
         title = self.parse_into_json(title)
         text = request.data['text']
