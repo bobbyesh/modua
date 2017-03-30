@@ -53,7 +53,7 @@ parser = ChineseParser()
 @permission_classes((AllowAny,))
 def api_root(request, format=None):
     return Response({
-        'words': reverse('api:public-word-list'),
+        'words': reverse('api:public-word-list', request=request, format=format),
         })
 
 
@@ -173,23 +173,25 @@ class PublicArticleView(APIView):
         title_words = []
         parser_results = (p for p in parser.parse(text) if not p.isspace())
         for i, segment in enumerate(parser_results):
-            try:
-                word = PublicWord.objects.get(word=segment)
-                definitions = PublicDefinition.objects.filter(word=word)
-                word = {
-                    'word': word.word,
-                    'index': i,
-                    'pinyin': word.pinyin,
-                    'definition': [d.definition for d in definitions]
-                }
-            except:
-                word = {
-                    'word': segment,
-                    'index': i,
-                    'pinyin': '',
-                    'definition': '',
-                }
+            words = PublicWord.objects.filter(word=segment)
+            if len(words) > 1:
+                word = words[0].word
+                pinyin = [w.pinyin for w in words]
+                definitions = PublicDefinition.objects.filter(word__word=word)
+            elif len(words) == 1:
+                word = words[0].word
+                pinyin = [word.pinyin]
+                definitions = PublicDefinition.objects.filter(word__word=word)
+            elif len(words) <= 0:
+                word = segment
+                definitions = []
+                pinyin = []
 
-            title_words.append(word)
+            title_words.append({
+                'word': word,
+                'index': i,
+                'pinyin': pinyin,
+                'definitions': definitions
+            })
 
         return title_words

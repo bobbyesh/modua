@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'guardian',
     'djoser',
+    'corsheaders',
     'core',
     'api',
     'modua',
@@ -73,6 +74,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,6 +83,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'modua.urls'
@@ -182,6 +185,11 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 
 try:
