@@ -22,28 +22,28 @@ class PublicDefinitionListViewTestCase(APITestCase):
 
     def test_read(self):
         kwargs={'word': 'foo'}
-        url = reverse('public-definition-list')
+        url = reverse('api:public-definition-list')
         response = self.client.get(url, kwargs)
         self.assertContains(response, 'foo')
 
     def test_returns_two_definitions(self):
         definition = PublicDefinition.objects.create(word=self.word, definition='meso')
         data = {'word': 'foo'}
-        url = reverse('public-definition-list')
+        url = reverse('api:public-definition-list')
         response = self.client.get(url, data=data)
         self.assertContains(response, str(definition.definition))
         self.assertContains(response, 'bar')
 
     def test_bad_word_returns_empty(self):
         data = {'word': 'not_in_db'}
-        url = reverse('public-definition-list')
+        url = reverse('api:public-definition-list')
         response = self.client.get(url, data)
         results = response.data['results']
         self.assertEqual(results, [])
 
 
 class UserDefinitionListViewTestCase(APITestCase):
-    """Tests that the UserDefinitionListView and 'user-definition-list' URL route are
+    """Tests that the UserDefinitionListView and 'api:user-definition-list' URL route are
     working correctly.
 
     The view only supports the GET method.
@@ -60,13 +60,13 @@ class UserDefinitionListViewTestCase(APITestCase):
 
     def test_read(self):
         kwargs={'pk': self.definition.pk}
-        url = reverse('user-definition-detail', kwargs=kwargs)
+        url = reverse('api:user-definition-detail', kwargs=kwargs)
         response = self.client.get(url, kwargs)
         self.assertContains(response, 'foo')
 
     def test_invalid_word_returns_empty(self):
         data = {'word': 'notindb'}
-        url = reverse('user-definition-list')
+        url = reverse('api:user-definition-list')
         response = self.client.get(url, data)
         self.assertEqual(response.data['results'], [])
 
@@ -81,8 +81,8 @@ class UserWordTestCase(APITestCase):
         self.client.login()
 
     def test_create(self):
-        kwargs={'word': 'foo'}
-        url = reverse('user-word-list')
+        kwargs={'word': 'foo', 'ease': 'easy', 'pinyin': 'ai3'}
+        url = reverse('api:user-word-list')
         response = self.client.post(url, kwargs)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         words = UserWord.objects.all()
@@ -93,7 +93,7 @@ class UserWordTestCase(APITestCase):
 
     def test_delete(self):
         word = UserWord.objects.create(word='foo', owner=self.user)
-        url = reverse('user-word-detail', kwargs={'word': 'foo'})
+        url = reverse('api:user-word-detail', kwargs={'word': 'foo'})
         response = self.client.delete(url)
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -103,7 +103,7 @@ class UserWordTestCase(APITestCase):
 
     def test_update(self):
         word = UserWord.objects.create(word='foo', owner=self.user)
-        url = reverse('user-word-detail', kwargs={'word': 'foo'})
+        url = reverse('api:user-word-detail', kwargs={'word': 'foo'})
         response = self.client.patch(url, {'ease': 'hard'})
         queryset = UserWord.objects.filter(owner=self.user, word='foo')
         self.assertTrue(str(queryset[0].ease) == 'hard')
@@ -115,7 +115,7 @@ class PublicWordListTestCase(APITestCase):
 
     def test_read(self):
         self.client = APIClient()
-        url = reverse('public-word-list')
+        url = reverse('api:public-word-list')
         response = self.client.get(url)
         self.assertContains(response, 'foo')
 
@@ -126,7 +126,7 @@ class PublicArticleViewTestCase(APITestCase):
         definition = PublicDefinition.objects.create(definition='hello', word=word)
 
         factory = APIRequestFactory()
-        url = reverse('public-article')
+        url = reverse('api:public-article')
         data = {
             'text': '    你好！\n   你好！',
             'title': '你好',

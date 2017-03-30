@@ -25,14 +25,14 @@ class UserDefinitionDetailTestCase(APITestCase):
 
     def test_get_definition(self):
         kwargs= {'pk': self.definition.pk }
-        url = reverse('user-definition-detail', kwargs=kwargs)
+        url = reverse('api:user-definition-detail', kwargs=kwargs)
         response = self.client.get(url, kwargs)
         self.assertContains(response, 'bar')
 
     def test_delete_definition(self):
         kwargs= {'word': 'foo'}
-        url = reverse('user-definition-list')
-        kwargs= {'definition': 'bar', 'word': 'foo', 'username': 'john'}
+        url = reverse('api:user-definition-list')
+        kwargs= {'definition': 'bar', 'word': 'foo', 'api:username': 'john'}
         response = self.client.delete(url, kwargs)
         queryset = PublicDefinition.objects.all()
         self.assertQuerysetEqual(queryset, [])
@@ -41,11 +41,11 @@ class UserDefinitionDetailTestCase(APITestCase):
         word = PublicWord.objects.create(word='notfoo')
         PublicDefinition.objects.create(
             word=word,
-            definition='public',
+            definition='api:public',
         )
 
         kwargs= {'word': 'notfoo'}
-        url = reverse('user-definition-list')
+        url = reverse('api:user-definition-list')
         response = self.client.delete(url, kwargs)
 
         result = PublicDefinition.objects.filter(
@@ -67,22 +67,22 @@ class TestPublicRequests(APITestCase):
         '''
         Passes if a valid search returns a status code of 200.
         '''
-        response = self.client.get("/api/0.1/words/我/")
+        response = self.client.get("/api/words/我/")
         self.assertEqual(response.status_code, 200)
 
     def test_term_search(self):
         '''
         Passes if the json returned from a valid request is the correct json.
         '''
-        url = reverse('public-word-list')
-        response = self.client.get("/api/0.1/words/我/")
+        url = reverse('api:public-word-list')
+        response = self.client.get("/api/words/我/")
         self.assertContains(response, '我')
 
     def test_bad_term_search(self):
         '''
         Passes if a request for a word not in the dictionary returns a status code 404.
         '''
-        response = self.client.get("/api/0.1/word/term_not_in_DB/", format='json')
+        response = self.client.get("/api/word/term_not_in_DB/", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_bad_url(self):
@@ -96,5 +96,5 @@ class TestPublicRequests(APITestCase):
         '''
         Passes if a request for a nondelimited word that isn't in the database returns a 404 response.
         '''
-        response = self.client.get("/api/0.1/word/term_not_in_DB/", format='json')
+        response = self.client.get("/api/word/term_not_in_DB/", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -14,7 +14,7 @@ class OwnerPermissionsTestCase(APITestCase):
         john = User.objects.create_user(username='john', password='password')
         word = UserWord.objects.create(owner=john, word='foo', ease='easy')
         definition = UserDefinition.objects.create(word=word, definition='bar')
-        word = PublicWord.objects.create(word='public')
+        word = PublicWord.objects.create(word='api:public')
         definition = PublicDefinition.objects.create(word=word, definition='should be okay')
         sally = User.objects.create_user(username='sally', password='password')
 
@@ -24,7 +24,7 @@ class OwnerPermissionsTestCase(APITestCase):
         client = APIClient()
         client.login(username='sally', password='password')
         kwargs = {'word': 'foo'}
-        url = reverse('user-word-detail', kwargs=kwargs)
+        url = reverse('api:user-word-detail', kwargs=kwargs)
         response = client.get(url, kwargs)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -35,13 +35,13 @@ class OwnerPermissionsTestCase(APITestCase):
         client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         client.login(username='john', password='password')
         kwargs = {'word': 'foo'}
-        url = reverse('user-word-detail', kwargs=kwargs)
+        url = reverse('api:user-word-detail', kwargs=kwargs)
         response = client.get(url, kwargs)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_non_owner_can_read_public_words(self):
         client = APIClient()
-        kwargs = {'word': 'public'}
-        url = reverse('public-word-detail', kwargs=kwargs)
+        kwargs = {'word': 'api:public'}
+        url = reverse('api:public-word-detail', kwargs=kwargs)
         response = client.get(url, kwargs)
         self.assertTrue(response.status_code == status.HTTP_200_OK)

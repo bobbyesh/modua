@@ -7,8 +7,8 @@ class FilterTestMixin(object):
 
     def setUp(self):
         create_fields = self.field_vals
-        if 'username' in create_fields:
-            user = User.objects.create_user(username=create_fields.pop('username'))
+        if 'api:username' in create_fields:
+            user = User.objects.create_user(username=create_fields.pop('api:username'))
             create_fields['owner'] = user
 
         if self.model == PublicDefinition:
@@ -54,7 +54,7 @@ class UserWordFilterTestCase(FilterTestMixin, TestCase):
     field_vals = {
         'word': 'foo',
         'pinyin': 'phauew',
-        'username': 'john',
+        'api:username': 'john',
         'ease': 'easy',
     }
 
@@ -72,7 +72,7 @@ class UserDefinitionFilterTestCase(FilterTestMixin, TestCase):
     model = UserDefinition
     filter = UserDefinitionFilter
     field_vals = {
-        'username': 'john',
+        'api:username': 'john',
         'word': 'foo',
         'definition': 'somedefinition',
     }

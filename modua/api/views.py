@@ -177,16 +177,15 @@ class PublicArticleView(APIView):
             if len(words) > 1:
                 word = words[0].word
                 pinyin = [w.pinyin for w in words]
-                definitions = PublicDefinition.objects.filter(word__word=word)
             elif len(words) == 1:
                 word = words[0].word
-                pinyin = [word.pinyin]
-                definitions = PublicDefinition.objects.filter(word__word=word)
+                pinyin = [words[0].pinyin]
             elif len(words) <= 0:
                 word = segment
                 definitions = []
                 pinyin = []
 
+            definitions = [d.definition for d in PublicDefinition.objects.filter(word__word=word)]
             title_words.append({
                 'word': word,
                 'index': i,
