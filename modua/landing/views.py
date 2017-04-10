@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import CreateView
@@ -125,3 +125,11 @@ class AnnotationCompleteView(TemplateView):
         context['words'] = request.session['words']
         context['popups'] = request.session['popups']
         return self.render_to_response(context)
+
+
+class LogoutView(TemplateView):
+    template_name = 'landing/logout.html'
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super().get(request, *args, **kwargs)

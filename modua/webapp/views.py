@@ -15,15 +15,6 @@ from core.services import fetch_article
 from webapp.forms import ArticleForm
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('webapp:logout_success')
-
-
-class LogoutSuccessView(TemplateView):
-    template_name = 'landing/logout_success.html'
-
-
 @method_decorator(login_required, name='dispatch')
 class HomeView(FormView, LoginRequiredMixin):
     template_name = 'webapp/home.html'
@@ -83,7 +74,6 @@ class ArticleView(TemplateView):
                 userword = word
 
             words.append(userword)
-
 
         context['entries'] = words
         # The e.ease int is turned into a string because Django templates don't like
