@@ -80,3 +80,8 @@ class ArticleView(TemplateView):
         # integers as dictionary keys
         context['counts'] = Counter(str(e.ease) for e in context['entries'] if hasattr(e, 'ease'))
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class AccountView(TemplateView):
+    template_name = 'webapp/account.html'
