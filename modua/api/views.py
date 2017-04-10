@@ -87,7 +87,7 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
 
     """
     queryset = UserDefinition.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
     serializer_class = UserDefinitionSerializer
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, WordFilter,)
@@ -101,7 +101,7 @@ class UserWordViewSet(viewsets.ModelViewSet):
     time passes.
     """
     queryset = UserWord.objects.all()
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (TokenAuthentication, SessionAuthentication,)
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
     serializer_class = UserWordSerializer
     filter_class = UserWordFilter

@@ -27,8 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Heroku Static File setup
 # Static files (CSS, JavaScript, Images)
 # These are setup to have the static folder in the root directory of the project.
 # This is different than the default Django implementation!
@@ -40,9 +38,9 @@ ALLOWED_HOSTS = []
 LOGIN_URL = 'login'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = ''
+STATIC_ROOT = '/'
 STATICFILES_DIRS = [
-    os.path.join('static'),
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 STATICFILES_FINDERs = [

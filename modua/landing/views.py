@@ -44,11 +44,6 @@ class SigninView(FormView):
             login(self.request, user)
             return redirect('webapp:home')
         else:
-            '''
-
-            .. TODO: Create reasonable invalid user redirection.
-
-            '''
             return redirect('login')
 
 

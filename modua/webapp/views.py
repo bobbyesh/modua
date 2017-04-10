@@ -10,9 +10,9 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from api.models import Article, PublicWord
+from api.models import Article, PublicWord, PublicDefinition, UserWord, UserDefinition
 from core.services import fetch_article
-from webapp.forms import URLForm
+from webapp.forms import ArticleForm
 
 
 def logout_view(request):
@@ -28,7 +28,7 @@ class LogoutSuccessView(TemplateView):
 class HomeView(FormView, LoginRequiredMixin):
     template_name = 'webapp/home.html'
     login_url = 'landing/login'
-    form_class = URLForm
+    form_class = ArticleForm
     success_url = reverse_lazy('webapp:home')
 
     def get_context_data(self, **kwargs):
@@ -38,57 +38,55 @@ class HomeView(FormView, LoginRequiredMixin):
         context['user'] = self.request.user
         return context
 
-
     def form_valid(self, form):
-        url = form.cleaned_data['url']
-        try:
-            article = Article.objects.get(url=url)
-            text = article.text
-            title = article.title
-        except ObjectDoesNotExist:
-            title, text = fetch_article(url, language='zh')
-
         user = self.request.user
-        Article.objects.get_or_create(title=title, text=text, url=url, owner=user)
+        url = form.cleaned_data['url']
+        title = form.cleaned_data['title']
+        body = form.cleaned_data['body']
+        # If this article is new, add the words to this user's db
+        # We do this now so we don't have to do when loading the article for them
+        # to read later.
+        article, created = Article.objects.get_or_create(title=title, body=body, url=url, owner=user)
+        if created:
+            for token in article.as_tokens():
+                word, created = UserWord.objects.get_or_create(word=token, owner=user)
+                if created:
+                    definitions = []
+                    try:
+                        public_word = PublicWord.objects.get(word=token)
+                        pinyin = public_word.pinyin
+                        word.pinyin = pinyin
+                        word.ease = 0
+                        word.save()
+                        word.articles.add(article)
+                        for public_definition in PublicDefinition.objects.filter(word=public_word):
+                            UserDefinition.objects.get_or_create(word=word, owner=user, definition=public_definition)
+                    except PublicWord.DoesNotExist:
+                        pass
+
         return super(HomeView, self).form_valid(form)
 
 
 @method_decorator(login_required, name='dispatch')
 class ArticleView(TemplateView):
-    template_name = 'webapp/sample.html'
+    template_name = 'webapp/article.html'
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
-        user = User.objects.get(username=self.request.user.username)
-        if user is not None:
-            entries = self.get_entries()
-            context['entries'] = entries
-            context['counts'] = Counter(e.ease for e in entries if hasattr(e, 'ease'))
-            print(context)
-        return context
-
-    def get_entries(self):
-        '''Returns a list of elements that are either `api.models.PublicWord` instances or just strings.
-
-        If the user has not saved a particular token as a word before, then that word is
-        get or created with an `ease` of `new`, but it is not associated with that user via the
-        ManyToMany `users` field in the :model:`PublicWord`.
-
-        '''
-
-        entries = []
-        article = self.get_article()
-        for token in article.as_tokens():
+        article = Article.objects.get(slug=self.kwargs['slug'], owner=self.request.user)
+        userwords = article.userword_set.all()
+        words = []
+        for word in article.as_tokens():
             try:
-                entry = PublicWord.objects.get(word=token)
+                userword = userwords.get(word=word)
             except ObjectDoesNotExist:
-                entry = token
+                userword = word
 
-            entries.append(entry)
+            words.append(userword)
 
-        return entries
 
-    def get_article(self):
-        slug = self.kwargs['slug']
-        article = Article.objects.get(slug=slug)
-        return article
+        context['entries'] = words
+        # The e.ease int is turned into a string because Django templates don't like
+        # integers as dictionary keys
+        context['counts'] = Counter(str(e.ease) for e in context['entries'] if hasattr(e, 'ease'))
+        return context
