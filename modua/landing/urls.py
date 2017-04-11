@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^contact/', views.ContactView.as_view(), name="contact"),
     url(r'^about/', views.AboutView.as_view(), name="about"),
     url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
+    url(r'^delete_account_success/$', views.DeleteAccountSuccessView.as_view(), name='delete_account_success'),
 ]

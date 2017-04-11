@@ -15,7 +15,7 @@ from wordfencer.parser import ChineseParser
 
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from api.models import PublicDefinition
+from api.models import PublicDefinition, UserWord, UserDefinition
 from core.utils import build_popup_html, build_word_html
 
 
@@ -132,4 +132,14 @@ class LogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         logout(request)
+        return super().get(request, *args, **kwargs)
+
+
+class DeleteAccountSuccessView(TemplateView):
+    template_name = 'landing/delete_account_success.html'
+
+    def get(self, request, *args, **kwargs):
+        UserDefinition.objects.filter(owner=request.user).delete()
+        UserWord.objects.filter(owner=request.user).delete()
+        request.user.delete()
         return super().get(request, *args, **kwargs)

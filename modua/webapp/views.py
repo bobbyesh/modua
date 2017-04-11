@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -115,3 +115,13 @@ class ChangePasswordView(FormView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
+
+
+@method_decorator(login_required, name='dispatch')
+class DeleteAccountView(TemplateView):
+    template_name = 'webapp/delete_account.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class DeleteAccountRedirectView(RedirectView):
+    url = reverse_lazy('delete_account_success')
