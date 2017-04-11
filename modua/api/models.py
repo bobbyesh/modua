@@ -48,9 +48,8 @@ class Article(Ownable, models.Model):
 
 
 class UserWord(Ownable, models.Model):
-    word = models.CharField(max_length=512)
+    word = models.CharField(max_length=100)
     ease = models.IntegerField(default=0)
-    pinyin = models.CharField(max_length=512)
     articles = models.ManyToManyField(Article)
 
     class Meta:
@@ -63,6 +62,7 @@ class UserWord(Ownable, models.Model):
 class UserDefinition(Ownable, models.Model):
     word = models.ForeignKey(UserWord)
     definition = models.CharField(max_length=512)
+    pinyin = models.CharField(max_length=512, blank=False)
 
     class Meta:
         unique_together = ('owner', 'word', 'definition')
@@ -72,11 +72,7 @@ class UserDefinition(Ownable, models.Model):
 
 
 class PublicWord(models.Model):
-    word = models.CharField(max_length=512)
-    pinyin = models.CharField(max_length=512)
-
-    class Meta:
-        unique_together = ('word', 'pinyin')
+    word = models.CharField(max_length=100)
 
     def __str__(self):
         return self.word
@@ -85,6 +81,7 @@ class PublicWord(models.Model):
 class PublicDefinition(models.Model):
     word = models.ForeignKey(PublicWord)
     definition = models.CharField(max_length=512)
+    pinyin = models.CharField(max_length=512, blank=False)
 
     def __str__(self):
         return self.definition

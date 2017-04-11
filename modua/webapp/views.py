@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse_lazy
@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -40,20 +41,17 @@ class HomeView(FormView, LoginRequiredMixin):
         article, created = Article.objects.get_or_create(title=title, body=body, url=url, owner=user)
         if created:
             for token in article.as_tokens():
-                word, created = UserWord.objects.get_or_create(word=token, owner=user)
+                user_word, created = UserWord.objects.get_or_create(word=token, owner=user)
+                user_word.articles.add(article)
                 if created:
-                    definitions = []
-                    try:
-                        public_word = PublicWord.objects.get(word=token)
-                        pinyin = public_word.pinyin
-                        word.pinyin = pinyin
-                        word.ease = 0
-                        word.save()
-                        word.articles.add(article)
+                    for public_word in PublicWord.objects.filter(word=token):
                         for public_definition in PublicDefinition.objects.filter(word=public_word):
-                            UserDefinition.objects.get_or_create(word=word, owner=user, definition=public_definition)
-                    except PublicWord.DoesNotExist:
-                        pass
+                            UserDefinition.objects.get_or_create(
+                                word=user_word,
+                                owner=user,
+                                definition=public_definition.definition,
+                                pinyin=public_definition.pinyin
+                            )
 
         return super(HomeView, self).form_valid(form)
 
@@ -75,13 +73,45 @@ class ArticleView(TemplateView):
 
             words.append(userword)
 
-        context['entries'] = words
+        entries = []
+        for word in words:
+            definitions = word.userdefinition_set.all()
+            unique_pinyins = set(d.pinyin for d in definitions)
+            pinyin_definitions = []
+            for pinyin in unique_pinyins:
+                tup = (pinyin, definitions.filter(pinyin=pinyin))
+                pinyin_definitions.append(tup)
+
+            entries.append({
+                'entry': word,
+                'pinyin_definitions': pinyin_definitions,
+            })
+
+        context['entries'] = entries
         # The e.ease int is turned into a string because Django templates don't like
         # integers as dictionary keys
-        context['counts'] = Counter(str(e.ease) for e in context['entries'] if hasattr(e, 'ease'))
+        context['counts'] = Counter(str(e['entry'].ease) for e in context['entries'])
         return context
 
 
 @method_decorator(login_required, name='dispatch')
 class AccountView(TemplateView):
     template_name = 'webapp/account.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class ChangeUsernameView(FormView):
+    template_name = 'webapp/change_username.html'
+    form_class = UserChangeForm
+
+
+@method_decorator(login_required, name='dispatch')
+class ChangePasswordView(FormView):
+    template_name = 'webapp/change_password.html'
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('webapp:account')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs

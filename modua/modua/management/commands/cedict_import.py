@@ -27,8 +27,8 @@ def store_def_boi(word, trans, def_arr):
     # If there is more than one definition insert them both as different rows
     for definition in def_arr:
         try:
-            word_obj, created = PublicWord.objects.get_or_create(word=word, pinyin=trans, defaults={'word': word, 'pinyin': trans})
-            PublicDefinition.objects.create(word=word_obj, definition=definition)
+            word_obj, created = PublicWord.objects.get_or_create(word=word, defaults={'word': word})
+            PublicDefinition.objects.create(word=word_obj, definition=definition, pinyin=trans)
         except IntegrityError as e:
             print(e)
 

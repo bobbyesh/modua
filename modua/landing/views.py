@@ -59,11 +59,11 @@ class SignupView(CreateView):
         password = form.cleaned_data.get('password1')
         new_user = authenticate(username=username, password=password)
         login(self.request, new_user)
-        email = form.cleaned_data.get('email')
-        title = 'Sign Up Confirmation at Readable!'
-        body = 'Thanks for loging up at Readable!'
-        email = EmailMessage(title, body, to=[email])
-        email.send()
+        # email = form.cleaned_data.get('email')
+        # title = 'Sign Up Confirmation at Readable!'
+        # body = 'Thanks for loging up at Readable!'
+        # email = EmailMessage(title, body, to=[email])
+        # email.send()
         return valid
 
 class SignupSuccessView(TemplateView):

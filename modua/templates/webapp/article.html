@@ -19,7 +19,7 @@
             </h3>
             <p>
                 {% for entry in entries %}
-                    <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry }}">{{ entry }}</span>
+                    <span class="entry ease-{{ entry.entry.ease }}" data-ease={{ entry.entry.ease }} name="{{ entry.entry }}">{{ entry.entry }}</span>
                 {% endfor %}
             </p>
             </div>
@@ -34,13 +34,18 @@
     </div> <!-- /.row -->
     <div>
       {% for entry in entries %}
-       	{% for definition in entry.userdefinition_set.all %}
-          <div class="definition" data-word="{{ entry }}">
+       	{% for pinyin, definitions in entry.pinyin_definitions %}
+          <div class="definition" data-word="{{ entry.entry }}">
         		<h3>
-              {{ entry }}
-              <p class="transliteration">{{ entry.pinyin }}</p>
+              {{ entry.entry }}
+              <p class="transliteration">{{ entry.entry.pinyin }}</p>
             </h3>
-            <p>{{ definition }}</p>
+            <p>{{ pinyin }}</p>
+            <ul>
+              {% for definition in definitions %}
+                  <li>{{ definition }}</li>
+              {% endfor %}
+            </ul>
       	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-1" target-class="ease-1">easy</button>
       	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-2" target-class="ease-2">hard</button>
       	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-3" target-class="ease-3">known</button>

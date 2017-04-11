@@ -88,7 +88,7 @@ $(document).ready(function() {
       var request = $.ajax({
         url: url,
         headers: {
-          Authorization: 'Token ' + window.sessionStorage.getItem('TOKEN_KEY'),
+          Authorization: 'Token ' + window.localStorage.getItem('TOKEN_KEY'),
         },
         data: {
           ease: new_ease,
