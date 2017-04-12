@@ -30,16 +30,10 @@ $.ajaxSetup({
 });
 
 $(document).ready(function() {
-  $('#submit-id-submit').click(function(e) {
+   $('form').submit(function () {
+    //$('#submit-id-submit').click(function(e) {
     var username = $('input#id_username').val();
-    var password = $('input#id_password').val();
-    var request = $.ajax({
-      url: 'http://127.0.0.1:8000/api/auth/login/',
-      method: 'POST',
-      data: {username: username, password: password},
-    });
-    request.done(function(response){
-      window.sessionStorage.setItem('TOKEN_KEY', response.auth_token);
-    });
+    var password = $('input#id_password1').val();
+    var email = $('input#id_email').val();
   })
 })

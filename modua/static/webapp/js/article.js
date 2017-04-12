@@ -24,9 +24,11 @@ function csrfSafeMethod(method) {
 
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
-        var csrftoken = getCookie('XSRF-TOKEN');
+        var csrftoken = getCookie('csrftoken');
+        console.log('csrf', csrftoken);
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
+//  xhr.setRequestHeader("HTTP_X_CSRFTOKEN", csrftoken);
         }
     }
 });
@@ -87,9 +89,6 @@ $(document).ready(function() {
       var url = `http://127.0.0.1:8000/api/user/words/${word}/`
       var request = $.ajax({
         url: url,
-        headers: {
-          Authorization: 'Token ' + window.localStorage.getItem('TOKEN_KEY'),
-        },
         data: {
           ease: new_ease,
         },

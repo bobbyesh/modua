@@ -101,14 +101,14 @@ class UserWordViewSet(viewsets.ModelViewSet):
     time passes.
     """
     queryset = UserWord.objects.all()
-    authentication_classes = (TokenAuthentication, SessionAuthentication,)
+    authentication_classes = (SessionAuthentication,)
+#    authentication_classes = (TokenAuthentication, SessionAuthentication,)
+
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
     serializer_class = UserWordSerializer
     filter_class = UserWordFilter
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     lookup_field = 'word'
-
-
 
 
 class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):

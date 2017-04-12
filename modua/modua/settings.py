@@ -40,7 +40,7 @@ LOGIN_URL = 'login'
 STATIC_URL = '/static/'
 STATIC_ROOT = '/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join('static'),
 ]
 
 STATICFILES_FINDERs = [
@@ -72,16 +72,15 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
-    'corsheaders.middleware.CorsMiddleware',
+#    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 ]
 
 ROOT_URLCONF = 'modua.urls'
@@ -161,6 +160,7 @@ REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
             ),
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.IsAuthenticated',
@@ -185,9 +185,7 @@ USE_L10N = True
 USE_TZ = True
 
 
-CSRF_COOKIE_NAME = "XSRF-TOKEN"
-CORS_ORIGIN_ALLOW_ALL = True
-
+CSRF_COOKIE_NAME = 'csrftoken'
 
 
 try:

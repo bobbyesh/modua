@@ -10,9 +10,9 @@ from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 from api.models import Article, PublicWord, PublicDefinition, UserWord, UserDefinition
-from core.services import fetch_article
 from webapp.forms import ArticleForm
 
 
@@ -56,6 +56,7 @@ class HomeView(FormView, LoginRequiredMixin):
         return super(HomeView, self).form_valid(form)
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class ArticleView(TemplateView):
     template_name = 'webapp/article.html'
