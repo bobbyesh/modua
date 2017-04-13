@@ -1,0 +1,32 @@
+{% extends 'landing/base.html' %}
+{% load staticfiles %}
+
+{% block navlinks %}
+<li><a href="{% url 'index' %}#">Home</a></li>
+<li><a href="{% url 'about' %}">About</a></li>
+<li><a href="{% url 'contact' %}">Contact</a></li>
+<li><a class="btn" href="{% url 'login' %}">SIGN IN / SIGN UP</a></li>
+{% endblock %}
+
+
+{% block body_open %}
+<body>
+{% endblock %}
+
+{% block content %}
+	<header id="head" class="secondary"></header>
+
+	<!-- container -->
+	<div class="container">
+
+		<ol class="breadcrumb">
+			<li><a href="{% url 'index' %}">Home</a></li>
+			<li class="active">Logged out</li>
+		</ol>
+
+		<div class="row">
+      <h2><strong>Account deleted!</strong><h2>
+		</div>
+	</div>	<!-- /container -->
+
+{% endblock %}

@@ -9,7 +9,7 @@ Show Languages
 URL
 ---
 
-/api/0.1/languages/
+/api//languages/
 
 
 Method
@@ -41,7 +41,7 @@ Example
 
 ::
 
-        GET :8000/api/0.1/languages/
+        GET :8000/api//languages/
 
 
         HTTP/1.0 200 OK
@@ -75,7 +75,7 @@ Show User Definitions
 URL
 ---
 
-/api/0.1/languages/:language/definitions/:word/ 'Authorization: Token <token>'
+/api//languages/:language/definitions/:word/ 'Authorization: Token <token>'
 
 
 Method
@@ -107,7 +107,7 @@ Getting A User's Token
 
 Assume there already is a user `foo` with password `password`.  First, get foo's token by posting his username/password::
 
-    POST :8000/api/0.1/api-token-auth/ username=foo password=password
+    POST :8000/api//api-token-auth/ username=foo password=password
 
 
         HTTP/1.0 200 OK
@@ -131,7 +131,7 @@ Getting A User Created Definition
 
 `Request`::
 
-        GET /api/0.1/languages/zh/definitions/未完成/ 'Authorization: Token 7b77c7031b4da70722f4eaeb7a54cbaa2fe25209'
+        GET /api//languages/zh/definitions/未完成/ 'Authorization: Token 7b77c7031b4da70722f4eaeb7a54cbaa2fe25209'
 
 `Response`::
 
@@ -187,7 +187,7 @@ To access all public definitions (not created by users), use the same request as
 `Request`::
 
 
-        GET /api/0.1/languages/zh/definitions/未完成/
+        GET /api//languages/zh/definitions/未完成/
 
 
 `Result`::
@@ -233,7 +233,7 @@ Parsing A String
 
 ::
 
-        POST :8000/api/0.1/languages/zh/parse/ string=一套由于实现
+        POST :8000/api//languages/zh/parse/ string=一套由于实现
 
         HTTP/1.0 200 OK
         Allow: POST, OPTIONS

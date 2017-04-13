@@ -4,7 +4,6 @@
 {% endblock %}
 
 {% block contents %}
-
     <div class="container">
     <div class="row">
         <div class="col-md-2">
@@ -12,7 +11,6 @@
         <button class="btn btn-primary btn-small glyphicon glyphicon-plus" data-toggle="modal" data-target="#modal-url">
         </button>
         </div>
-
         <!-- Modal -->
         <div class="modal fade" id="modal-url" tabindex="-1" role="dialog">
             <div class="modal-dialog">
@@ -30,15 +28,11 @@
                         <!-- Modal Body -->
                         <div class="modal-body">
                           <div class="row">
-                          <p>
-                            <small> Example:  Copy and paste this link to a Baidu article about Chinese history,
-                            and then click 'import'!</small class="text-muted">
-                          </p>
-
-                              <a href="http://baike.baidu.com/item/元谋人">http://baike.baidu.com/item/元谋人</a>
-
-                              {% load crispy_forms_tags %}
-                              {% crispy form %}
+                            <p>
+                              <small> Example:  Copy and paste a Chinese article to below start reading</small class="text-muted">
+                            </p>
+                            {% load crispy_forms_tags %}
+                            {% crispy form %}
                           </div>
                       </div>
                     </div>

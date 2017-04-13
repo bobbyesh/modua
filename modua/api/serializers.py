@@ -1,55 +1,42 @@
 from rest_framework import serializers
-from .models import PublicDefinition, Language, PublicWord, UserDefinition, UserWord
+from .models import PublicDefinition, PublicWord, UserDefinition, UserWord
 
 
 class TokenSerializer(serializers.Serializer):
     string = serializers.CharField(trim_whitespace=True)
 
 
-class LanguageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Language
-        fields = ('language', 'id')
-
-
 class PublicWordSerializer(serializers.ModelSerializer):
-    language = LanguageSerializer()
-
     class Meta:
         model = PublicWord
-        fields = ('word', 'language', 'id')
+        fields = ('word', 'id')
         depth = 1
 
 
 class UserWordSerializer(serializers.ModelSerializer):
-    language = LanguageSerializer()
+    owner = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
 
     class Meta:
         model = UserWord
-        fields = ('word', 'language', 'ease', 'id')
+        fields = ('word', 'ease', 'id', 'owner')
         depth = 1
 
 
 class PublicDefinitionSerializer(serializers.ModelSerializer):
-
     word = PublicWordSerializer()
-    language = LanguageSerializer()
 
     class Meta:
         model = PublicDefinition
-        fields = ('word', 'definition', 'language', 'id')
+        fields = ('word', 'definition', 'id')
         depth = 1
 
 
 class UserDefinitionSerializer(serializers.ModelSerializer):
-
     word = UserWordSerializer()
-    language = LanguageSerializer()
 
     class Meta:
         model = UserDefinition
-        fields = ('word', 'definition', 'language', 'id')
+        fields = ('word', 'definition', 'id')
         depth = 1
-
-

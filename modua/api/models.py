@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from core.behaviors import Timestampable, Contributable, Editable, Ownable
-from core.utils import tokenize_text
+from wordfencer.parser import ChineseParser
 
 # The following set of imports and the create_auth_token are placed in this models.py because
 # it is guaranteed that it will be imported by Django at startup, as suggested by the Django REST Framework
@@ -13,6 +13,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
+# Placed here so that loading occurs before view call (I think)
+parser = ChineseParser()
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -20,20 +22,10 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 
-class Language(Contributable, Editable, Timestampable, models.Model):
-    language = models.CharField(blank=True, max_length=150)
-    script = models.CharField(blank=True, max_length=300)
-    delimited = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.language
-
-
 class Article(Ownable, models.Model):
-    title = models.CharField(max_length=512, blank=True)
+    title = models.CharField(max_length=512)
     url = models.CharField(max_length=512, blank=True)
-    text = models.TextField()
-    language = models.ForeignKey(Language, related_name='api_article_language')
+    body = models.TextField()
     slug = models.SlugField(max_length=200, allow_unicode=True, unique=True)
 
     def __str__(self):
@@ -49,17 +41,15 @@ class Article(Ownable, models.Model):
 
     @property
     def preview(self):
-        return str(self.text)[:50] + ' ...'
+        return str(self.body)[:50] + ' ...'
 
     def as_tokens(self):
-        return tokenize_text(self.text)
+        return parser.parse(self.body)
 
 
 class UserWord(Ownable, models.Model):
-    word = models.CharField(blank=True, max_length=512)
-    ease = models.CharField(blank=True, max_length=20)
-    language = models.ForeignKey(Language)
-    transliteration = models.CharField(blank=True, max_length=512)
+    word = models.CharField(max_length=100)
+    ease = models.IntegerField(default=0)
     articles = models.ManyToManyField(Article)
 
     class Meta:
@@ -69,31 +59,29 @@ class UserWord(Ownable, models.Model):
         return self.word
 
 
-class PublicWord(models.Model):
-    word = models.CharField(blank=True, max_length=512)
-    language = models.ForeignKey(Language)
-    transliteration = models.CharField(blank=True, max_length=512)
-
-    def __str__(self):
-        return self.word
-
-
-class PublicDefinition(Timestampable, models.Model):
-    word = models.ForeignKey(PublicWord)
+class UserDefinition(Ownable, models.Model):
+    word = models.ForeignKey(UserWord)
     definition = models.CharField(max_length=512)
-    language = models.ForeignKey(Language)
+    pinyin = models.CharField(max_length=512, blank=False)
+
+    class Meta:
+        unique_together = ('owner', 'word', 'definition')
 
     def __str__(self):
         return self.definition
 
 
-class UserDefinition(Ownable, Timestampable, models.Model):
-    word = models.ForeignKey(UserWord)
-    definition = models.CharField(max_length=512)
-    language = models.ForeignKey(Language)
+class PublicWord(models.Model):
+    word = models.CharField(max_length=100)
 
-    class Meta:
-        unique_together = ("owner", "word", "definition", "language")
+    def __str__(self):
+        return self.word
+
+
+class PublicDefinition(models.Model):
+    word = models.ForeignKey(PublicWord)
+    definition = models.CharField(max_length=512)
+    pinyin = models.CharField(max_length=512, blank=False)
 
     def __str__(self):
         return self.definition

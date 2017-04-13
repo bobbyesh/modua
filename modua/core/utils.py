@@ -126,19 +126,6 @@ def all_combinations(string):
     return s
 
 
-def is_delimited(tag):
-    '''Returns True if the language tag identifies a space delimited
-    language, otherwise returns False'''
-    if type(tag) is not str:
-        tag = str(tag)
-
-    subtags = re.split('-', tag)
-    if subtags[0] == 'en':
-        return True
-    if subtags[0] == 'zh':
-        return False
-
-
 def is_punctuation(char):
     if len(char) != 1:
         return False

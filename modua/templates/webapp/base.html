@@ -1,55 +1,58 @@
-{% load staticfiles %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>Readable</title>
-
-      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-      <link rel="stylesheet" href="{% static 'webapp/css/custom.css' %}"/>
-      {% block head_include %}
-      {% endblock %}
-
-  <!-- This style block is just for testing and development. -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'webapp/css/custom.css' %}"/>
   </head>
 <body>
-<div class="container base">
-<div class="row">
-<nav class="navbar navbar-default" role="navigation">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="iconbar">A</span>
-            <span class="icon-bar">B</span>
-            <span class="icon-bar">C</span>
-        </button>
-        <a class="navbar-brand" href="{% url 'webapp:home' %}">Readable</a>
-    </div>
-
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.username }}<b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Account Settings</a></li>
-                    <li><a href="{% url 'webapp:logout' %}">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
-    </div><!-- /.navbar-collapse -->
-</nav>
-</div>
-</div>
-{% block contents %}
-{% endblock %}
-
-</body>
+<div class="container">
+  <div class="row navbar-row">
+    <nav class="navbar navbar-default navbar-custom" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="iconbar">A</span>
+                <span class="icon-bar">B</span>
+                <span class="icon-bar">C</span>
+            </button>
+            <a class="navbar-brand" href="{% url 'webapp:home' %}">Readable</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-navbar">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="{% url 'webapp:user_stats' %}">User Stats</a>
+                </li>
+                <li class="dropdown">
+                   <a href="#" class="dropdown-toggle fa fa-cogs" data-toggle="dropdown">    {{ user.username }}  <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'webapp:account' %}">Account</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul> <!-- /.nav navbar-nav -->
+        </div><!-- /.navbar-collapse -->
+    </nav> <!-- /.navbar -->
+  </div> <!-- /.row -->
+  {% block contents %}
+  {% endblock %}
+</div> <!-- /.container -->
 <footer>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <form>
+    {% csrf_token %}
+  </form>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" ></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  {% block footer_scripts %}
+  {% endblock %}
+  <script src="{% static "webapp/js/article.js" %}"></script>
 </footer>
+</body>
+</html>
