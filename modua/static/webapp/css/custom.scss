@@ -27,7 +27,7 @@ span.entry {
   transition: 0.5s;
   border-radius: 15%;
   &:hover {
-    background-color: lightblue;
+    background-color: orange;
   }
 }
 
@@ -44,12 +44,12 @@ span.entry {
 
 .ease-1 {
   @extend .ease;
-  background-color: green;
+  background-color: red;
 }
 
 .ease-2 {
   @extend .ease;
-  background-color: red;
+  background-color: green;
 }
 
 .ease-3 {

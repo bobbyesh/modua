@@ -1,6 +1,5 @@
 import unicodedata
 from django.shortcuts import redirect
-from django.core.mail import EmailMessage
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth.models import User
@@ -8,9 +7,6 @@ from django.contrib.auth import login, authenticate, logout
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import CreateView
-from rest_framework.authtoken.models import Token
-from rest_framework import status
-from rest_framework.response import Response
 from wordfencer.parser import ChineseParser
 
 
@@ -59,11 +55,6 @@ class SignupView(CreateView):
         password = form.cleaned_data.get('password1')
         new_user = authenticate(username=username, password=password)
         login(self.request, new_user)
-        # email = form.cleaned_data.get('email')
-        # title = 'Sign Up Confirmation at Readable!'
-        # body = 'Thanks for loging up at Readable!'
-        # email = EmailMessage(title, body, to=[email])
-        # email.send()
         return valid
 
 class SignupSuccessView(TemplateView):

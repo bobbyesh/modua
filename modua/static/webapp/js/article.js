@@ -84,7 +84,7 @@ $(document).ready(function() {
       new_counter.html(new_count.toString());
 
       // Make ajax to update DB
-      var url = 'http://127.0.0.1:8000/api/user/words/' + word + '/';
+      var url = window.location.origin + '/api/user/words/' + word + '/';
         var request = $.ajax({
         url: url,
         data: {

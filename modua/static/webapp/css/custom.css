@@ -23,7 +23,7 @@ span.entry {
   transition: 0.5s;
   border-radius: 15%; }
   span.entry:hover {
-    background-color: lightblue; }
+    background-color: orange; }
 
 .ease, .ease-0, .ease-1, .ease-2, .ease-3 {
   border-radius: 25%;
@@ -34,10 +34,10 @@ span.entry {
   background-color: lightblue; }
 
 .ease-1 {
-  background-color: green; }
+  background-color: red; }
 
 .ease-2 {
-  background-color: red; }
+  background-color: green; }
 
 .ease-3 {
   background-color: white; }
