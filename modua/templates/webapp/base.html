@@ -26,6 +26,9 @@
         </div>
         <div class="collapse navbar-collapse navbar-navbar">
             <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="{% url 'webapp:user_stats' %}">User Stats</a>
+                </li>
                 <li class="dropdown">
                    <a href="#" class="dropdown-toggle fa fa-cogs" data-toggle="dropdown">    {{ user.username }}  <b class="caret"></b></a>
                     <ul class="dropdown-menu">

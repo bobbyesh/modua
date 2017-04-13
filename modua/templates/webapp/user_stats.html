@@ -1,0 +1,50 @@
+{% extends 'webapp/base.html' %}
+{% load static %}
+{% block contents %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="row">
+				<div class="col-md-8">
+					<h3>
+						User Statistics
+					</h3>
+				</div>
+				<div class="col-md-4">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+            <h4>New</h4>
+		</div>
+		<div class="col-md-6">
+            {{ word_counts.new }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+            <h4>Hard</h4>
+		</div>
+		<div class="col-md-6">
+            {{ word_counts.hard }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+            <h4>Easy</h4>
+		</div>
+		<div class="col-md-6">
+            {{ word_counts.easy }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+            <h4>Known</h4>
+		</div>
+		<div class="col-md-6">
+            {{ word_counts.known }}
+		</div>
+	</div>
+</div>{% endblock %}

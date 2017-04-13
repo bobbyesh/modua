@@ -28,7 +28,6 @@ $.ajaxSetup({
         console.log('csrf', csrftoken);
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
-//  xhr.setRequestHeader("HTTP_X_CSRFTOKEN", csrftoken);
         }
     }
 });
@@ -60,7 +59,6 @@ $(document).ready(function() {
     var word = $(this).parent().attr('data-word');
     var selector = 'span.entry[name="' + word + '"]';
     var element = $(selector);
-    console.log(targetClass, element.attr('class'))
     if (!element.hasClass(targetClass)) {
       element.removeClass('ease-0');
       element.removeClass('ease-1');
@@ -86,14 +84,14 @@ $(document).ready(function() {
       new_counter.html(new_count.toString());
 
       // Make ajax to update DB
-      var url = `http://127.0.0.1:8000/api/user/words/${word}/`
-      var request = $.ajax({
+      var url = 'http://127.0.0.1:8000/api/user/words/' + word + '/';
+        var request = $.ajax({
         url: url,
         data: {
-          ease: new_ease,
+          ease: new_ease
         },
         method: 'PATCH',
-        dataType: 'json',
+        dataType: 'json'
       });
 
       request.done(function(msg) {

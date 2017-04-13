@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^change_password/$', views.ChangePasswordView.as_view(), name='change_password'),
     url(r'^delete_account/$', views.DeleteAccountView.as_view(), name='delete_account'),
     url(r'^delete_account_redirect/$', views.DeleteAccountRedirectView.as_view(), name='delete_account_redirect'),
+    url(r'^user_stats/$', views.UserStatsView.as_view(), name='user_stats'),
 ]

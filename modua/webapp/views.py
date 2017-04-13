@@ -126,3 +126,23 @@ class DeleteAccountView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class DeleteAccountRedirectView(RedirectView):
     url = reverse_lazy('delete_account_success')
+
+
+@method_decorator(login_required, name='dispatch')
+class UserStatsView(TemplateView):
+    template_name = 'webapp/user_stats.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = UserWord.objects.filter(owner=self.request.user)
+        new = queryset.filter(ease=0)
+        hard = queryset.filter(ease=1)
+        easy = queryset.filter(ease=2)
+        known = queryset.filter(ease=3)
+
+        context['word_counts'] = dict()
+        context['word_counts']['new'] = len(new)
+        context['word_counts']['hard'] = len(hard)
+        context['word_counts']['easy'] = len(easy)
+        context['word_counts']['known'] = len(known)
+        return context
