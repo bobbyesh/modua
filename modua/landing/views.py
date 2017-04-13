@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import FormView, CreateView
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import CreateView
@@ -15,7 +15,7 @@ from wordfencer.parser import ChineseParser
 
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from api.models import PublicDefinition, Language
+from api.models import PublicDefinition, UserWord, UserDefinition
 from core.utils import build_popup_html, build_word_html
 
 
@@ -33,7 +33,7 @@ class AboutView(TemplateView):
 
 class SigninView(FormView):
     model = User
-    template_name = 'landing/signin.html'
+    template_name = 'landing/login.html'
     form_class = SigninForm
 
     def form_valid(self, form):
@@ -44,12 +44,7 @@ class SigninView(FormView):
             login(self.request, user)
             return redirect('webapp:home')
         else:
-            '''
-
-            .. TODO: Create reasonable invalid user redirection.
-
-            '''
-            return redirect('signin')
+            return redirect('login')
 
 
 class SignupView(CreateView):
@@ -64,11 +59,11 @@ class SignupView(CreateView):
         password = form.cleaned_data.get('password1')
         new_user = authenticate(username=username, password=password)
         login(self.request, new_user)
-        email = form.cleaned_data.get('email')
-        title = 'Sign Up Confirmation at Readable!'
-        body = 'Thanks for signing up at Readable!'
-        email = EmailMessage(title, body, to=[email])
-        email.send()
+        # email = form.cleaned_data.get('email')
+        # title = 'Sign Up Confirmation at Readable!'
+        # body = 'Thanks for loging up at Readable!'
+        # email = EmailMessage(title, body, to=[email])
+        # email.send()
         return valid
 
 class SignupSuccessView(TemplateView):
@@ -112,8 +107,7 @@ class AnnotationView(FormView):
     def get_definitions_or_empty(self, word):
         s = ''
         try:
-            language = Language.objects.get(language='zh')
-            definitions = PublicDefinition.objects.filter(word=word, language=language)
+            definitions = PublicDefinition.objects.filter(word=word)
             unique_definitions = list(set([x.definition for x in definitions]))
             for definition in unique_definitions:
                 s += definition + ' / '
@@ -131,3 +125,21 @@ class AnnotationCompleteView(TemplateView):
         context['words'] = request.session['words']
         context['popups'] = request.session['popups']
         return self.render_to_response(context)
+
+
+class LogoutView(TemplateView):
+    template_name = 'landing/logout.html'
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super().get(request, *args, **kwargs)
+
+
+class DeleteAccountSuccessView(TemplateView):
+    template_name = 'landing/delete_account_success.html'
+
+    def get(self, request, *args, **kwargs):
+        UserDefinition.objects.filter(owner=request.user).delete()
+        UserWord.objects.filter(owner=request.user).delete()
+        request.user.delete()
+        return super().get(request, *args, **kwargs)

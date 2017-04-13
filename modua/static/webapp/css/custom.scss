@@ -1,0 +1,58 @@
+.navbar {
+  min-height: 85px;
+  width: 100%;
+  background-color: rgba(32, 166, 231, 0.8);
+}
+
+.navbar-row {
+  margin-right: -50px;
+  margin-left: -50px;
+}
+
+.navbar-header > a.navbar-brand {
+  font-size: 2em;
+  margin-top: 15px;
+  color: white;
+}
+
+.navbar-default .navbar-nav>li>a {
+  font-size: 1.5em;
+  color: white;
+  margin-top: 15px;
+  margin-right: 5px;
+}
+
+span.entry {
+  font-size: 1.5em;
+  transition: 0.5s;
+  border-radius: 15%;
+  &:hover {
+    background-color: lightblue;
+  }
+}
+
+.ease {
+  border-radius: 25%;
+  padding: 1px;
+  margin: 1px;
+}
+
+.ease-0 {
+  @extend .ease;
+  background-color: lightblue;
+}
+
+.ease-1 {
+  @extend .ease;
+  background-color: green;
+}
+
+.ease-2 {
+  @extend .ease;
+  background-color: red;
+}
+
+.ease-3 {
+  @extend .ease;
+  background-color: white;
+}

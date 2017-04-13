@@ -1,21 +1,17 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import Definition, User, Language, Article, Word
+from .models import PublicDefinition, User, Article, PublicWord
 
 
 class ArticleTestCase(TestCase):
-
     def test_slugify(self):
-        l = Language.objects.create(language='en')
-        a = Article.objects.create(title='some title', text='some text', language=l)
+        a = Article.objects.create(title='some title', text='some text')
         self.assertTrue(a.slug == 'some-title')
 
 
-class DefinitionWordLanguageTestCase(TestCase):
-
+class PublicDefinitionPublicWordTestCase(TestCase):
     def test_create(self):
-        english = Language.objects.create(language='en')
-        word = Word.objects.create(word='hey', language=english)
-        Definition.objects.create(language=english, word=word, definition='bar')
-        result = Definition.objects.all()
+        word = PublicWord.objects.create(word='hey')
+        PublicDefinition.objects.create(word=word, definition='bar')
+        result = PublicDefinition.objects.all()
         self.assertTrue(len(result) == 1)

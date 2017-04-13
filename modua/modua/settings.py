@@ -27,8 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Heroku Static File setup
 # Static files (CSS, JavaScript, Images)
 # These are setup to have the static folder in the root directory of the project.
 # This is different than the default Django implementation!
@@ -37,10 +35,10 @@ ALLOWED_HOSTS = []
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 # Extra places for collectstatic to find static files.
 
-LOGIN_URL = 'signin'
+LOGIN_URL = 'login'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = ''
+STATIC_ROOT = '/'
 STATICFILES_DIRS = [
     os.path.join('static'),
 ]
@@ -60,10 +58,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
     'twitter_bootstrap',
     'crispy_forms',
     'guardian',
     'djoser',
+    'corsheaders',
     'core',
     'api',
     'modua',
@@ -72,10 +72,11 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+#    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -159,6 +160,7 @@ REST_FRAMEWORK = {
         'DEFAULT_AUTHENTICATION_CLASSES': (
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
             ),
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.IsAuthenticated',
@@ -181,6 +183,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+CSRF_COOKIE_NAME = 'csrftoken'
 
 
 try:

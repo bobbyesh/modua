@@ -6,9 +6,11 @@ urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name="index"),
     url(r'^signup/', views.SignupView.as_view(), name="signup"),
     url(r'^signup/success/', views.SignupSuccessView.as_view(), name="signup-success"),
-    url(r'^signin/', views.SigninView.as_view(), name="signin"),
+    url(r'^login/$', views.SigninView.as_view(), name="login"),
     url(r'^annotate/', views.AnnotationView.as_view(), name="annotation"),
     url(r'^annotate_complete/', views.AnnotationCompleteView.as_view(), name="annotate-complete"),
     url(r'^contact/', views.ContactView.as_view(), name="contact"),
     url(r'^about/', views.AboutView.as_view(), name="about"),
+    url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
+    url(r'^delete_account_success/$', views.DeleteAccountSuccessView.as_view(), name='delete_account_success'),
 ]

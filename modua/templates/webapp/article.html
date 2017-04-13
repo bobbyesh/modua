@@ -1,0 +1,60 @@
+{% extends 'webapp/base.html' %}
+{% load static %}
+
+{% block contents %}
+    <div class="row">
+        <div class="col-md-2">
+            <div class="article-info">
+                <h5>Word Counts</h5>
+            		<div>New: <strong><span class="ease-0" id="counter-0">{{ counts.0 }}</span></strong></div>
+            		<div>Hard: <strong><span class="ease-1" id="counter-1">{{ counts.1 }}</span></strong></div>
+            		<div>Easy: <strong><span class="ease-2" id="counter-2">{{ counts.2 }}</span></strong></div>
+            		<div>Known: <strong><span class="ease-3" id="counter-3">{{ counts.3 }}</span></strong></div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="article">
+            <h3>
+                {{ title }}
+            </h3>
+            <p>
+                {% for entry in entries %}
+                    <span class="entry ease-{{ entry.entry.ease }}" data-ease={{ entry.entry.ease }} name="{{ entry.entry }}">{{ entry.entry }}</span>
+                {% endfor %}
+            </p>
+            </div>
+        </div>
+        <div class="col-md-2">
+          <ul>
+            <li>filler1</li>
+            <li>filler1</li>
+            <li>filler1</li>
+          </ul>
+        </div>
+    </div> <!-- /.row -->
+    <div>
+      {% for entry in entries %}
+       	{% for pinyin, definitions in entry.pinyin_definitions %}
+          <div class="definition" data-word="{{ entry.entry }}">
+        		<h3>
+              {{ entry.entry }}
+              <p class="transliteration">{{ entry.entry.pinyin }}</p>
+            </h3>
+            <p>{{ pinyin }}</p>
+            <ul>
+              {% for definition in definitions %}
+                  <li>{{ definition }}</li>
+              {% endfor %}
+            </ul>
+      	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-1" target-class="ease-1">hard</button>
+      	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-2" target-class="ease-2">easy</button>
+      	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-3" target-class="ease-3">known</button>
+          </div>
+        {% endfor %}
+    {% endfor %}
+  </div>
+{%  endblock %}
+
+{% block footer_scripts %}
+  <link rel="stylesheet" href="{% static 'webapp/css/hover.css' %}" type="text/css"/>
+{% endblock %}

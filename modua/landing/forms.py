@@ -13,7 +13,7 @@ class SigninForm(AuthenticationForm):
         super(SigninForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         # form_action associates a view name
-        self.helper.form_action = 'signin'
+        self.helper.form_action = 'login'
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Login'))
         self.helper.layout = Layout(

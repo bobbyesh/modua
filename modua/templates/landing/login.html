@@ -1,0 +1,40 @@
+{% extends 'landing/base.html' %}
+{% load staticfiles %}
+
+{% block navlinks %}
+<li><a href="{% url 'index' %}#">Home</a></li>
+<li><a href="{% url 'about' %}">About</a></li>
+<li><a href="{% url 'contact' %}">Contact</a></li>
+<li class="active"><a class="btn" href="{% url 'login' %}">SIGN IN / SIGN UP</a></li>
+{% endblock %}
+
+{% block content %}
+	<header id="head" class="secondary"></header>
+	<!-- container -->
+	<div class="container">
+		<ol class="breadcrumb">
+			<li><a href="{% url 'index' %}">Home</a></li>
+			<li class="active">User access</li>
+		</ol>
+		<div class="row">
+			<!-- Article main content -->
+			<article class="col-xs-12 maincontent">
+				<header class="page-header">
+					<h1 class="page-title">Login</h1>
+				</header>
+				<div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<h3 class="thin text-center">Login to your account</h3>
+							<p class="text-center text-muted">If you don't have an account, please <a href="{% url 'signup' %}">Register</a>. </p>
+							<hr>
+
+              {% load crispy_forms_tags %}
+                {% crispy form %}
+
+				</div>
+			</article>
+			<!-- /Article -->
+		</div>
+	</div>	<!-- /container -->
+{% endblock %}

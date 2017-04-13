@@ -4,8 +4,8 @@ import bs4
 import requests
 
 
-def fetch_article(url, language):
-    a = Article(url, language=language)
+def fetch_article(url):
+    a = Article(url, language='zh')
     a.download()
     a.parse()
     title = a.title

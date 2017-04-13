@@ -1,7 +1,8 @@
 #cedict_import.py
 from django.core.management.base import BaseCommand
+from django.db import IntegrityError
 from tqdm import tqdm
-from api.models import PublicDefinition, Language, PublicWord
+from api.models import PublicDefinition, PublicWord
 from . import cedict_parser
 
 
@@ -10,7 +11,6 @@ def clean_entry(def_boi):
      return_string = str(def_boi)
      return_string = return_string.replace("'", "\'")
      return return_string
-
 
 def store_def_boi(word, trans, def_arr):
     # Escape the apostrophe going into the DB
@@ -24,11 +24,12 @@ def store_def_boi(word, trans, def_arr):
 
     # Do the insertion
     # If there is more than one definition insert them both as different rows
-    zh, created = Language.objects.get_or_create(language='zh')
-    en, created = Language.objects.get_or_create(language='en')
     for definition in def_arr:
-        word_instance = PublicWord.objects.create(word=word, language=zh, transliteration=trans)
-        definition_instance = PublicDefinition.objects.create(word=word_instance, definition=definition, language=en)
+        try:
+            word_obj, created = PublicWord.objects.get_or_create(word=word, defaults={'word': word})
+            PublicDefinition.objects.create(word=word_obj, definition=definition, pinyin=trans)
+        except IntegrityError as e:
+            print(e)
 
 
 def import_dictionary(file_name):

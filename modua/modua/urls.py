@@ -16,10 +16,16 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from rest_framework_swagger.views import get_swagger_view
+
+
+schema_view = get_swagger_view(title='Readble API')
+
 
 urlpatterns = [
-    url(r'', include('landing.urls')),
+    url(r'^', include('landing.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/0.1/', include('api.urls')),
+    url(r'^api/$', schema_view),
+    url(r'^api/', include('api.urls', namespace='api')),
     url(r'^webapp/', include('webapp.urls', namespace='webapp')),
 ]

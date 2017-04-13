@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse_lazy
@@ -6,29 +6,21 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.views.generic.base import TemplateView
+from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.csrf import ensure_csrf_cookie
 
-from api.models import Article, Language, PublicWord
-from core.services import fetch_article
-from webapp.forms import URLForm
-
-
-def logout_view(request):
-    logout(request)
-    return redirect('webapp:logout_success')
-
-
-class LogoutSuccessView(TemplateView):
-    template_name = 'landing/logout_success.html'
+from api.models import Article, PublicWord, PublicDefinition, UserWord, UserDefinition
+from webapp.forms import ArticleForm
 
 
 @method_decorator(login_required, name='dispatch')
 class HomeView(FormView, LoginRequiredMixin):
     template_name = 'webapp/home.html'
-    login_url = 'landing/signin'
-    form_class = URLForm
+    login_url = 'landing/login'
+    form_class = ArticleForm
     success_url = reverse_lazy('webapp:home')
 
     def get_context_data(self, **kwargs):
@@ -38,58 +30,119 @@ class HomeView(FormView, LoginRequiredMixin):
         context['user'] = self.request.user
         return context
 
-
     def form_valid(self, form):
-        url = form.cleaned_data['url']
-        try:
-            article = Article.objects.get(url=url)
-            text = article.text
-            title = article.title
-        except ObjectDoesNotExist:
-            title, text = fetch_article(url, language='zh')
-
         user = self.request.user
-        language = Language.objects.get(language='zh')
-        Article.objects.get_or_create(title=title, text=text, url=url, language=language, owner=user)
+        url = form.cleaned_data['url']
+        title = form.cleaned_data['title']
+        body = form.cleaned_data['body']
+        # If this article is new, add the words to this user's db
+        # We do this now so we don't have to do when loading the article for them
+        # to read later.
+        article, created = Article.objects.get_or_create(title=title, body=body, url=url, owner=user)
+        if created:
+            for token in article.as_tokens():
+                user_word, created = UserWord.objects.get_or_create(word=token, owner=user)
+                user_word.articles.add(article)
+                if created:
+                    for public_word in PublicWord.objects.filter(word=token):
+                        for public_definition in PublicDefinition.objects.filter(word=public_word):
+                            UserDefinition.objects.get_or_create(
+                                word=user_word,
+                                owner=user,
+                                definition=public_definition.definition,
+                                pinyin=public_definition.pinyin
+                            )
+
         return super(HomeView, self).form_valid(form)
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 class ArticleView(TemplateView):
-    template_name = 'webapp/sample.html'
+    template_name = 'webapp/article.html'
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
-        user = User.objects.get(username=self.request.user.username)
-        if user is not None:
-            entries = self.get_entries()
-            context['entries'] = entries
-            context['counts'] = Counter(e.ease for e in entries if hasattr(e, 'ease'))
-            print(context)
-        return context
+        article = Article.objects.get(slug=self.kwargs['slug'], owner=self.request.user)
+        userwords = article.userword_set.all()
+        words = []
+        for word in article.as_tokens():
+            try:
+                userword = userwords.get(word=word)
+            except ObjectDoesNotExist:
+                userword = word
 
-    def get_entries(self):
-        '''Returns a list of elements that are either `api.models.PublicWord` instances or just strings.
-
-        If the user has not saved a particular token as a word before, then that word is
-        get or created with an `ease` of `new`, but it is not associated with that user via the
-        ManyToMany `users` field in the :model:`PublicWord`.
-
-        '''
+            words.append(userword)
 
         entries = []
-        article = self.get_article()
-        for token in article.as_tokens():
-            try:
-                entry = PublicWord.objects.get(word=token, language=article.language)
-            except ObjectDoesNotExist:
-                entry = token
+        for word in words:
+            definitions = word.userdefinition_set.all()
+            unique_pinyins = set(d.pinyin for d in definitions)
+            pinyin_definitions = []
+            for pinyin in unique_pinyins:
+                tup = (pinyin, definitions.filter(pinyin=pinyin))
+                pinyin_definitions.append(tup)
 
-            entries.append(entry)
+            entries.append({
+                'entry': word,
+                'pinyin_definitions': pinyin_definitions,
+            })
 
-        return entries
+        context['entries'] = entries
+        # The e.ease int is turned into a string because Django templates don't like
+        # integers as dictionary keys
+        context['counts'] = Counter(str(e['entry'].ease) for e in context['entries'])
+        return context
 
-    def get_article(self):
-        slug = self.kwargs['slug']
-        article = Article.objects.get(slug=slug)
-        return article
+
+@method_decorator(login_required, name='dispatch')
+class AccountView(TemplateView):
+    template_name = 'webapp/account.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class ChangeUsernameView(FormView):
+    template_name = 'webapp/change_username.html'
+    form_class = UserChangeForm
+
+
+@method_decorator(login_required, name='dispatch')
+class ChangePasswordView(FormView):
+    template_name = 'webapp/change_password.html'
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('webapp:account')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+@method_decorator(login_required, name='dispatch')
+class DeleteAccountView(TemplateView):
+    template_name = 'webapp/delete_account.html'
+
+
+@method_decorator(login_required, name='dispatch')
+class DeleteAccountRedirectView(RedirectView):
+    url = reverse_lazy('delete_account_success')
+
+
+@method_decorator(login_required, name='dispatch')
+class UserStatsView(TemplateView):
+    template_name = 'webapp/user_stats.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = UserWord.objects.filter(owner=self.request.user)
+        new = queryset.filter(ease=0)
+        hard = queryset.filter(ease=1)
+        easy = queryset.filter(ease=2)
+        known = queryset.filter(ease=3)
+
+        context['word_counts'] = dict()
+        context['word_counts']['new'] = len(new)
+        context['word_counts']['hard'] = len(hard)
+        context['word_counts']['easy'] = len(easy)
+        context['word_counts']['known'] = len(known)
+        return context
