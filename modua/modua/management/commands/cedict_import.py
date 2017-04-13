@@ -12,7 +12,6 @@ def clean_entry(def_boi):
      return_string = return_string.replace("'", "\'")
      return return_string
 
-
 def store_def_boi(word, trans, def_arr):
     # Escape the apostrophe going into the DB
     word = clean_entry(word)
@@ -35,9 +34,10 @@ def store_def_boi(word, trans, def_arr):
 
 def import_dictionary(file_name):
     cnt = 0
+    lines = []
     with open(file_name) as f:
-        for idx, line in enumerate(f):
-            cnt = idx
+        for cnt, line in enumerate(f):
+            lines.append(line)
 
     # tqdm is the progress bar
     with tqdm(total=cnt) as pbar:
