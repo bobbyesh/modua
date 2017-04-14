@@ -41,7 +41,7 @@ from .filters import (
     UserWordFilter,
     UserDefinitionFilter
 )
-from .serializers import PublicDefinitionSerializer, PublicWordSerializer, TokenSerializer, UserWordSerializer, UserDefinitionSerializer
+from .serializers import PublicDefinitionSerializer, PublicWordSerializer, UserWordSerializer, UserDefinitionSerializer
 from core.utils import Token, get_object_or_403, is_punctuation
 from .permissions import OnlyOwnerCanAccess, OnlyOwnerCanDelete, NoPutAllowed, OnlyEaseCanChange
 
@@ -81,10 +81,6 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
     This view should allow the creation and reading of definitions because user's can create and read definitions
     they have saved for themselves.
 
-    :Supported Methods:
-
-        GET, POST
-
     """
     queryset = UserDefinition.objects.all()
     authentication_classes = (TokenAuthentication, SessionAuthentication,)
@@ -92,6 +88,20 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
     serializer_class = UserDefinitionSerializer
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, WordFilter,)
     filter_class = UserDefinitionFilter
+
+    def create(self, request, *args, **kwargs):
+        word = UserWord.objects.get(id=request.data['word']['id'])
+        definition = request.data['definition']
+        definition, _ = UserDefinition.objects.get_or_create(word=word, owner=request.user, definition=definition)
+        data = {
+            'word': {
+                'id': word.id,
+                'word': word.word,
+            },
+            'definition': definition.definition,
+            'id': definition.id,
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class UserWordViewSet(viewsets.ModelViewSet):
@@ -141,6 +151,7 @@ class URLImportView(APIView, LoginRequiredMixin):
 
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class PublicArticleView(APIView):
     """Requires 'title' and 'text' query parameters"""

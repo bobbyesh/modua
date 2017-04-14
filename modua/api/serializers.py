@@ -1,9 +1,6 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import PublicDefinition, PublicWord, UserDefinition, UserWord
-
-
-class TokenSerializer(serializers.Serializer):
-    string = serializers.CharField(trim_whitespace=True)
 
 
 class PublicWordSerializer(serializers.ModelSerializer):
@@ -15,7 +12,7 @@ class PublicWordSerializer(serializers.ModelSerializer):
 
 class UserWordSerializer(serializers.ModelSerializer):
     owner = serializers.HiddenField(
-        default=serializers.CurrentUserDefault()
+        default=serializers.CurrentUserDefault(),
     )
 
     class Meta:
@@ -33,10 +30,12 @@ class PublicDefinitionSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+
 class UserDefinitionSerializer(serializers.ModelSerializer):
     word = UserWordSerializer()
 
     class Meta:
         model = UserDefinition
-        fields = ('word', 'definition', 'id')
+        fields = ('word', 'definition', 'id', 'owner')
         depth = 1
+

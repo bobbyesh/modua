@@ -45,6 +45,16 @@
               {% for definition in definitions %}
                   <li>{{ definition }}</li>
               {% endfor %}
+                <br>
+                <li>
+                    <form action="" method="post" id="POST-definition-form-{{ entry.entry }}" data-word="{{ entry.entry }}">
+                        <label for="POST-definition-text">
+                            Add a definition
+                        </label>
+                        <input type="text" class="POST-definition-text" id="POST-definition-text-{{ entry.entry }}" name="POST-definition-text-{{ entry.entry }}" data-word="{{ entry.entry }}">
+                        <input type="submit" value="Add" class="POST-definition-submit">
+                    </form>
+                </li>
             </ul>
       	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-1" target-class="ease-1">hard</button>
       	    <button type="submit" class="btn btn-primary easy-button" id="easy-button-2" target-class="ease-2">easy</button>

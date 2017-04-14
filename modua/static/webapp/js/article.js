@@ -96,7 +96,7 @@ $(document).ready(function() {
 
       request.done(function(msg) {
         console.log(msg)
-      })
+      });
 
       request.fail(function(error) {
         console.log(error)
@@ -105,4 +105,12 @@ $(document).ready(function() {
 
     $('div.definition').hide();
   });
-})
+});
+
+$(document).ready(function() {
+    $('.POST-definition-submit').click(function(e) {
+        e.preventDefault();
+        var data = $(this).siblings('.POST-definition-text').val();
+
+    })
+});
