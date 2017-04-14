@@ -1,5 +1,3 @@
-
-
 // using jQuery
 function getCookie(name) {
     var cookieValue = null;
@@ -25,7 +23,6 @@ function csrfSafeMethod(method) {
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         var csrftoken = getCookie('csrftoken');
-        console.log('csrf', csrftoken);
         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrftoken);
         }
@@ -66,7 +63,6 @@ $(document).ready(function() {
       element.removeClass('ease-3');
 
       var old_ease = $(selector).attr('data-ease');
-      console.log('targetclass', targetClass);
       element.addClass(targetClass);
 
       // The old easiness needs to drop because the user changed the easines of this word
@@ -95,11 +91,11 @@ $(document).ready(function() {
       });
 
       request.done(function(msg) {
-        console.log(msg)
+        console.log('done saving word', msg)
       });
 
       request.fail(function(error) {
-        console.log(error)
+        console.log('failed to save word', error)
       })
     }
 
@@ -126,14 +122,41 @@ $(document).ready(function() {
             method: 'POST',
             dataType: 'json'
         }).done(function(response) {
-            var $elem = '<li>' + definition + '</li>';
+            var id = response.id.toString();
+            // TODO: Research template literals and browser compatability to do away with
+            //       ugly concatenations, if supported.
+            var $elem = $('<li ' + 'data-id="' + id + '"' + '>' +
+                            definition +
+                           '<button class="glyphicon glyphicon-remove remove"></button>' +
+                        '</li>');
             ancestor.before($elem);
+            console.log(response);
         }).fail(function(error) {
             var $elem = '<li>' + 'Server error, could not save definition' + '</li>';
             ancestor.before($elem);
             console.log(error);
         });
-
-        console.log(request);
     })
+});
+
+$(document).ready(function() {
+    $(document).on('click', '.remove', function(e) {
+        e.preventDefault();
+        var parent = $(this).parent();
+        var id = parent.attr('data-id');
+        var url = window.location.origin + '/api/user/definitions/' + id + '/';
+        var request = $.ajax({
+            url: url,
+            type: 'DELETE',
+        }).done(function(response) {
+            parent.remove();
+            console.log(parent);
+        }).fail(function(error) {
+            console.log('delete failed', error);
+        }).then(function() {
+            console.log('then');
+        }).always(function() {
+            console.log('always');
+        });
+    });
 });

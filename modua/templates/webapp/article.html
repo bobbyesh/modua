@@ -5,11 +5,13 @@
     <div class="row">
         <div class="col-md-2">
             <div class="article-info">
-                <h5>Word Counts</h5>
-            		<div>New: <strong><span class="ease-0" id="counter-0">{{ counts.0 }}</span></strong></div>
-            		<div>Hard: <strong><span class="ease-1" id="counter-1">{{ counts.1 }}</span></strong></div>
-            		<div>Easy: <strong><span class="ease-2" id="counter-2">{{ counts.2 }}</span></strong></div>
-            		<div>Known: <strong><span class="ease-3" id="counter-3">{{ counts.3 }}</span></strong></div>
+                <h5>Unique Word Counts</h5>
+                <div>New: <strong><span class="ease-0" id="counter-0">{{ counts.0 }}</span></strong></div>
+                <div>Hard: <strong><span class="ease-1" id="counter-1">{{ counts.1 }}</span></strong></div>
+                <div>Easy: <strong><span class="ease-2" id="counter-2">{{ counts.2 }}</span></strong></div>
+                <div>Known: <strong><span class="ease-3" id="counter-3">{{ counts.3 }}</span></strong></div>
+                <br>
+                <h4>Total Count: {{ total_word_count }}</h4>
             </div>
         </div>
         <div class="col-md-8">
@@ -18,31 +20,27 @@
                 {{ title }}
             </h3>
             <p>
-                {% for entry in entries %}
-                    <span class="entry ease-{{ entry.entry.ease }}" data-ease={{ entry.entry.ease }} name="{{ entry.entry }}">{{ entry.entry }}</span>
+                {% for entry in article_words %}
+                    <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry }}">{{ entry }}</span>
                 {% endfor %}
             </p>
             </div>
         </div>
         <div class="col-md-2">
-          <ul>
-            <li>filler1</li>
-            <li>filler1</li>
-            <li>filler1</li>
-          </ul>
+
         </div>
     </div> <!-- /.row -->
     <div>
-      {% for entry in entries %}
+      {% for entry in dictionary_entries %}
        	{% for pinyin, definitions in entry.pinyin_definitions %}
-          <div class="definition" data-word="{{ entry.entry }}">
+          <div class="definition" data-word="{{ entry.entry }}" data-word-id="{{ entry.entry.id }}">
         		<h3>
               {{ entry.entry }}
             </h3>
-            <p>{{ pinyin }}</p>
+            <p class="pinyin">{{ pinyin }}</p>
             <ul>
               {% for definition in definitions %}
-                  <li>{{ definition }}</li>
+                  <li data-id="{{ definition.id }}">{{ definition }} <button class="glyphicon glyphicon-remove remove"></button></li>
               {% endfor %}
                 <br id="break-{{ pinyin }}">
                 <li>

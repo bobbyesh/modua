@@ -75,7 +75,7 @@ class ArticleView(TemplateView):
             words.append(userword)
 
         entries = []
-        for word in words:
+        for word in userwords:
             definitions = word.userdefinition_set.all()
             unique_pinyins = set(d.pinyin for d in definitions)
             pinyin_definitions = []
@@ -88,10 +88,12 @@ class ArticleView(TemplateView):
                 'pinyin_definitions': pinyin_definitions,
             })
 
-        context['entries'] = entries
+        context['total_word_count'] = len(words)
+        context['article_words'] = words
+        context['dictionary_entries'] = entries
         # The e.ease int is turned into a string because Django templates don't like
         # integers as dictionary keys
-        context['counts'] = Counter(str(e['entry'].ease) for e in context['entries'])
+        context['counts'] = Counter(str(e['entry'].ease) for e in context['dictionary_entries'])
         return context
 
 

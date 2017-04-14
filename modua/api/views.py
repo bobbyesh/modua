@@ -115,6 +115,21 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
 
         return Response(data, status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, *args, **kwargs):
+        """Delete a definition.
+        
+        Example request:
+        
+            DELETE /api/user/definitions/2
+        
+        
+        Will throw 404 if definition doesn't exist.
+        """
+
+        definition = get_object_or_404(UserDefinition, id=kwargs['pk'], owner=request.user)
+        definition.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class UserWordViewSet(viewsets.ModelViewSet):
     """Defines a view for users to create, modify, or delete a single word in their account.
