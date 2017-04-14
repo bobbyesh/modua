@@ -65,7 +65,7 @@ class UserDefinition(Ownable, models.Model):
     pinyin = models.CharField(max_length=512, blank=False)
 
     class Meta:
-        unique_together = ('owner', 'word', 'definition')
+        unique_together = ('owner', 'word', 'definition',)
 
     def __str__(self):
         return self.definition

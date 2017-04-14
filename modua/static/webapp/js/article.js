@@ -110,7 +110,30 @@ $(document).ready(function() {
 $(document).ready(function() {
     $('.POST-definition-submit').click(function(e) {
         e.preventDefault();
-        var data = $(this).siblings('.POST-definition-text').val();
+        var definition = $(this).siblings('.POST-definition-text').val();
+        var word = $(this).siblings('.POST-definition-text').attr('data-word');
+        var pinyin = $(this).siblings('.POST-definition-text').attr('data-pinyin');
+        var data = {
+            definition: definition,
+            pinyin: pinyin,
+            word: word
+        };
+        var url = window.location.origin + '/api/user/definitions/';
+        var ancestor = $('#POST-definition-form-' + word).parent();
+        var request = $.ajax({
+            url: url,
+            data: data,
+            method: 'POST',
+            dataType: 'json'
+        }).done(function(response) {
+            var $elem = '<li>' + definition + '</li>';
+            ancestor.before($elem);
+        }).fail(function(error) {
+            var $elem = '<li>' + 'Server error, could not save definition' + '</li>';
+            ancestor.before($elem);
+            console.log(error);
+        });
 
+        console.log(request);
     })
 });

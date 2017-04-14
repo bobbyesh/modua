@@ -26,24 +26,18 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db.utils import IntegrityError
-
 from core.services import fetch_article
-from core.decorators import required_request_data
-from core.exceptions import Raise403
 from .models import PublicDefinition, UserDefinition, Article, PublicWord, UserWord
 from .filters import (
     PublicWordFilter,
     PublicDefinitionFilter,
     OwnerOnlyFilter,
-    OwnerWordOnlyFilter,
     WordFilter,
     UserWordFilter,
     UserDefinitionFilter
 )
 from .serializers import PublicDefinitionSerializer, PublicWordSerializer, UserWordSerializer, UserDefinitionSerializer
-from core.utils import Token, get_object_or_403, is_punctuation
-from .permissions import OnlyOwnerCanAccess, OnlyOwnerCanDelete, NoPutAllowed, OnlyEaseCanChange
+from .permissions import OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange
 
 
 parser = ChineseParser()
@@ -62,9 +56,6 @@ class PublicDefinitionViewSet(viewsets.ReadOnlyModelViewSet):
 
     This view should be read-only, as public information should be protected from deletion.
     This means that only the GET method need be supported.
-
-
-    .. todo: Change OwnerOnlyFilter to PublicFilter for clarity
 
     """
     queryset = PublicDefinition.objects.all()
@@ -90,17 +81,38 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
     filter_class = UserDefinitionFilter
 
     def create(self, request, *args, **kwargs):
-        word = UserWord.objects.get(id=request.data['word']['id'])
+        """Example POST data:
+        
+            {
+              "definition": "string123",
+              "word": "A貨",
+              "pinyin": "A huo4"
+            }
+
+        """
+        pinyin = request.data['pinyin']
+        word = UserWord.objects.get(
+            word=request.data['word'],
+            owner=request.user,
+        )
         definition = request.data['definition']
-        definition, _ = UserDefinition.objects.get_or_create(word=word, owner=request.user, definition=definition)
+        definition, _ = UserDefinition.objects.get_or_create(
+            word=word,
+            owner=request.user,
+            definition=definition,
+            pinyin=pinyin
+        )
         data = {
             'word': {
                 'id': word.id,
                 'word': word.word,
+                'ease': word.ease,
             },
             'definition': definition.definition,
             'id': definition.id,
+            'pinyin': pinyin,
         }
+
         return Response(data, status=status.HTTP_201_CREATED)
 
 
@@ -112,8 +124,6 @@ class UserWordViewSet(viewsets.ModelViewSet):
     """
     queryset = UserWord.objects.all()
     authentication_classes = (SessionAuthentication,)
-#    authentication_classes = (TokenAuthentication, SessionAuthentication,)
-
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
     serializer_class = UserWordSerializer
     filter_class = UserWordFilter

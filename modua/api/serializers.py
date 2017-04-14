@@ -26,9 +26,8 @@ class PublicDefinitionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PublicDefinition
-        fields = ('word', 'definition', 'id')
+        fields = ('word', 'definition', 'id',)
         depth = 1
-
 
 
 class UserDefinitionSerializer(serializers.ModelSerializer):
@@ -36,6 +35,6 @@ class UserDefinitionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserDefinition
-        fields = ('word', 'definition', 'id', 'owner')
+        fields = ('word', 'definition', 'id', 'pinyin',)
         depth = 1
 

@@ -38,20 +38,19 @@
           <div class="definition" data-word="{{ entry.entry }}">
         		<h3>
               {{ entry.entry }}
-              <p class="transliteration">{{ entry.entry.pinyin }}</p>
             </h3>
             <p>{{ pinyin }}</p>
             <ul>
               {% for definition in definitions %}
                   <li>{{ definition }}</li>
               {% endfor %}
-                <br>
+                <br id="break-{{ pinyin }}">
                 <li>
                     <form action="" method="post" id="POST-definition-form-{{ entry.entry }}" data-word="{{ entry.entry }}">
-                        <label for="POST-definition-text">
+                        <label for="POST-definition-text-{{ entry.entry }}">
                             Add a definition
                         </label>
-                        <input type="text" class="POST-definition-text" id="POST-definition-text-{{ entry.entry }}" name="POST-definition-text-{{ entry.entry }}" data-word="{{ entry.entry }}">
+                        <input type="text" class="POST-definition-text" data-pinyin="{{ pinyin }}" id="POST-definition-text-{{ entry.entry }}" name="POST-definition-text-{{ entry.entry }}" data-word="{{ entry.entry }}">
                         <input type="submit" value="Add" class="POST-definition-submit">
                     </form>
                 </li>
