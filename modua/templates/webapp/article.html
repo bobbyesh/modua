@@ -6,12 +6,12 @@
         <div class="col-md-2">
             <div class="article-info">
                 <h5>Unique Word Counts</h5>
-                <div>New: <strong><span class="ease-0" id="counter-0">{{ counts.0 }}</span></strong></div>
-                <div>Hard: <strong><span class="ease-1" id="counter-1">{{ counts.1 }}</span></strong></div>
-                <div>Easy: <strong><span class="ease-2" id="counter-2">{{ counts.2 }}</span></strong></div>
-                <div>Known: <strong><span class="ease-3" id="counter-3">{{ counts.3 }}</span></strong></div>
+                <div>New: <strong><span class="ease-0" id="counter-0"></span></strong></div>
+                <div>Hard: <strong><span class="ease-1" id="counter-1"></span></strong></div>
+                <div>Easy: <strong><span class="ease-2" id="counter-2"></span></strong></div>
+                <div>Known: <strong><span class="ease-3" id="counter-3"></span></strong></div>
                 <br>
-                <h4>Total Count: {{ total_word_count }}</h4>
+                <div>Total Count: <strong><span id="total-count"></span> </strong></div>
             </div>
         </div>
         <div class="col-md-8">
@@ -21,13 +21,17 @@
             </h3>
             <p>
                 {% for entry in article_words %}
-                    <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry }}">{{ entry }}</span>
+                    {% if entry.ease != None %}
+                        <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry }}">{{ entry }}</span>
+                    {% else %}
+                        {{ entry }}
+                    {%  endif %}
                 {% endfor %}
             </p>
             </div>
         </div>
         <div class="col-md-2">
-
+            <button id="button-all-known">Mark All Known</button>
         </div>
     </div> <!-- /.row -->
     <div>

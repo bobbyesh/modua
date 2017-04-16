@@ -1,3 +1,9 @@
+const NEW = 0;
+const HARD = 1;
+const EASY = 2;
+const KNOWN = 3;
+
+
 // using jQuery
 function getCookie(name) {
     var cookieValue = null;
@@ -45,61 +51,57 @@ $(document).ready(function() {
 
 });
 
+
+function updateCounts() {
+    var ease = [
+        $('[data-ease=0]').length,
+        $('[data-ease=1]').length,
+        $('[data-ease=2]').length,
+        $('[data-ease=3]').length
+    ];
+
+    $('#counter-0').html(ease[0]);
+    $('#counter-1').html(ease[1]);
+    $('#counter-2').html(ease[2]);
+    $('#counter-3').html(ease[3]);
+    $('#total-count').html(ease[0] + ease[1] + ease[2] + ease[3]);
+}
+
+$(document).ready(updateCounts());
+
+
 // Clicking on an 'ease' button changes the ease rating for the word
 $(document).ready(function() {
   var csrftoken = getCookie('csrftoken');
   $('button.easy-button').on('click', function() {
-    var id = $(this).attr('id');
-    var new_ease = parseInt(id[id.length - 1]);
-    var targetClass = 'ease-' + new_ease;
+      var id = $(this).attr('id');
+      var new_ease = parseInt(id[id.length - 1]);
+      var targetClass = 'ease-' + new_ease;
+      var word = $(this).parent().attr('data-word');
+      var selector = 'span.entry[name="' + word + '"]';
+      var element = $(selector);
+      // We check if the class isn't already the selected ease-# because we can avoid an ajax call
+      if (!element.hasClass(targetClass)) {
+          element.removeClass('ease-0');
+          element.removeClass('ease-1');
+          element.removeClass('ease-2');
+          element.removeClass('ease-3');
+          element.addClass(targetClass);
+          $(selector).attr('data-ease', new_ease);
+          // Make ajax to update DB
+          var url = window.location.origin + '/api/user/words/' + word + '/';
+          var request = $.ajax({
+              url: url,
+              data: {
+                ease: new_ease
+              },
+              method: 'PATCH',
+              dataType: 'json'
+          });
+        }
 
-    var word = $(this).parent().attr('data-word');
-    var selector = 'span.entry[name="' + word + '"]';
-    var element = $(selector);
-    if (!element.hasClass(targetClass)) {
-      element.removeClass('ease-0');
-      element.removeClass('ease-1');
-      element.removeClass('ease-2');
-      element.removeClass('ease-3');
-
-      var old_ease = $(selector).attr('data-ease');
-      element.addClass(targetClass);
-
-      // The old easiness needs to drop because the user changed the easines of this word
-      var old_counter = $('#counter-' + old_ease);
-      var old_count = old_counter.html();
-      old_count = parseInt(old_count);
-      old_count--;
-      old_counter.html(old_count.toString());
-
-      // The user set a new easiness for this word, so update the new ease's counter
-      var new_counter = $('#counter-' + new_ease);
-      var new_count = new_counter.html();
-      new_count = parseInt(new_count);
-      new_count++;
-      new_counter.html(new_count.toString());
-
-      // Make ajax to update DB
-      var url = window.location.origin + '/api/user/words/' + word + '/';
-        var request = $.ajax({
-        url: url,
-        data: {
-          ease: new_ease
-        },
-        method: 'PATCH',
-        dataType: 'json'
-      });
-
-      request.done(function(msg) {
-        console.log('done saving word', msg)
-      });
-
-      request.fail(function(error) {
-        console.log('failed to save word', error)
-      })
-    }
-
-    $('div.definition').hide();
+        $('div.definition').hide();
+        updateCounts();
   });
 });
 
@@ -130,11 +132,9 @@ $(document).ready(function() {
                            '<button class="glyphicon glyphicon-remove remove"></button>' +
                         '</li>');
             ancestor.before($elem);
-            console.log(response);
         }).fail(function(error) {
             var $elem = '<li>' + 'Server error, could not save definition' + '</li>';
             ancestor.before($elem);
-            console.log(error);
         });
     })
 });
@@ -147,16 +147,39 @@ $(document).ready(function() {
         var url = window.location.origin + '/api/user/definitions/' + id + '/';
         var request = $.ajax({
             url: url,
-            type: 'DELETE',
+            type: 'DELETE'
         }).done(function(response) {
             parent.remove();
-            console.log(parent);
-        }).fail(function(error) {
-            console.log('delete failed', error);
-        }).then(function() {
-            console.log('then');
-        }).always(function() {
-            console.log('always');
         });
+    });
+});
+
+
+$(document).ready(function() {
+    $('#button-all-known').on('click', function(e) {
+        e.preventDefault();
+        $('.entry')
+            .removeClass('ease-0')
+            .removeClass('ease-1')
+            .removeClass('ease-2')
+            .addClass('ease-3')
+            .attr('data-ease', KNOWN)
+            .each(function(idx, word) {
+                var text = $(word).text();
+                var url = window.location.origin + '/api/user/words/' + text + '/';
+                if (validator.isURL(url)) {
+                    var request = $.ajax({
+                        url: url,
+                        data: {
+                            ease: KNOWN
+                        },
+                        method: 'PATCH',
+                        dataType: 'json'
+                    }).fail(function(error) {
+                        console.log('Ease not saved, error:', error);
+                    });
+                }
+            });
+        updateCounts();
     });
 });

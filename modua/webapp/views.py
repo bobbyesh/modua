@@ -14,7 +14,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from api.models import Article, PublicWord, PublicDefinition, UserWord, UserDefinition
 from webapp.forms import ArticleForm
-
+from core.services import YouDaoAPI
+from core.utils import is_valid_word
 
 @method_decorator(login_required, name='dispatch')
 class HomeView(FormView, LoginRequiredMixin):
@@ -44,16 +45,45 @@ class HomeView(FormView, LoginRequiredMixin):
                 user_word, created = UserWord.objects.get_or_create(word=token, owner=user)
                 user_word.articles.add(article)
                 if created:
-                    for public_word in PublicWord.objects.filter(word=token):
-                        for public_definition in PublicDefinition.objects.filter(word=public_word):
-                            UserDefinition.objects.get_or_create(
-                                word=user_word,
-                                owner=user,
-                                definition=public_definition.definition,
-                                pinyin=public_definition.pinyin
-                            )
+                    user_word.ease = 0
+                    user_word.save()
+                    public_words = PublicWord.objects.filter(word=user_word.word)
+                    if public_words:
+                        self.load_user_data_with_public_data(public_words, user_word)
+                    else:
+                        HomeView.load_public_data_with_api_data(token)
+                        public_words = PublicWord.objects.filter(word=user_word.word)
+                        self.load_user_data_with_public_data(public_words, user_word)
 
         return super(HomeView, self).form_valid(form)
+
+    def load_user_data_with_public_data(self, public_words, user_word):
+        """For all words in public_words, find their public definitions and save them as
+        user definitions.  Associate the new definitions with the user_word and owner.
+        
+        """
+        for public_word in public_words:
+            for public_definition in PublicDefinition.objects.filter(word=public_word):
+                UserDefinition.objects.get_or_create(
+                    word=user_word,
+                    owner=self.request.user,
+                    definition=public_definition.definition,
+                    pinyin=public_definition.pinyin
+                )
+
+    @staticmethod
+    def load_public_data_with_api_data(word):
+        if not is_valid_word(word):
+            return
+        else:
+            api_response = YouDaoAPI.get_word(word)
+            if 'definitions' in api_response:
+                definitions = api_response['definitions']
+                pinyin = api_response['pinyin']
+                public_word, _ = PublicWord.objects.get_or_create(word=word)
+                for definition in definitions:
+                    PublicDefinition.objects.get_or_create(word=public_word, definition=definition, pinyin=pinyin)
+                    print(definition)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -64,18 +94,18 @@ class ArticleView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
         article = Article.objects.get(slug=self.kwargs['slug'], owner=self.request.user)
-        userwords = article.userword_set.all()
+        user_words = article.userword_set.all()
         words = []
         for word in article.as_tokens():
             try:
-                userword = userwords.get(word=word)
+                user_word = user_words.get(word=word)
             except ObjectDoesNotExist:
-                userword = word
+                user_word = word
 
-            words.append(userword)
+            words.append(user_word)
 
         entries = []
-        for word in userwords:
+        for word in user_words:
             definitions = word.userdefinition_set.all()
             unique_pinyins = set(d.pinyin for d in definitions)
             pinyin_definitions = []
@@ -87,6 +117,7 @@ class ArticleView(TemplateView):
                 'entry': word,
                 'pinyin_definitions': pinyin_definitions,
             })
+
 
         context['total_word_count'] = len(words)
         context['article_words'] = words

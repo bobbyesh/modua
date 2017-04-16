@@ -17,3 +17,4 @@ modua/modua/requirements/cedict_1_0_ts_utf-8_mdbg.txt
 *.log
 *.pyc
 local_settings.py
+modua/modua/local_settings.py

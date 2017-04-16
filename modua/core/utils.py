@@ -127,6 +127,7 @@ def all_combinations(string):
 
 
 def is_punctuation(char):
+    """We use unicode data here because it also includes CJK punctuation."""
     if len(char) != 1:
         return False
     return unicodedata.category(char).startswith('P')
@@ -139,3 +140,7 @@ def tokenize_text(text):
         tokens += p.parse(string)
 
     return tokens
+
+
+def is_valid_word(word: str):
+    return not is_punctuation(word) and word.strip()

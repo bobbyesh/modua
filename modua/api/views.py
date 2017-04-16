@@ -26,8 +26,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from core.services import fetch_article
-from .models import PublicDefinition, UserDefinition, Article, PublicWord, UserWord
+from .models import PublicDefinition, UserDefinition, PublicWord, UserWord
 from .filters import (
     PublicWordFilter,
     PublicDefinitionFilter,
@@ -161,23 +160,6 @@ class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'word'
 
 
-class URLImportView(APIView, LoginRequiredMixin):
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (AllowAny,)
-
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        url = request.data['url']
-        article = Article.objects.filter(url=url)
-        if not article:
-            title, text = fetch_article(url)
-            Article.objects.create(title=title, text=text, url=url, owner=user)
-            return Response(status=status.HTTP_200_OK)
-
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
 class PublicArticleView(APIView):
     """Requires 'title' and 'text' query parameters"""
     permission_classes = (AllowAny,)
@@ -204,7 +186,6 @@ class PublicArticleView(APIView):
 
         return Response(data)
 
-
     def parse_into_json(self, text):
         title_words = []
         parser_results = (p for p in parser.parse(text) if not p.isspace())
@@ -216,9 +197,8 @@ class PublicArticleView(APIView):
             elif len(words) == 1:
                 word = words[0].word
                 pinyin = [words[0].pinyin]
-            elif len(words) <= 0:
+            else:
                 word = segment
-                definitions = []
                 pinyin = []
 
             definitions = [d.definition for d in PublicDefinition.objects.filter(word__word=word)]
