@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from core.exceptions import Raise403
 from wordfencer.parser import ChineseParser
+from api import models
 
 
 def get_object_or_403(model, message='HTTP 403: Forbidden', **kwargs):
@@ -142,5 +143,8 @@ def tokenize_text(text):
     return tokens
 
 
-def is_valid_word(word: str):
+def is_valid_word(word):
+    type_ = type(word)
+    if type_ is models.UserWord or type_ is models.PublicWord:
+        word = word.word
     return not is_punctuation(word) and word.strip()

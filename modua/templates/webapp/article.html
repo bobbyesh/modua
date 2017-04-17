@@ -21,10 +21,10 @@
             </h3>
             <p>
                 {% for entry in article_words %}
-                    {% if entry.ease != None %}
-                        <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry }}">{{ entry }}</span>
-                    {% else %}
-                        {{ entry }}
+                    {% if entry.word %}
+                        <span class="entry ease-{{ entry.word.ease }}" data-ease={{ entry.word.ease }} name="{{ entry.word }}">{{ entry.word }}</span>
+                    {% elif entry.other %}
+                        <span class="entry">{{ entry.other }}</span>
                     {%  endif %}
                 {% endfor %}
             </p>

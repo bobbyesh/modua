@@ -1,11 +1,8 @@
-from collections import Counter, defaultdict
-from django.shortcuts import redirect
-from django.contrib.auth import logout
+from collections import Counter
 from django.core.urlresolvers import reverse_lazy
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
@@ -118,8 +115,7 @@ class ArticleView(TemplateView):
                 'pinyin_definitions': pinyin_definitions,
             })
 
-
-        context['total_word_count'] = len(words)
+        words = [{'word': word} if is_valid_word(word) else {'other': word} for word in words]
         context['article_words'] = words
         context['dictionary_entries'] = entries
         # The e.ease int is turned into a string because Django templates don't like
