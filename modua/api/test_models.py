@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import PublicDefinition, User, Article, PublicWord
+from .models import PublicDefinition, User, Article, Word
 
 
 class ArticleTestCase(TestCase):
@@ -11,7 +11,7 @@ class ArticleTestCase(TestCase):
 
 class PublicDefinitionPublicWordTestCase(TestCase):
     def test_create(self):
-        word = PublicWord.objects.create(word='hey')
+        word = Word.objects.create(word='hey')
         PublicDefinition.objects.create(word=word, definition='bar')
         result = PublicDefinition.objects.all()
         self.assertTrue(len(result) == 1)

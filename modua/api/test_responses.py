@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.core.urlresolvers import reverse
-from .models import User, PublicWord, UserWord, UserDefinition, PublicDefinition
+from .models import User, Word, UserWordData, Definition, PublicDefinition
 
 
 
@@ -12,8 +12,8 @@ class UserDefinitionDetailTestCase(APITestCase):
         username = 'john'
         password = 'password'
         john = User.objects.create_user(username=username, email='jdoe@gmail.com', password=password)
-        word = UserWord.objects.create(word='foo', owner=john)
-        definition = UserDefinition.objects.create(word=word, definition='bar', owner=john)
+        word = UserWordData.objects.create(word='foo', owner=john)
+        definition = Definition.objects.create(word=word, definition='bar', owner=john)
 
         token = Token.objects.get(user__username=username)
         client = APIClient()
@@ -38,7 +38,7 @@ class UserDefinitionDetailTestCase(APITestCase):
         self.assertQuerysetEqual(queryset, [])
 
     def test_can_not_delete_public(self):
-        word = PublicWord.objects.create(word='notfoo')
+        word = Word.objects.create(word='notfoo')
         PublicDefinition.objects.create(
             word=word,
             definition='api:public',
@@ -59,7 +59,7 @@ class TestPublicRequests(APITestCase):
 
     def setUp(self):
         for chinese_word, english_word in [("我", "I"), ("爱", "love"), ("中国", "China")]:
-            word = PublicWord.objects.create(word=chinese_word)
+            word = Word.objects.create(word=chinese_word)
             definition = PublicDefinition.objects.create(definition=english_word, word=word)
 
 

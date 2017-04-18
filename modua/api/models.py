@@ -43,12 +43,26 @@ class Article(Ownable, models.Model):
     def preview(self):
         return str(self.body)[:50] + ' ...'
 
-    def as_tokens(self):
+    @property
+    def tokens(self):
         return parser.parse(self.body)
 
+    @property
+    def words(self):
+        for token in self.tokens:
+            word, _ = Word.objects.get_or_create(word=token)
+            yield word
 
-class UserWord(Ownable, models.Model):
+
+class Word(models.Model):
     word = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.word
+
+
+class UserWordData(Ownable, models.Model):
+    word = models.ForeignKey(Word)
     ease = models.IntegerField(default=0)
     articles = models.ManyToManyField(Article)
 
@@ -59,27 +73,8 @@ class UserWord(Ownable, models.Model):
         return self.word
 
 
-class UserDefinition(Ownable, models.Model):
-    word = models.ForeignKey(UserWord)
-    definition = models.CharField(max_length=512)
-    pinyin = models.CharField(max_length=512, blank=False)
-
-    class Meta:
-        unique_together = ('owner', 'word', 'definition',)
-
-    def __str__(self):
-        return self.definition
-
-
-class PublicWord(models.Model):
-    word = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.word
-
-
-class PublicDefinition(models.Model):
-    word = models.ForeignKey(PublicWord)
+class Definition(Ownable, models.Model):
+    word = models.ForeignKey(Word)
     definition = models.CharField(max_length=512)
     pinyin = models.CharField(max_length=512, blank=False)
 

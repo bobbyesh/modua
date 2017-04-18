@@ -1,6 +1,6 @@
 from django.test import TestCase
-from api.filters import PublicWordFilter, UserWordFilter, PublicDefinitionFilter, UserDefinitionFilter
-from api.models import PublicWord, UserWord, PublicDefinition, UserDefinition
+from api.filters import PublicWordFilter, UserWordDataFilter, PublicDefinitionFilter, DefinitionFilter
+from api.models import Word, UserWordData, PublicDefinition, Definition
 from django.contrib.auth.models import User
 
 class FilterTestMixin(object):
@@ -12,10 +12,10 @@ class FilterTestMixin(object):
             create_fields['owner'] = user
 
         if self.model == PublicDefinition:
-            word = PublicWord.objects.create(word=create_fields.pop('word'))
+            word = Word.objects.create(word=create_fields.pop('word'))
             create_fields['word'] = word
-        elif self.model == UserDefinition:
-            word = UserWord.objects.create(word=create_fields.pop('word'))
+        elif self.model == Definition:
+            word = UserWordData.objects.create(word=create_fields.pop('word'))
             create_fields['word'] = word
 
         try:
@@ -43,14 +43,14 @@ class FilterTestMixin(object):
 
 
 class PublicWordFilterTestCase(FilterTestMixin, TestCase):
-    model = PublicWord
+    model = Word
     filter = PublicWordFilter
     field_vals = {'word': 'foo', 'pinyin': 'phauew'}
 
 
 class UserWordFilterTestCase(FilterTestMixin, TestCase):
-    model = UserWord
-    filter = UserWordFilter
+    model = UserWordData
+    filter = UserWordDataFilter
     field_vals = {
         'word': 'foo',
         'pinyin': 'phauew',
@@ -69,8 +69,8 @@ class PublicDefinitionFilterTestCase(FilterTestMixin, TestCase):
 
 
 class UserDefinitionFilterTestCase(FilterTestMixin, TestCase):
-    model = UserDefinition
-    filter = UserDefinitionFilter
+    model = Definition
+    filter = DefinitionFilter
     field_vals = {
         'api:username': 'john',
         'word': 'foo',

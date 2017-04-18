@@ -145,6 +145,6 @@ def tokenize_text(text):
 
 def is_valid_word(word):
     type_ = type(word)
-    if type_ is models.UserWord or type_ is models.PublicWord:
+    if type_ is models.UserWordData or type_ is models.Word:
         word = word.word
     return not is_punctuation(word) and word.strip()

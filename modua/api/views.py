@@ -26,16 +26,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from .models import PublicDefinition, UserDefinition, PublicWord, UserWord
+from .models import Definition, Word, UserWordData
 from .filters import (
     PublicWordFilter,
-    PublicDefinitionFilter,
     OwnerOnlyFilter,
     WordFilter,
-    UserWordFilter,
-    UserDefinitionFilter
+    UserWordDataFilter,
+    DefinitionFilter
 )
-from .serializers import PublicDefinitionSerializer, PublicWordSerializer, UserWordSerializer, UserDefinitionSerializer
+from .serializers import PublicWordSerializer, UserWordDataSerializer, DefinitionSerializer
 from .permissions import OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange
 
 
@@ -50,34 +49,19 @@ def api_root(request, format=None):
         })
 
 
-class PublicDefinitionViewSet(viewsets.ReadOnlyModelViewSet):
-    """Defines a list view for the `PublicDefinition` model that is publically accessible.
-
-    This view should be read-only, as public information should be protected from deletion.
-    This means that only the GET method need be supported.
-
-    """
-    queryset = PublicDefinition.objects.all()
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (AllowAny,)
-    serializer_class = PublicDefinitionSerializer
-    filter_backends = (DjangoFilterBackend, WordFilter)
-    filter_class = PublicDefinitionFilter
-
-
-class UserDefinitionViewSet(viewsets.ModelViewSet):
+class DefinitionViewSet(viewsets.ModelViewSet):
     """Defines a list view for the `Definition` model that is only accessible by an authenticated user.
 
     This view should allow the creation and reading of definitions because user's can create and read definitions
     they have saved for themselves.
 
     """
-    queryset = UserDefinition.objects.all()
+    queryset = Definition.objects.all()
     authentication_classes = (TokenAuthentication, SessionAuthentication,)
     permission_classes = (OnlyOwnerCanAccess,)
-    serializer_class = UserDefinitionSerializer
+    serializer_class = DefinitionSerializer
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter, WordFilter,)
-    filter_class = UserDefinitionFilter
+    filter_class = DefinitionFilter
 
     def create(self, request, *args, **kwargs):
         """Example POST data:
@@ -90,12 +74,12 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
 
         """
         pinyin = request.data['pinyin']
-        word = UserWord.objects.get(
+        word = UserWordData.objects.get(
             word=request.data['word'],
             owner=request.user,
         )
         definition = request.data['definition']
-        definition, _ = UserDefinition.objects.get_or_create(
+        definition, _ = Definition.objects.get_or_create(
             word=word,
             owner=request.user,
             definition=definition,
@@ -125,7 +109,7 @@ class UserDefinitionViewSet(viewsets.ModelViewSet):
         Will throw 404 if definition doesn't exist.
         """
 
-        definition = get_object_or_404(UserDefinition, id=kwargs['pk'], owner=request.user)
+        definition = get_object_or_404(Definition, id=kwargs['pk'], owner=request.user)
         definition.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -136,11 +120,11 @@ class UserWordViewSet(viewsets.ModelViewSet):
     The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as
     time passes.
     """
-    queryset = UserWord.objects.all()
+    queryset = UserWordData.objects.all()
     authentication_classes = (SessionAuthentication,)
     permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
-    serializer_class = UserWordSerializer
-    filter_class = UserWordFilter
+    serializer_class = UserWordDataSerializer
+    filter_class = UserWordDataFilter
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     lookup_field = 'word'
 
@@ -152,7 +136,7 @@ class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
     words, this only the GET method is supported.
 
     """
-    queryset = PublicWord.objects.all()
+    queryset = Word.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = PublicWordSerializer
     filter_backends = (DjangoFilterBackend,)
@@ -190,7 +174,7 @@ class PublicArticleView(APIView):
         title_words = []
         parser_results = (p for p in parser.parse(text) if not p.isspace())
         for i, segment in enumerate(parser_results):
-            words = PublicWord.objects.filter(word=segment)
+            words = Word.objects.filter(word=segment)
             if len(words) > 1:
                 word = words[0].word
                 pinyin = [w.pinyin for w in words]

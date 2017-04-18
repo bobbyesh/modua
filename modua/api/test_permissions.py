@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from api.models import User, UserWord, UserDefinition, PublicWord, PublicDefinition
+from api.models import User, UserWordData, Definition, Word, PublicDefinition
 from django.core.urlresolvers import reverse
 from rest_framework.authtoken.models import Token
 
@@ -12,9 +12,9 @@ class OwnerPermissionsTestCase(APITestCase):
 
     def setUp(self):
         john = User.objects.create_user(username='john', password='password')
-        word = UserWord.objects.create(owner=john, word='foo', ease='easy')
-        definition = UserDefinition.objects.create(word=word, definition='bar')
-        word = PublicWord.objects.create(word='api:public')
+        word = UserWordData.objects.create(owner=john, word='foo', ease='easy')
+        definition = Definition.objects.create(word=word, definition='bar')
+        word = Word.objects.create(word='api:public')
         definition = PublicDefinition.objects.create(word=word, definition='should be okay')
         sally = User.objects.create_user(username='sally', password='password')
 

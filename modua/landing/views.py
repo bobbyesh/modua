@@ -11,7 +11,7 @@ from wordfencer.parser import ChineseParser
 
 
 from .forms import SignupForm, AnnotationForm, SigninForm
-from api.models import PublicDefinition, UserWord, UserDefinition
+from api.models import UserWordData, Definition
 from core.utils import build_popup_html, build_word_html
 
 
@@ -98,7 +98,7 @@ class AnnotationView(FormView):
     def get_definitions_or_empty(self, word):
         s = ''
         try:
-            definitions = PublicDefinition.objects.filter(word=word)
+            definitions = Definition.objects.filter(word=word)
             unique_definitions = list(set([x.definition for x in definitions]))
             for definition in unique_definitions:
                 s += definition + ' / '
@@ -130,7 +130,7 @@ class DeleteAccountSuccessView(TemplateView):
     template_name = 'landing/delete_account_success.html'
 
     def get(self, request, *args, **kwargs):
-        UserDefinition.objects.filter(owner=request.user).delete()
-        UserWord.objects.filter(owner=request.user).delete()
+        Definition.objects.filter(owner=request.user).delete()
+        UserWordData.objects.filter(owner=request.user).delete()
         request.user.delete()
         return super().get(request, *args, **kwargs)

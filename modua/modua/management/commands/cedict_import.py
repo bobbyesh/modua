@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 from tqdm import tqdm
-from api.models import PublicDefinition, PublicWord
+from api.models import Definition, Word
 from . import cedict_parser
 
 
@@ -26,8 +26,8 @@ def store_def_boi(word, trans, def_arr):
     # If there is more than one definition insert them both as different rows
     for definition in def_arr:
         try:
-            word_obj, created = PublicWord.objects.get_or_create(word=word, defaults={'word': word})
-            PublicDefinition.objects.create(word=word_obj, definition=definition, pinyin=trans)
+            word_obj, created = Word.objects.get_or_create(word=word, defaults={'word': word})
+            Definition.objects.create(word=word_obj, definition=definition, pinyin=trans)
         except IntegrityError as e:
             print(e)
 

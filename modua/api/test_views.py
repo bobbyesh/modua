@@ -6,7 +6,7 @@ from mock import patch
 from django.core.urlresolvers import reverse
 
 from .serializers import PublicDefinitionSerializer
-from .models import PublicDefinition, User, PublicWord, UserDefinition, UserWord
+from .models import PublicDefinition, User, Word, Definition, UserWordData
 from .views import PublicArticleView
 
 
@@ -16,7 +16,7 @@ DEBUG = True
 class PublicDefinitionListViewTestCase(APITestCase):
 
     def setUp(self):
-        self.word = PublicWord.objects.create(word='foo')
+        self.word = Word.objects.create(word='foo')
         definition = PublicDefinition.objects.create(word=self.word, definition='bar')
         self.client = APIClient()
 
@@ -55,8 +55,8 @@ class UserDefinitionListViewTestCase(APITestCase):
         token = Token.objects.get(user__username='john')
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        word = UserWord.objects.create(word='foo', owner=self.user)
-        self.definition = UserDefinition.objects.create(owner=self.user, word=word, definition='bar')
+        word = UserWordData.objects.create(word='foo', owner=self.user)
+        self.definition = Definition.objects.create(owner=self.user, word=word, definition='bar')
 
     def test_read(self):
         kwargs={'pk': self.definition.pk}
@@ -85,33 +85,33 @@ class UserWordTestCase(APITestCase):
         url = reverse('api:user-word-list')
         response = self.client.post(url, kwargs)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
-        words = UserWord.objects.all()
-        queryset = UserWord.objects.filter(owner=self.user, word='foo')
+        words = UserWordData.objects.all()
+        queryset = UserWordData.objects.filter(owner=self.user, word='foo')
         self.assertTrue(len(queryset) == 1)
         self.assertTrue(str(queryset[0].word) == 'foo')
 
 
     def test_delete(self):
-        word = UserWord.objects.create(word='foo', owner=self.user)
+        word = UserWordData.objects.create(word='foo', owner=self.user)
         url = reverse('api:user-word-detail', kwargs={'word': 'foo'})
         response = self.client.delete(url)
         self.assertEquals(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        words = UserWord.objects.filter(word='foo', owner=self.user)
+        words = UserWordData.objects.filter(word='foo', owner=self.user)
         self.assertEqual(len(words), 0)
 
 
     def test_update(self):
-        word = UserWord.objects.create(word='foo', owner=self.user)
+        word = UserWordData.objects.create(word='foo', owner=self.user)
         url = reverse('api:user-word-detail', kwargs={'word': 'foo'})
         response = self.client.patch(url, {'ease': 'hard'})
-        queryset = UserWord.objects.filter(owner=self.user, word='foo')
+        queryset = UserWordData.objects.filter(owner=self.user, word='foo')
         self.assertTrue(str(queryset[0].ease) == 'hard')
 
 
 class PublicWordListTestCase(APITestCase):
     def setUp(self):
-        word = PublicWord.objects.create(word='foo')
+        word = Word.objects.create(word='foo')
 
     def test_read(self):
         self.client = APIClient()
@@ -122,7 +122,7 @@ class PublicWordListTestCase(APITestCase):
 
 class PublicArticleViewTestCase(APITestCase):
     def setUp(self):
-        word = PublicWord.objects.create(word='你好', pinyin='nǐ hǎo')
+        word = Word.objects.create(word='你好', pinyin='nǐ hǎo')
         definition = PublicDefinition.objects.create(definition='hello', word=word)
 
         factory = APIRequestFactory()

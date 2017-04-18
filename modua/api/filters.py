@@ -1,40 +1,31 @@
 # filters.py
 import django_filters
 from rest_framework import filters
-from .models import PublicWord, PublicDefinition, UserWord, UserDefinition
+from .models import Word, UserWordData, Definition
 from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
 
 
 class PublicWordFilter(filters.FilterSet):
     class Meta:
-        model = PublicWord
+        model = Word
         fields = ['word', 'id']
 
 
-class UserWordFilter(filters.FilterSet):
+class UserWordDataFilter(filters.FilterSet):
     username = django_filters.CharFilter(name='owner__username')
     article = django_filters.NumberFilter(name='articles__id')
 
     class Meta:
-        model = UserWord
+        model = UserWordData
         fields = ['word', 'id', 'username', 'ease']
 
 
-class PublicDefinitionFilter(filters.FilterSet):
-    word = django_filters.CharFilter(name='word__word')
-
-    class Meta:
-        model = PublicDefinition
-        fields = ['word', 'definition', 'id']
-
-
-class UserDefinitionFilter(filters.FilterSet):
+class DefinitionFilter(filters.FilterSet):
     word = django_filters.CharFilter(name='word__word')
     username = django_filters.CharFilter(name='owner__username')
 
     class Meta:
-        model = UserDefinition
+        model = Definition
         fields = ['word', 'definition', 'id', 'username']
 
 
