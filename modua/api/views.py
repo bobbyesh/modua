@@ -7,10 +7,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
 from rest_framework.filters import DjangoFilterBackend
-
 from rest_framework.exceptions import ValidationError
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from django.core.exceptions import ValidationError
 from .models import Definition, Word, UserWordData
 from .filters import (
@@ -60,12 +60,7 @@ class DefinitionViewSet(viewsets.ModelViewSet):
 
         """
         pinyin = request.data['pinyin']
-
-        word_obj = Word.objects.get_or_create(word=request.data['word'])
-        user_word = UserWordData.objects.get(
-            word=word_obj,
-            owner=request.user,
-        )
+        user_word, _ = Word.objects.get_or_create(word=request.data['word'])
         definition = request.data['definition']
         definition, _ = Definition.objects.get_or_create(
             word=user_word,
@@ -77,7 +72,6 @@ class DefinitionViewSet(viewsets.ModelViewSet):
             'word': {
                 'id': user_word.id,
                 'word': user_word.word,
-                'ease': user_word.ease,
             },
             'definition': definition.definition,
             'id': definition.id,
@@ -100,6 +94,11 @@ class DefinitionViewSet(viewsets.ModelViewSet):
         definition = get_object_or_404(Definition, id=kwargs['pk'], owner=request.user)
         definition.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def list(self, request, *args, **kwargs):
+        definitions = Definition.objects.filter(Q(owner=request.user) | Q(owner=None))
+        serialized = DefinitionSerializer(definitions, many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
 
 
 class UserWordDataViewSet(viewsets.ModelViewSet):

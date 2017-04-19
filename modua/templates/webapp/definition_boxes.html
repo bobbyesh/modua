@@ -26,10 +26,12 @@
                 <li data-public-id="{{ definition.id }}">{{ definition }} <button class="glyphicon glyphicon-plus add"></button></li>
             {% endfor %}
         </ul>
+    {% endfor %}
+
         <button type="submit" class="btn btn-primary easy-button" id="easy-button-1" target-class="ease-1">hard</button>
         <button type="submit" class="btn btn-primary easy-button" id="easy-button-2" target-class="ease-2">easy</button>
         <button type="submit" class="btn btn-primary easy-button" id="easy-button-3" target-class="ease-3">known</button>
-      </div>
-    {% endfor %}
+    </div>
+
 {% endfor %}
 </div>

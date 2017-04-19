@@ -119,7 +119,7 @@ $(document).ready(function() {
             pinyin: pinyin,
             word: word
         };
-        var url = window.location.origin + '/api/user/definitions/';
+        var url = window.location.origin + '/api/definitions/';
         var ancestor = $('#POST-definition-form-' + word).parent();
         var request = $.ajax({
             url: url,

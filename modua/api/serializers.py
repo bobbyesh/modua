@@ -3,10 +3,10 @@ from .models import Word, Definition, UserWordData
 
 
 class WordSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Word
-        fields = ('word', 'id')
-        depth = 1
+        fields = ('word', 'id',)
 
 
 class UserWordDataSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class UserWordDataSerializer(serializers.ModelSerializer):
 
 
 class DefinitionSerializer(serializers.ModelSerializer):
-    word = UserWordDataSerializer()
+    word = WordSerializer()
 
     class Meta:
         model = Definition
