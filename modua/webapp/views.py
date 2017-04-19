@@ -46,9 +46,48 @@ class ArticleView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
         article = Article.objects.get(slug=self.kwargs['slug'], owner=self.request.user)
-        datas = []
+        article_words = []
+        dictionary_entries = []
         for word in article.words:
-            print(word)
+            if is_valid_word(word):
+                datum, created = UserWordData.objects.get_or_create(word=word, owner=self.request.user)
+                if created:
+                    datum.ease = 0
+                    datum.save()
+
+                definitions = Definition.objects.filter(word=word)
+                # TODO: Make a more sophisticated decision process for API calls
+                # We go to the YouDao api if we can't find any definitions for this word
+                if not definitions:
+                    api_data = YouDaoAPI.get_word(word)
+                    for definition in api_data['definitions']:
+                        pinyin = api_data['pinyin']
+                        Definition.objects.create(word=word, definition=definition, pinyin=pinyin, owner=None)
+
+                user_definitions = Definition.objects.filter(word=word, owner=self.request.user)
+                public_definitions = Definition.objects.filter(word=word, owner=None)
+                entry = dict()
+                pinyins = Definition.objects.filter(word=word).values('pinyin').distinct()
+                if pinyins:
+                    entry['entry'] = word
+                    entry['pinyin_groups'] = []
+                    for pinyin in pinyins:
+                        pinyin = pinyin['pinyin']
+                        pinyin_group = {
+                            'pinyin': pinyin,
+                            'user_definitions': user_definitions.filter(pinyin=pinyin),
+                            'public_definitions': public_definitions.filter(pinyin=pinyin),
+                        }
+                        entry['pinyin_groups'].append(pinyin_group)
+                if entry:
+                    dictionary_entries.append(entry)
+            else:
+                datum = word
+
+            article_words.append(datum)
+
+        context['dictionary_entries'] = dictionary_entries
+        context['article_words'] = article_words
         return context
 
 

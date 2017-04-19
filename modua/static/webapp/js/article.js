@@ -42,13 +42,15 @@ $(document).ready(function() {
     $('span.entry').click(function(e){
       var name = $(this).attr('name');
       var selector = 'div.definition[data-word="' + name + '"]';
+
+      // Close all definitions because we only want one open at a time
       $('div.definition').hide();
 
       var definition = $(selector);
+      console.log(selector);
       definition.css('top', e.pageY + moveDown).css('left', e.pageX + moveLeft);
       definition.show();
     });
-
 });
 
 

@@ -46,6 +46,11 @@ class YouDaoAPI(object):
 
     @staticmethod
     def get_word(word):
+        if type(word) is not str:
+            try:
+                word = str(word)
+            except ValueError:
+                raise ValueError('word arg in YouDaoAPI.get_word must be str or have __str__ defined')
         json = YouDaoAPI.get_json(word)
         if 'basic' not in json:
             raise Exception('This request did not return basic definitions.  '

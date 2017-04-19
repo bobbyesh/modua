@@ -22,9 +22,9 @@
             <p>
                 {% for entry in article_words %}
                     {% if entry.word %}
-                        <span class="entry ease-{{ entry.word.ease }}" data-ease={{ entry.word.ease }} name="{{ entry.word }}">{{ entry.word }}</span>
-                    {% elif entry.other %}
-                        <span class="entry">{{ entry.other }}</span>
+                        <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry.word }}">{{ entry.word }}</span>
+                    {% else %}
+                        <span class="entry">{{ entry }}</span>
                     {%  endif %}
                 {% endfor %}
             </p>

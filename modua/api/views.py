@@ -1,14 +1,3 @@
-from rest_framework.generics import (
-    ListAPIView,
-    UpdateAPIView,
-    RetrieveUpdateAPIView,
-    RetrieveAPIView,
-    RetrieveDestroyAPIView,
-    RetrieveUpdateDestroyAPIView,
-    CreateAPIView,
-    DestroyAPIView,
-)
-
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -18,14 +7,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.reverse import reverse
 from rest_framework.filters import DjangoFilterBackend
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
-from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
-from rest_framework.exceptions import NotFound, ValidationError
-from django.contrib.auth.mixins import LoginRequiredMixin
+
+from rest_framework.exceptions import ValidationError
 from wordfencer.parser import ChineseParser
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from .models import Definition, Word, UserWordData
 from .filters import (
     PublicWordFilter,
@@ -74,22 +60,24 @@ class DefinitionViewSet(viewsets.ModelViewSet):
 
         """
         pinyin = request.data['pinyin']
-        word = UserWordData.objects.get(
-            word=request.data['word'],
+
+        word_obj = Word.objects.get_or_create(word=request.data['word'])
+        user_word = UserWordData.objects.get(
+            word=word_obj,
             owner=request.user,
         )
         definition = request.data['definition']
         definition, _ = Definition.objects.get_or_create(
-            word=word,
+            word=user_word,
             owner=request.user,
             definition=definition,
             pinyin=pinyin
         )
         data = {
             'word': {
-                'id': word.id,
-                'word': word.word,
-                'ease': word.ease,
+                'id': user_word.id,
+                'word': user_word.word,
+                'ease': user_word.ease,
             },
             'definition': definition.definition,
             'id': definition.id,
