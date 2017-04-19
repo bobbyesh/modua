@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Word, Definition, UserWordData
 
 
-class PublicWordSerializer(serializers.ModelSerializer):
+class WordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Word
         fields = ('word', 'id')
@@ -13,6 +13,7 @@ class UserWordDataSerializer(serializers.ModelSerializer):
     owner = serializers.HiddenField(
         default=serializers.CurrentUserDefault(),
     )
+    word = WordSerializer()
 
     class Meta:
         model = UserWordData

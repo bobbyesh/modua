@@ -20,7 +20,7 @@ from .filters import (
     UserWordDataFilter,
     DefinitionFilter
 )
-from .serializers import PublicWordSerializer, UserWordDataSerializer, DefinitionSerializer
+from .serializers import WordSerializer, UserWordDataSerializer, DefinitionSerializer
 from .permissions import OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange
 
 
@@ -102,7 +102,7 @@ class DefinitionViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserWordViewSet(viewsets.ModelViewSet):
+class UserWordDataViewSet(viewsets.ModelViewSet):
     """Defines a view for users to create, modify, or delete a single word in their account.
 
     The primary use of this view is adding a word to a user's account and changing the `ease` of a stored word as a learner comes to know the word more as
@@ -110,11 +110,26 @@ class UserWordViewSet(viewsets.ModelViewSet):
     """
     queryset = UserWordData.objects.all()
     authentication_classes = (SessionAuthentication,)
-    permission_classes = (OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange)
+    permission_classes = (OnlyOwnerCanAccess, NoPutAllowed,)
     serializer_class = UserWordDataSerializer
     filter_class = UserWordDataFilter
     filter_backends = (DjangoFilterBackend, OwnerOnlyFilter,)
     lookup_field = 'word'
+
+    def retrieve(self, request, *args, **kwargs):
+        word = kwargs['word']
+        word_data = get_object_or_404(UserWordData, word__word=word, owner=request.user)
+        serialized = UserWordDataSerializer(word_data)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        print(request.data, args, kwargs)
+        word = kwargs['word']
+        word_data = get_object_or_404(UserWordData, word__word=word, owner=request.user)
+        word_data.ease = request.data['ease']
+        word_data.save()
+        serialized = UserWordDataSerializer(word_data)
+        return Response(serialized.data, status=status.HTTP_200_OK)
 
 
 class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
@@ -126,7 +141,7 @@ class PublicWordViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Word.objects.all()
     permission_classes = (AllowAny,)
-    serializer_class = PublicWordSerializer
+    serializer_class = WordSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = PublicWordFilter
     lookup_field = 'word'
@@ -173,7 +188,7 @@ class PublicArticleView(APIView):
                 word = segment
                 pinyin = []
 
-            definitions = [d.definition for d in PublicDefinition.objects.filter(word__word=word)]
+            definitions = [d.definition for d in Definition.objects.filter(word__word=word)]
             title_words.append({
                 'word': word,
                 'index': i,

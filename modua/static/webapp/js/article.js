@@ -92,6 +92,7 @@ $(document).ready(function() {
           $(selector).attr('data-ease', new_ease);
           // Make ajax to update DB
           var url = window.location.origin + '/api/user/words/' + word + '/';
+          console.log('ajax', url);
           var request = $.ajax({
               url: url,
               data: {
