@@ -39,8 +39,6 @@
                 </div>
             </div>
         </div>
-
-
         <div class="col-md-8">
             {% for article in articles %}
         					<h2>
@@ -52,8 +50,12 @@
         					<p>
         						<a class="btn" href="{{ article.get_absolute_url }}">View details »</a>
         					</p>
-          {% endfor %}
-			</div>
+            {% endfor %}
+        </div>
+        <div class="col-md-2">
+            <!-- Button trigger modal -->
+            <strong>Words you know:</strong> {{ known_words }}
+        </div>
     </div> <!-- row -->
     </div> <!-- container -->
   {% endblock %}

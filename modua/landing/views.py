@@ -55,65 +55,9 @@ class SignupView(CreateView):
         login(self.request, new_user)
         return valid
 
+
 class SignupSuccessView(TemplateView):
     template_name = 'landing/success.html'
-
-
-class AnnotationView(FormView):
-    template_name = 'landing/annotation.html'
-    form_class = AnnotationForm
-    success_url = reverse_lazy('annotate-complete')
-
-    def post(self, request, *args, **kwargs):
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        if form.is_valid():
-            text = form.cleaned_data['text']
-            request.session['text'] = text
-            parser = ChineseParser()
-            words = parser.parse(text)
-            popups = []
-            for idx, word in enumerate(words):
-                if len(word) > 1:
-                    word_html = build_word_html(word)
-                    words[idx] = word_html
-                    definitions = self.get_definitions_or_empty(word)
-                    popups.append(build_popup_html(word, definitions))
-                    # Any unicode category starting with a P is punctuation
-                elif not unicodedata.category(word).startswith('P'):
-                    word_html = build_word_html(word)
-                    words[idx] = word_html
-                    definitions = self.get_definitions_or_empty(word)
-                    popups.append(build_popup_html(word, definitions))
-
-            request.session['words'] = words
-            request.session['popups'] = popups
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-
-    def get_definitions_or_empty(self, word):
-        s = ''
-        try:
-            definitions = Definition.objects.filter(word=word)
-            unique_definitions = list(set([x.definition for x in definitions]))
-            for definition in unique_definitions:
-                s += definition + ' / '
-        except ObjectDoesNotExist:
-            pass
-        return s
-
-
-class AnnotationCompleteView(TemplateView):
-    template_name = 'landing/annotate_complete.html'
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        context['text'] = request.session['text']
-        context['words'] = request.session['words']
-        context['popups'] = request.session['popups']
-        return self.render_to_response(context)
 
 
 class LogoutView(TemplateView):

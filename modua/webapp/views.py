@@ -1,4 +1,3 @@
-from collections import defaultdict
 from django.core.urlresolvers import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -8,7 +7,7 @@ from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Q, Max
-from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 
 from api.models import Article, UserWordData, Definition, UserWordTimeStamp
 from webapp.forms import ArticleForm
@@ -28,6 +27,7 @@ class HomeView(FormView, LoginRequiredMixin):
         articles = self.request.user.api_article_owner.all()
         context['articles'] = articles
         context['user'] = self.request.user
+        context['known_words'] = UserWordData.objects.filter(owner=self.request.user, ease=3).count()
         return context
 
     def form_valid(self, form):
@@ -46,7 +46,7 @@ class ArticleView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ArticleView, self).get_context_data(**kwargs)
-        article = Article.objects.get(slug=self.kwargs['slug'], owner=self.request.user)
+        article = get_object_or_404(Article, id=self.kwargs['pk'], owner=self.request.user)
         article_words = []
         dictionary_entries = []
         for word in article.words:
@@ -136,25 +136,20 @@ class UserStatsView(TemplateView):
         context['word_counts']['easy'] = len(easy)
         context['word_counts']['known'] = len(known)
 
-        queryset = UserWordTimeStamp.objects.filter(owner=self.request.user)
+        queryset = UserWordTimeStamp.objects.all()
         context['learned_this_month'] = self.get_final_known_count(queryset.filter(timestamp__range=get_month_range()))
         context['learned_this_week'] = self.get_final_known_count(queryset.filter(timestamp__range=get_week_range()))
         context['learned_today'] = self.get_final_known_count(queryset.filter(timestamp__range=get_day_range()))
         return context
 
     def get_final_known_count(self, queryset):
+        queryset = queryset.filter(owner=self.request.user)
         words = queryset.values('word').distinct()
         count = 0
         for word in words:
             word = word['word']
-            most_recent_time = queryset.filter(word=word) \
-                                       .aggregate(Max('timestamp'))
+            most_recent_time = queryset.filter(word=word).aggregate(Max('timestamp'))
             most_recent_time = most_recent_time['timestamp__max']
-            try:
-                most_recent_instance = queryset.get(timestamp=most_recent_time, word=word)
-                if most_recent_instance.ease == 3:
-                    count += 1
-            except ObjectDoesNotExist:
-                pass
+            count += queryset.filter(timestamp=most_recent_time, word=word, ease=3).count()
 
         return count

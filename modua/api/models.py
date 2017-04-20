@@ -37,7 +37,7 @@ class Article(Ownable, models.Model):
         super(Article, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('webapp:article', kwargs={'slug': str(self.slug)})
+        return reverse('webapp:article', kwargs={'pk': self.id})
 
     @property
     def preview(self):
