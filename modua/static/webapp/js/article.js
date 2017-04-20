@@ -168,18 +168,20 @@ $(document).ready(function() {
             .addClass('ease-3')
             .attr('data-ease', KNOWN)
             .each(function(idx, word) {
-                var text = $(word).text();
-                var url = window.location.origin + '/api/user/words/' + text + '/';
+                var word = $(word).text();
+                var url = window.location.origin + '/api/user/words/' + word + '/';
+                console.log(word, url);
                 if (validator.isURL(url)) {
                     var request = $.ajax({
                         url: url,
                         data: {
+                            word: word,
                             ease: KNOWN
                         },
                         method: 'PATCH',
                         dataType: 'json'
                     }).fail(function(error) {
-                        console.log('Ease not saved, error:', error);
+                        console.log('Ease not saved, error:', error, 'for word:', word);
                     });
                 }
             });

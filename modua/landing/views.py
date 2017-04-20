@@ -9,10 +9,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic.edit import CreateView
 from wordfencer.parser import ChineseParser
 
-
 from .forms import SignupForm, AnnotationForm, SigninForm
 from api.models import UserWordData, Definition
-from core.utils import build_popup_html, build_word_html
 
 
 class IndexView(TemplateView):

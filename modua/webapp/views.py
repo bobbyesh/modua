@@ -1,7 +1,5 @@
-from collections import Counter
-from itertools import groupby
+from collections import defaultdict
 from django.core.urlresolvers import reverse_lazy
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
@@ -9,11 +7,14 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db.models import Q, Max
+from django.core.exceptions import ObjectDoesNotExist
 
-from api.models import Article, Word, UserWordData, Definition
+from api.models import Article, UserWordData, Definition, UserWordTimeStamp
 from webapp.forms import ArticleForm
 from core.services import YouDaoAPI
-from core.utils import is_valid_word
+from core.utils import is_valid_word, get_month_range, get_week_range, get_day_range
+
 
 @method_decorator(login_required, name='dispatch')
 class HomeView(FormView, LoginRequiredMixin):
@@ -50,37 +51,11 @@ class ArticleView(TemplateView):
         dictionary_entries = []
         for word in article.words:
             if is_valid_word(word):
-                datum, created = UserWordData.objects.get_or_create(word=word, owner=self.request.user)
-                if created:
-                    datum.ease = 0
-                    datum.save()
-
-                definitions = Definition.objects.filter(word=word)
-                # TODO: Make a more sophisticated decision process for API calls
-                # We go to the YouDao api if we can't find any definitions for this word
-                if not definitions:
-                    api_data = YouDaoAPI.get_word(word)
-                    for definition in api_data['definitions']:
-                        pinyin = api_data['pinyin']
-                        Definition.objects.create(word=word, definition=definition, pinyin=pinyin, owner=None)
-
-                user_definitions = Definition.objects.filter(word=word, owner=self.request.user)
-                public_definitions = Definition.objects.filter(word=word, owner=None)
-                entry = dict()
-                pinyins = Definition.objects.filter(word=word).values('pinyin').distinct()
-                if pinyins:
-                    entry['entry'] = word
-                    entry['pinyin_groups'] = []
-                    for pinyin in pinyins:
-                        pinyin = pinyin['pinyin']
-                        pinyin_group = {
-                            'pinyin': pinyin,
-                            'user_definitions': user_definitions.filter(pinyin=pinyin),
-                            'public_definitions': public_definitions.filter(pinyin=pinyin),
-                        }
-                        entry['pinyin_groups'].append(pinyin_group)
-                if entry:
-                    dictionary_entries.append(entry)
+                datum, _ = UserWordData.objects.get_or_create(word=word, owner=self.request.user)
+                definitions = self.get_definitions(word)
+                definitions.pinyin_list = [p['pinyin'] for p in definitions.values('pinyin').distinct()]
+                definitions.word = word
+                dictionary_entries.append(definitions)
             else:
                 datum = word
 
@@ -90,10 +65,29 @@ class ArticleView(TemplateView):
         context['article_words'] = article_words
         return context
 
+    def get_definitions(self, word):
+        definitions = Definition.objects.filter(word=word)
+        # TODO: Make a more sophisticated decision process for API calls
+        # We go to the YouDao api if we can't find any definitions for this word
+        if not definitions:
+            api_data = YouDaoAPI.get_word(word)
+            for definition in api_data['definitions']:
+                pinyin = api_data['pinyin']
+                Definition.objects.create(word=word, definition=definition, pinyin=pinyin, owner=None)
+
+        return Definition.objects.filter(word=word) \
+                                 .filter(Q(owner=self.request.user) | Q(owner=None))
+
 
 @method_decorator(login_required, name='dispatch')
 class AccountView(TemplateView):
     template_name = 'webapp/account.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['username'] = self.request.user.username
+        context['email'] = self.request.user.email
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -141,4 +135,26 @@ class UserStatsView(TemplateView):
         context['word_counts']['hard'] = len(hard)
         context['word_counts']['easy'] = len(easy)
         context['word_counts']['known'] = len(known)
+
+        queryset = UserWordTimeStamp.objects.filter(owner=self.request.user)
+        context['learned_this_month'] = self.get_final_known_count(queryset.filter(timestamp__range=get_month_range()))
+        context['learned_this_week'] = self.get_final_known_count(queryset.filter(timestamp__range=get_week_range()))
+        context['learned_today'] = self.get_final_known_count(queryset.filter(timestamp__range=get_day_range()))
         return context
+
+    def get_final_known_count(self, queryset):
+        words = queryset.values('word').distinct()
+        count = 0
+        for word in words:
+            word = word['word']
+            most_recent_time = queryset.filter(word=word) \
+                                       .aggregate(Max('timestamp'))
+            most_recent_time = most_recent_time['timestamp__max']
+            try:
+                most_recent_instance = queryset.get(timestamp=most_recent_time, word=word)
+                if most_recent_instance.ease == 3:
+                    count += 1
+            except ObjectDoesNotExist:
+                pass
+
+        return count

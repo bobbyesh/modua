@@ -69,6 +69,10 @@ class UserWordData(Ownable, models.Model):
     class Meta:
         unique_together = ('owner', 'word')
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        UserWordTimeStamp.objects.create(word=self.word, ease=self.ease, owner=self.owner)
+        super().save(force_insert, force_update, using, update_fields)
+
     def __str__(self):
         return self.word.word
 
@@ -80,3 +84,12 @@ class Definition(Ownable, models.Model):
 
     def __str__(self):
         return self.definition
+
+
+class UserWordTimeStamp(Ownable, models.Model):
+    ease = models.IntegerField(null=False)
+    timestamp = models.DateTimeField(auto_now=True)
+    word = models.ForeignKey(Word)
+
+    def __str__(self):
+        return '{} @ {}'.format(self.word, self.timestamp)

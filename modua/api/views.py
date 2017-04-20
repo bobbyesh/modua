@@ -21,7 +21,7 @@ from .filters import (
     DefinitionFilter
 )
 from .serializers import WordSerializer, UserWordDataSerializer, DefinitionSerializer
-from .permissions import OnlyOwnerCanAccess, NoPutAllowed, OnlyEaseCanChange
+from .permissions import OnlyOwnerCanAccess, NoPutAllowed
 
 
 parser = ChineseParser()
@@ -122,7 +122,6 @@ class UserWordDataViewSet(viewsets.ModelViewSet):
         return Response(serialized.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        print(request.data, args, kwargs)
         word = kwargs['word']
         word_data = get_object_or_404(UserWordData, word__word=word, owner=request.user)
         word_data.ease = request.data['ease']
