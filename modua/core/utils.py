@@ -94,8 +94,10 @@ def get_month_range():
 def get_week_range():
     now = datetime.now()
     weekday = calendar.weekday(now.year, now.month, now.day)
-    first = datetime(now.year, now.month, now.day - weekday - 1)
-    last = datetime(now.year, now.month, now.day + (6 - weekday - 1))
+    days_from_monday = timedelta(days=weekday)
+    days_until_sunday = timedelta(days=7-weekday)
+    first = now - days_from_monday
+    last = now + days_until_sunday
     return first, last
 
 

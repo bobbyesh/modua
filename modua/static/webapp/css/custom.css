@@ -1,14 +1,15 @@
+.nav {
+  background-color: transparent;
+  border-color: transparent; }
+
 .navbar {
   min-height: 85px;
   width: 100%;
   background-color: rgba(32, 166, 231, 0.8); }
 
-.navbar-row {
-  margin-right: -50px;
-  margin-left: -50px; }
-
 .navbar-header > a.navbar-brand {
-  font-size: 2em;
+  margin-left: 85px;
+  font-size: 2.75em;
   margin-top: 15px;
   color: white; }
 
@@ -17,6 +18,9 @@
   color: white;
   margin-top: 15px;
   margin-right: 5px; }
+
+.navbar-default .navbar-nav > li:last-child {
+  margin-right: 75px; }
 
 span.entry {
   font-size: 1.5em;
@@ -41,5 +45,18 @@ span.entry {
 
 .ease-3 {
   background-color: white; }
+
+body {
+  background-color: #E9E9E9; }
+
+#outer-container {
+  width: 100%; }
+
+#inner-content {
+  margin-top: 50px;
+  background-color: white;
+  padding: 50px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 24px 8px #ccc; }
 
 /*# sourceMappingURL=custom.css.map */
