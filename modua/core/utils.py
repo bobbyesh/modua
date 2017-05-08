@@ -82,7 +82,7 @@ def is_valid_word(word):
     type_ = type(word)
     if type_ is models.UserWordData or type_ is models.Word:
         word = word.word
-    return not is_punctuation(word) and word.strip()
+    return not is_punctuation(word.strip()) and word.strip() != ''
 
 
 def get_month_range():

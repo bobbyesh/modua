@@ -161,7 +161,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     $('#button-all-known').on('click', function(e) {
         e.preventDefault();
-        $('.entry')
+        $('.entry.ease-0, .entry.ease-1, .entry.ease-2')
             .removeClass('ease-0')
             .removeClass('ease-1')
             .removeClass('ease-2')

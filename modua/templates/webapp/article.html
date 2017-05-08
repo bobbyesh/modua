@@ -6,12 +6,12 @@
         <div class="col-md-2">
             <div class="article-info">
                 <h5>Unique Word Counts</h5>
-                <div>New: <strong><span class="ease-0" id="counter-0"></span></strong></div>
-                <div>Hard: <strong><span class="ease-1" id="counter-1"></span></strong></div>
-                <div>Easy: <strong><span class="ease-2" id="counter-2"></span></strong></div>
-                <div>Known: <strong><span class="ease-3" id="counter-3"></span></strong></div>
+                <div>New <strong><span class="ease-0" id="counter-0"></span></strong></div>
+                <div>Hard <strong><span class="ease-1" id="counter-1"></span></strong></div>
+                <div>Easy <strong><span class="ease-2" id="counter-2"></span></strong></div>
+                <div>Known <strong><span class="ease-3" id="counter-3"></span></strong></div>
                 <br>
-                <div>Total Count: <strong><span id="total-count"></span> </strong></div>
+                <div>Total Count <strong><span id="total-count"></span> </strong></div>
             </div>
         </div>
         <div class="col-md-8">
@@ -22,9 +22,9 @@
             <p>
                 {% for entry in article_words %}
                     {% if entry.word %}
-                        <span class="entry ease-{{ entry.ease }}" data-ease={{ entry.ease }} name="{{ entry.word }}">{{ entry.word }}</span>
+                        <span class="entry ease-{{ entry.ease }}" data-ease="{{ entry.ease }}" name="{{ entry.word }}">{{ entry.word }}</span>
                     {% else %}
-                        <span class="entry">{{ entry }}</span>
+                        <span>{{ entry }}</span>
                     {%  endif %}
                 {% endfor %}
             </p>

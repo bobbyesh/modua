@@ -57,6 +57,7 @@ class ArticleView(TemplateView):
                 definitions.word = word
                 dictionary_entries.append(definitions)
             else:
+                print(word)
                 datum = word
 
             article_words.append(datum)
